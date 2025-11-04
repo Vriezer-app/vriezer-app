@@ -1,5 +1,4 @@
 // Stap 1: Initialiseer Firebase
-// AANGEPAST: Gebruik dezelfde config-logica als auth.js
 const firebaseConfig = typeof __firebase_config !== 'undefined' 
     ? JSON.parse(__firebase_config) 
     : {
@@ -14,7 +13,7 @@ const firebaseConfig = typeof __firebase_config !== 'undefined'
 // Initialiseer Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth(); // NIEUW: Auth instance toevoegen
+const auth = firebase.auth();
 const itemsCollectie = db.collection('items');
 const ladesCollectie = db.collection('lades');
 
@@ -50,9 +49,14 @@ const ladesLijstV2 = document.getElementById('lades-lijst-v2');
 const logoutBtn = document.getElementById('logout-btn');
 const searchBar = document.getElementById('search-bar');
 
+// --- SNELKOPPELINGEN VOOR NIEUWE FUNCTIES ---
+const printBtn = document.getElementById('print-btn');
+const dashTotaal = document.getElementById('dash-totaal');
+const dashV1 = document.getElementById('dash-v1');
+const dashV2 = document.getElementById('dash-v2');
 
 // ---
-// HELPER FUNCTIE VOOR AANTALLEN
+// HELPER FUNCTIES
 // ---
 function formatAantal(aantal, eenheid) {
     if (!eenheid || eenheid === 'stuks') {
@@ -69,6 +73,12 @@ function formatAantal(aantal, eenheid) {
     return `${aantal} ${eenheid}`;
 }
 
+// Helper voor 'Ingevroren op' datum
+function formatDatum(timestamp) {
+    if (!timestamp) return 'Onbekende datum';
+    const datum = timestamp.toDate(); // Zet Firebase timestamp om naar JS Date
+    return datum.toLocaleDateString('nl-BE'); // Maakt er "4/11/2025" van
+}
 
 // ---
 // STAP 2: LADES OPHALEN & APP INITIALISEREN
@@ -116,20 +126,39 @@ form.addEventListener('submit', (e) => {
         ingevrorenOp: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then(() => {
-        form.reset();
-        document.getElementById('item-eenheid').value = "stuks";
-        document.getElementById('item-vriezer').value = "";
-        schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
+        // --- LOGICA VOOR "ONTHOUD LADE" CHECKBOX (VERPLAATST) ---
+        const rememberCheck = document.getElementById('remember-drawer-check');
+        
+        if (rememberCheck.checked) {
+            // Reset alleen de item-specifieke velden
+            document.getElementById('item-naam').value = '';
+            document.getElementById('item-aantal').value = 1;
+            document.getElementById('item-eenheid').value = "stuks";
+            document.getElementById('item-naam').focus(); // Zet cursor terug in naam-veld
+        } else {
+            // Volledige reset (zoals het hoort)
+            form.reset();
+            document.getElementById('item-eenheid').value = "stuks";
+            document.getElementById('item-vriezer').value = "";
+            schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
+        }
     });
 });
 
 // ---
-// STAP 4: Items Tonen (Read)
+// STAP 4: Items Tonen (Read) - NU MET KLEUR & DASHBOARD
 // ---
 function laadItems() {
     itemsCollectie.orderBy("vriezer").orderBy("ladeId").onSnapshot((snapshot) => {
+        // Reset de lijsten
         lijstVriezer1.innerHTML = '';
         lijstVriezer2.innerHTML = '';
+
+        // --- Reset de tellers voor het dashboard ---
+        let countV1 = 0;
+        let countV2 = 0;
+        // ---------------------------------
+
         let huidigeLadeIdV1 = "";
         let huidigeLadeIdV2 = "";
 
@@ -139,25 +168,29 @@ function laadItems() {
             const ladeNaam = ladesMap[item.ladeId] || "Onbekende Lade";
             const li = document.createElement('li');
             const aantalText = formatAantal(item.aantal, item.eenheid);
-        // Bereken de leeftijd
-if (item.ingevrorenOp) {
-    const ingevrorenDatum = item.ingevrorenOp.toDate();
-    const vandaag = new Date();
-    const diffTijd = Math.abs(vandaag - ingevrorenDatum);
-    const diffDagen = Math.ceil(diffTijd / (1000 * 60 * 60 * 24));
+            const datumText = formatDatum(item.ingevrorenOp); // <-- Voor weergave
+            
+            // --- KLEURCODERING LOGICA ---
+            if (item.ingevrorenOp) {
+                const ingevrorenDatum = item.ingevrorenOp.toDate();
+                const vandaag = new Date();
+                const diffTijd = Math.abs(vandaag - ingevrorenDatum);
+                const diffDagen = Math.ceil(diffTijd / (1000 * 60 * 60 * 24));
 
-    if (diffDagen > 180) { // 6+ maanden
-        li.classList.add('item-old');
-    } else if (diffDagen > 90) { // 3-6 maanden
-        li.classList.add('item-medium');
-    } else { // 0-3 maanden
-        li.classList.add('item-fresh');
-    }
-}   
-            // AANGEPAST: Knoppen zijn nu iconen
+                if (diffDagen > 180) { // 6+ maanden
+                    li.classList.add('item-old');
+                } else if (diffDagen > 90) { // 3-6 maanden
+                    li.classList.add('item-medium');
+                } else { // 0-3 maanden
+                    li.classList.add('item-fresh');
+                }
+            }   
+            
+            // AANGEPAST: Toont nu ook de datum
             li.innerHTML = `
                 <div class="item-text">
                     <strong>${item.naam} (${aantalText})</strong>
+                    <small style="display: block; color: #555;">Ingevroren op: ${datumText}</small>
                 </div>
                 <div class="item-buttons">
                     <button class="edit-btn" data-id="${docId}" title="Bewerken">
@@ -170,6 +203,7 @@ if (item.ingevrorenOp) {
             `;
 
             if (item.vriezer === 'Vriezer 1') {
+                countV1++; // <-- Tel voor dashboard
                 if (item.ladeId !== huidigeLadeIdV1) {
                     huidigeLadeIdV1 = item.ladeId;
                     const titel = document.createElement('h3');
@@ -179,6 +213,7 @@ if (item.ingevrorenOp) {
                 }
                 lijstVriezer1.appendChild(li);
             } else if (item.vriezer === 'Vriezer 2') {
+                countV2++; // <-- Tel voor dashboard
                 if (item.ladeId !== huidigeLadeIdV2) {
                     huidigeLadeIdV2 = item.ladeId;
                     const titel = document.createElement('h3');
@@ -189,6 +224,13 @@ if (item.ingevrorenOp) {
                 lijstVriezer2.appendChild(li);
             }
         });
+        
+        // --- Update het dashboard ---
+        dashTotaal.textContent = `Totaal: ${countV1 + countV2}`;
+        dashV1.textContent = `Vriezer 1: ${countV1}`;
+        dashV2.textContent = `Vriezer 2: ${countV2}`;
+        // -----------------------------
+
     }, (error) => {
         console.error("Fout bij ophalen items: ", error);
         if (error.code === 'failed-precondition') {
@@ -201,8 +243,6 @@ if (item.ingevrorenOp) {
 // STAP 5: Items Verwijderen & Bewerken (Listeners)
 // ---
 function handleItemLijstClick(e) {
-    // We gebruiken .closest() om zeker te zijn dat we de knop klikken,
-    // zelfs als de gebruiker op het <i> icoon zelf klikt.
     const editButton = e.target.closest('.edit-btn');
     const deleteButton = e.target.closest('.delete-btn');
 
@@ -277,8 +317,6 @@ function vulLadeBeheerLijst() {
         const vriezerTekst = document.createElement('span');
         vriezerTekst.textContent = `(${lade.vriezer})`;
         
-        // AANGEPAST: Knoppen zijn nu iconen
-        // Ik geef "Opslaan" een nieuwe class "save-btn" voor de duidelijkheid
         const buttons = document.createElement('div');
         buttons.className = 'item-buttons';
         buttons.innerHTML = `
@@ -301,6 +339,7 @@ function vulLadeBeheerLijst() {
     });
 }
 
+// --- HERSTELD: Lade toevoegen formulier ---
 addLadeForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const naam = document.getElementById('lade-naam').value;
@@ -310,13 +349,14 @@ addLadeForm.addEventListener('submit', (e) => {
         vriezer: vriezer
     })
     .then(() => {
+        // Simpelweg het formulier resetten.
         addLadeForm.reset();
     });
 });
 
 async function handleLadeLijstClick(e) {
     const deleteButton = e.target.closest('.delete-btn');
-    const saveButton = e.target.closest('.save-btn'); // AANGEPAST
+    const saveButton = e.target.closest('.save-btn');
 
     if (deleteButton) {
         const id = deleteButton.dataset.id;
@@ -330,7 +370,6 @@ async function handleLadeLijstClick(e) {
         }
     }
     
-    // AANGEPAST: Zoekt nu naar .save-btn
     if (saveButton) {
         const id = saveButton.dataset.id;
         const parentLi = saveButton.closest('li');
@@ -346,6 +385,7 @@ async function handleLadeLijstClick(e) {
 }
 ladesLijstV1.addEventListener('click', handleLadeLijstClick);
 ladesLijstV2.addEventListener('click', handleLadeLijstClick);
+
 // ---
 // STAP 7: UITLOGGEN LOGICA
 // ---
@@ -354,9 +394,6 @@ logoutBtn.addEventListener('click', () => {
         auth.signOut()
             .then(() => {
                 console.log("Gebruiker uitgelogd.");
-                // De onAuthStateChanged listener (hieronder)
-                // pakt dit automatisch op en stuurt de gebruiker
-                // terug naar index.html.
             })
             .catch((error) => {
                 console.error("Fout bij uitloggen:", error);
@@ -364,41 +401,31 @@ logoutBtn.addEventListener('click', () => {
             });
     }
 });
+
 // ---
 // STAP 8: ZOEKBALK LOGICA
 // ---
-
 searchBar.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
     filterItems(searchTerm);
 });
 
 function filterItems(term) {
-    // 1. Pak alle item-kaartjes (de <li> elementen)
     const items = document.querySelectorAll('#lijst-vriezer-1 li, #lijst-vriezer-2 li');
     
     items.forEach(item => {
-        // 2. Zoek de productnaam binnen het kaartje
         const itemText = item.querySelector('.item-text strong').textContent.toLowerCase();
         
-        // 3. Toon of verberg het kaartje
-        if (itemText.startsWith(term)) { // <-- AANGEPAST: .includes() is .startsWith() geworden
-            item.style.display = 'flex'; // 'flex' is hoe ze standaard getoond worden
+        if (itemText.startsWith(term)) {
+            item.style.display = 'flex';
         } else {
-            item.style.display = 'none'; // Verberg als het niet matcht
+            item.style.display = 'none';
         }
     });
-
-    // 4. Verberg lade-titels (<h3>) als ze leeg zijn
     checkLadesInLijst(document.getElementById('lijst-vriezer-1'));
     checkLadesInLijst(document.getElementById('lijst-vriezer-2'));
 }
 
-/**
- * Deze helper-functie controleert alle lade-titels (<h3>) in een lijst (<ul>).
- * Als alle items (<li>) onder een titel verborgen zijn, 
- * wordt de titel zelf ook verborgen.
- */
 function checkLadesInLijst(lijstElement) {
     const lades = lijstElement.querySelectorAll('.schuif-titel');
     
@@ -407,43 +434,39 @@ function checkLadesInLijst(lijstElement) {
         let itemsInDezeLade = 0;
         let zichtbareItems = 0;
 
-        // Loop door alle <li> elementen die direct na deze titel komen
         while (nextElement && nextElement.tagName === 'LI') {
             itemsInDezeLade++;
-            // Check of het item zichtbaar is (niet 'display: none')
             if (nextElement.style.display !== 'none') {
                 zichtbareItems++;
             }
             nextElement = nextElement.nextElementSibling;
         }
 
-        // Als er items in de lade horen, maar er is er geen enkele zichtbaar:
         if (itemsInDezeLade > 0 && zichtbareItems === 0) {
-            ladeTitel.style.display = 'none'; // Verberg de lade-titel
+            ladeTitel.style.display = 'none';
         } else {
-            ladeTitel.style.display = 'block'; // Toon de lade-titel
+            ladeTitel.style.display = 'block';
         }
     });
 }
-// ---
-// ALLES STARTEN
-// ---
-// AANGEPAST: Start de app pas na een succesvolle auth check
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // Gebruiker is ingelogd, laad de lades (en de rest van de app)
-        console.log("Ingelogd als:", user.displayName || user.email || user.uid);
-        laadLades();
-    } else {
-        // Gebruiker is niet ingelogd, stuur terug naar de login pagina
-        console.log("Niet ingelogd, terug naar index.html");
-        window.location.replace('index.html');
-    }
-// Voeg toe bij je snelkoppelingen
-const printBtn = document.getElementById('print-btn');
 
-// Voeg toe bij je event listeners
+// ---
+// STAP 9: PRINT LOGICA (VERPLAATST)
+// ---
 printBtn.addEventListener('click', () => {
     window.print();
 });
+
+
+// ---
+// ALLES STARTEN
+// ---
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("Ingelogd als:", user.displayName || user.email || user.uid);
+        laadLades(); // Dit laadt lades, en 'laadLades' laadt vervolgens 'laadItems'
+    } else {
+        console.log("Niet ingelogd, terug naar index.html");
+        window.location.replace('index.html');
+    }
 });
