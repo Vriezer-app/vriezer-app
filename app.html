@@ -125,8 +125,10 @@
     </div>
 
     <div id="lade-beheer-modal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-header">
             <h2>Beheer Lades</h2>
+            <button type="button" id="btn-sluit-lade-beheer" class="btn-cancel">Sluiten</button>
+            </div>
             <form id="add-lade-form">
                 <h3>Nieuwe Lade Toevoegen</h3>
                 <input type="text" id="lade-naam" placeholder="Naam van nieuwe lade" required>
@@ -148,11 +150,6 @@
                     <ul id="lades-lijst-v2"></ul>
                 </div>
             </div>
-            <div class="modal-buttons">
-                <button type="button" id="btn-sluit-lade-beheer" class="btn-cancel">Sluiten</button>
-            </div>
-        </div>
-    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
