@@ -305,4 +305,47 @@ li .item-buttons { display: flex; gap: 10px; }
     padding-left: 45px;
     font-size: 1.1em; /* Iets groter lettertype voor de zoekbalk */
 }
+/* Voeg dit helemaal onderaan je style.css toe */
+@media print {
+    /* Verberg alles wat je niet wilt printen */
+    .header-bar,
+    #add-item-form,
+    .search-container,
+    .modal-overlay,
+    hr,
+    .item-buttons {
+        display: none !important; /* Forceer verbergen */
+    }
+
+    /* Zorg dat de lijsten de volledige breedte pakken */
+    body, .container {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Reset de item-stijl voor print */
+    li {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid; /* Zorg dat een item niet over 2 paginas splitst */
+    }
+
+    .vriezer-container {
+        flex-direction: column; /* Zet vriezers onder elkaar */
+    }
+
+    h2, .schuif-titel {
+        background-color: #eee !important;
+        color: #000 !important;
+        border: none;
+        -webkit-print-color-adjust: exact; /* Forceer achtergrondkleur bij printen */
+        color-adjust: exact;
+    }
+}
+li.item-fresh { border-left: 5px solid #66DDAA; }
+li.item-medium { border-left: 5px solid #FFC107; }
+li.item-old { border-left: 5px solid #FF6B6B; }
 }
