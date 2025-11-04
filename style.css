@@ -285,4 +285,24 @@ li .item-buttons { display: flex; gap: 10px; }
 .btn-logout:hover {
     background-color: #FF8F8F;
 }
+/* --- Zoekbalk --- */
+.search-container {
+    position: relative;
+    margin-bottom: 25px; /* Zorgt voor ruimte onder de zoekbalk */
+}
+
+.search-container .fa-search {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+#search-bar {
+    /* De globale input-stijl wordt gebruikt, 
+       we hoeven alleen de padding voor het icoon aan te passen */
+    padding-left: 45px;
+    font-size: 1.1em; /* Iets groter lettertype voor de zoekbalk */
+}
 }
