@@ -220,6 +220,20 @@ li .item-buttons { display: flex; gap: 10px; }
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
 }
+/* --- Stijl voor de nieuwe modal header --- */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* Ruimte onder de header */
+}
+
+/* Zorg dat de h2 in de header geen extra margin heeft */
+.modal-header h2 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
 #lades-lijst-v1, #lades-lijst-v2 { list-style: none; padding: 0; }
 
 /* Dit is het cruciale blok dat is aangepast */
