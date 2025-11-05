@@ -1,635 +1,211 @@
-// Stap 1: Initialiseer Firebase
-const firebaseConfig = typeof __firebase_config !== 'undefined' 
-    ? JSON.parse(__firebase_config) 
-    : {
-  apiKey: "AIzaSyB9KRUbVBknnDDkkWF2Z5nRskmY-9CkD24",
-  authDomain: "vriezer-app.firebaseapp.com",
-  projectId: "vriezer-app",
-  storageBucket: "vriezer-app.firebasestorage.app",
-  messagingSenderId: "788492326775",
-  appId: "1:788492326775:web:c2cd85deac708b44f27372"
-    };
-
-// Initialiseer Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
-const itemsCollectie = db.collection('items');
-const ladesCollectie = db.collection('lades');
-
-// ---
-// GLOBALE VARIABELEN
-// ---
-let alleLades = [];
-let ladesMap = {};
-let uniekeProductNamen = new Set(); // Voor autocomplete
-
-// ---
-// Snelkoppelingen naar elementen
-// ---
-const form = document.getElementById('add-item-form');
-const lijstVriezer1 = document.getElementById('lijst-vriezer-1');
-const lijstVriezer2 = document.getElementById('lijst-vriezer-2');
-const vriezerSelect = document.getElementById('item-vriezer');
-const schuifSelect = document.getElementById('item-schuif');
-const editModal = document.getElementById('edit-modal');
-const editForm = document.getElementById('edit-item-form');
-const editId = document.getElementById('edit-item-id');
-const editNaam = document.getElementById('edit-item-naam');
-const editAantal = document.getElementById('edit-item-aantal');
-const editEenheid = document.getElementById('edit-item-eenheid');
-const editVriezer = document.getElementById('edit-item-vriezer');
-const editSchuif = document.getElementById('edit-item-schuif');
-const btnCancel = document.getElementById('btn-cancel');
-const ladeBeheerModal = document.getElementById('lade-beheer-modal');
-const beheerLadesKnop = document.getElementById('beheer-lades-knop');
-const sluitLadeBeheerKnop = document.getElementById('btn-sluit-lade-beheer');
-const addLadeForm = document.getElementById('add-lade-form');
-const ladesLijstV1 = document.getElementById('lades-lijst-v1');
-const ladesLijstV2 = document.getElementById('lades-lijst-v2');
-const logoutBtn = document.getElementById('logout-btn');
-const searchBar = document.getElementById('search-bar');
-const printBtn = document.getElementById('print-btn');
-const dashTotaal = document.getElementById('dash-totaal');
-const dashV1 = document.getElementById('dash-v1');
-const dashV2 = document.getElementById('dash-v2');
-
-// --- SNELKOPPELINGEN VOOR BARCODE ---
-const barcodeInput = document.getElementById('item-barcode');
-const barcodeSearchBtn = document.getElementById('barcode-search-btn');
-const barcodeScanBtn = document.getElementById('barcode-scan-btn');
-const scannerModal = document.getElementById('scanner-modal');
-const scannerSluitBtn = document.getElementById('scanner-sluit-btn');
-const scannerVideo = document.getElementById('scanner-video');
-
-
-// ---
-// HELPER FUNCTIES
-// ---
-function formatAantal(aantal, eenheid) {
-    if (!eenheid || eenheid === 'stuks') {
-        return `${aantal}x`;
-    }
-    if (eenheid === 'zak') {
-        if (aantal === 1) return "1 zak";
-        if (aantal === 0.75) return "3/4 zak";
-        if (aantal === 0.5) return "1/2 zak";
-        if (aantal === 0.25) return "1/4 zak";
-        if (aantal > 1 && (aantal % 1 === 0)) return `${aantal} zakken`;
-        return `${aantal} zakken`;
-    }
-    return `${aantal} ${eenheid}`;
-}
-
-function formatDatum(timestamp) {
-    if (!timestamp) return 'Onbekende datum';
-    const datum = timestamp.toDate(); 
-    return datum.toLocaleDateString('nl-BE'); 
-}
-
-// ---
-// BARCODE API & SCANNER FUNCTIES
-// ---
-
-/**
- * Voert de daadwerkelijke zoekopdracht uit bij de API
- */
-async function fetchProductFromAPI(barcode) {
-    document.getElementById('item-naam').value = "Bezig met zoeken...";
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mijn Vriezer Voorraad</title>
     
-    try {
-        const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.status === 1 && data.product && data.product.product_name) {
-            let productName = data.product.product_name;
-            if (data.product.brands) {
-                productName = `${data.product.brands}: ${productName}`;
-            }
-            document.getElementById('item-naam').value = productName;
-            document.getElementById('item-aantal').focus(); 
-        } else {
-            alert("Product niet gevonden in de database. Voer het handmatig in.");
-            document.getElementById('item-naam').value = ""; 
-            document.getElementById('item-naam').focus();
-        }
-    } catch (error) {
-        console.error("Fout bij ophalen product:", error);
-        alert("Fout bij het verbinden met de product-database.");
-        document.getElementById('item-naam').value = "";
-    }
-}
-
-/**
- * Voegt listeners toe aan de barcode knoppen, het veld, en de camera modal
- */
-function initBarcodeScanner() {
-    // --- Knop voor Handmatig Zoeken ---
-    barcodeSearchBtn.addEventListener('click', () => {
-        const barcode = barcodeInput.value;
-        if (barcode) {
-            fetchProductFromAPI(barcode);
-        }
-    });
+    <link rel="stylesheet" href="style.css">
     
-    // --- Enter in Handmatig Veld ---
-    barcodeInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const barcode = barcodeInput.value;
-            if (barcode) {
-                fetchProductFromAPI(barcode);
-            }
-        }
-    });
-
-    // --- LOGICA VOOR DE CAMERA ---
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
-    // Controleer of ZXing wel geladen is. Zo niet, verberg de scan-knop.
-    if (typeof ZXing === 'undefined') {
-        console.error("ZXing scanner bibliotheek is niet geladen!");
-        barcodeScanBtn.style.display = 'none';
-        return; // Stop de functie hier
-    }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
-    const codeReader = new ZXing.BrowserMultiFormatReader();
-    let selectedDeviceId;
-    let controls; // Om de camera-controls op te slaan
+    <!-- Je favicon links -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
 
-    // --- Knop om de scan-modal te OPENEN ---
-    barcodeScanBtn.addEventListener('click', async () => {
-        scannerModal.style.display = 'flex';
-        
-        try {
-            const videoInputDevices = await codeReader.listVideoInputDevices();
-            const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('omgeving'));
+    <div class="container">
+        <div class="header-bar">
+            <h2>Vriezer Voorraad</h2>
+            <div class="header-buttons">
+                <button id="beheer-lades-knop" class="btn-beheer">Beheer Lades</button>
+                <button id="print-btn" class="btn-beheer" style="background-color: #777;">Print</button>
+                <button id="logout-btn" class="btn-beheer btn-logout">Uitloggen</button>
+            </div>
+        </div>
+
+        <div id="dashboard" style="display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; margin-bottom: 20px;">
+            <strong id="dash-totaal">Laden...</strong>
+            <span id="dash-v1">Laden...</span>
+            <span id="dash-v2">Laden...</span>
+        </div>
+
+        <!-- Dit formulier heeft de 2-kolom layout -->
+        <form id="add-item-form">
+            <!-- Volle breedte -->
+            <input type="text" id="item-naam" placeholder="Productnaam" required list="product-suggesties">
+            <datalist id="product-suggesties"></datalist>
+
+            <!-- Volle breedte -->
+            <input type="text" id="item-barcode" placeholder="Typ EAN-code..." inputmode="numeric">
             
-            if (rearCamera) {
-                selectedDeviceId = rearCamera.deviceId;
-            } else if (videoInputDevices.length > 0) {
-                selectedDeviceId = videoInputDevices[0].deviceId;
-            } else {
-                alert("Geen camera gevonden op dit apparaat.");
-                scannerModal.style.display = 'none'; // Verberg modal als er geen camera is
-                return;
-            }
-
-            console.log(`Camera ${selectedDeviceId} wordt gebruikt`);
-
-            // Start het scannen
-            controls = await codeReader.decodeFromVideoDevice(selectedDeviceId, 'scanner-video', (result, err) => {
-                if (result) {
-                    // --- SUCCESS! Barcode gevonden ---
-                    console.log("Barcode gevonden:", result.text);
-                    if (controls) {
-                        controls.stop(); // Stop de camera-track
-                    }
-                    scannerModal.style.display = 'none';
-                    
-                    barcodeInput.value = result.text;
-                    fetchProductFromAPI(result.text);
-                }
-                if (err && !(err instanceof ZXing.NotFoundException)) {
-                    // Log andere fouten, maar negeer "NotFoundException" (dat is normaal)
-                    console.error(err);
-                }
-            });
-
-        } catch (error) {
-            console.error("Fout bij starten camera:", error);
-            alert(`Fout bij camera: ${error.message}`);
-            scannerModal.style.display = 'none';
-        }
-    });
-
-    // --- Knop om de scan-modal te SLUITEN ---
-    scannerSluitBtn.addEventListener('click', () => {
-        if (controls) {
-            controls.stop(); // Stop de camera-track
-        }
-        codeReader.reset(); // Algemene reset van de lezer
-        scannerModal.style.display = 'none';
-    });
-}
-// --- EINDE BARCODE FUNCTIES ---
-
-
-// ---
-// STAP 2: LADES OPHALEN & APP INITIALISEREN
-// ---
-async function laadLades() {
-    // Sorteert lades op vriezer, daarna op naam
-    ladesCollectie.orderBy("vriezer").orderBy("naam").onSnapshot(snapshot => {
-        alleLades = [];
-        ladesMap = {};
-        snapshot.docs.forEach(doc => {
-            const lade = { id: doc.id, ...doc.data() };
-            alleLades.push(lade);
-            ladesMap[lade.id] = lade.naam;
-        });
-        vulLadeBeheerLijst();
-        vulSchuifDropdowns();
-        laadItems(); 
-    });
-}
-
-function vulSchuifDropdowns() {
-    const geselecteerdeVriezer = vriezerSelect.value;
-    schuifSelect.innerHTML = '<option value="" disabled selected>Kies een schuif...</option>';
-    const gefilterdeLades = alleLades.filter(lade => lade.vriezer === geselecteerdeVriezer);
-    gefilterdeLades.forEach(lade => {
-        const option = document.createElement('option');
-        option.value = lade.id;
-        option.textContent = lade.naam;
-        schuifSelect.appendChild(option);
-    });
-}
-vriezerSelect.addEventListener('change', vulSchuifDropdowns);
-
-
-// ---
-// STAP 3: Items Opslaan (Create) - NU MET ladeNaam
-// ---
-form.addEventListener('submit', (e) => {
-    e.preventDefault(); 
-
-    // Pak de lade naam uit de dropdown voor correct sorteren
-    const schuifDropdown = document.getElementById('item-schuif');
-    const geselecteerdeLadeId = schuifDropdown.value;
-    const geselecteerdeLadeNaam = schuifDropdown.options[schuifDropdown.selectedIndex].text;
-
-    itemsCollectie.add({
-        naam: document.getElementById('item-naam').value,
-        aantal: parseFloat(document.getElementById('item-aantal').value),
-        eenheid: document.getElementById('item-eenheid').value,
-        vriezer: document.getElementById('item-vriezer').value,
-        ladeId: geselecteerdeLadeId,
-        ladeNaam: geselecteerdeLadeNaam, // <-- VELD VOOR SORTEREN
-        ingevrorenOp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        // "Onthoud Lade" logica
-        const rememberCheck = document.getElementById('remember-drawer-check');
-        
-        if (rememberCheck.checked) {
-            document.getElementById('item-naam').value = '';
-            document.getElementById('item-barcode').value = ''; // Reset ook barcode
-            document.getElementById('item-aantal').value = 1;
-            document.getElementById('item-eenheid').value = "stuks";
-            document.getElementById('item-naam').focus(); 
-        } else {
-            form.reset();
-            document.getElementById('item-eenheid').value = "stuks";
-            document.getElementById('item-vriezer').value = "";
-            schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
-        }
-    });
-});
-
-// ---
-// STAP 4: Items Tonen (Read) - NU MET ladeNaam sortering
-// ---
-function laadItems() {
-    // SORTEERT NU OP ladeNaam IPV ladeId
-    itemsCollectie.orderBy("vriezer").orderBy("ladeNaam").onSnapshot((snapshot) => {
-        lijstVriezer1.innerHTML = '';
-        lijstVriezer2.innerHTML = '';
-        
-        let countV1 = 0;
-        let countV2 = 0;
-        uniekeProductNamen.clear(); // Voor autocomplete
-
-        let huidigeLadeIdV1 = "";
-        let huidigeLadeIdV2 = "";
-
-        snapshot.docs.forEach((doc) => {
-            const item = doc.data();
-            const docId = doc.id;
-            
-            uniekeProductNamen.add(item.naam); // Vul autocomplete
-            
-            // Gebruik de opgeslagen ladeNaam, of val terug op de ladesMap (voor oude items)
-            const ladeNaam = item.ladeNaam || ladesMap[item.ladeId] || "Onbekende Lade";
-            
-            const li = document.createElement('li');
-            const aantalText = formatAantal(item.aantal, item.eenheid);
-            const datumText = formatDatum(item.ingevrorenOp); 
-            
-            // Kleurcodering logica
-            if (item.ingevrorenOp) {
-                const ingevrorenDatum = item.ingevrorenOp.toDate();
-                const vandaag = new Date();
-                const diffTijd = Math.abs(vandaag - ingevrorenDatum);
-                const diffDagen = Math.ceil(diffTijd / (1000 * 60 * 60 * 24));
-
-                if (diffDagen > 180) { li.classList.add('item-old'); } 
-                else if (diffDagen > 90) { li.classList.add('item-medium'); } 
-                else { li.classList.add('item-fresh'); }
-            }   
-            
-            li.innerHTML = `
-                <div class="item-text">
-                    <strong>${item.naam} (${aantalText})</strong>
-                    <small style="display: block; color: #555;">Ingevroren op: ${datumText}</small>
-                </div>
-                <div class="item-buttons">
-                    <button class="edit-btn" data-id="${docId}" title="Bewerken">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button class="delete-btn" data-id="${docId}" title="Verwijder">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            `;
-
-            if (item.vriezer === 'Vriezer 1') {
-                countV1++; 
-                // Gebruik ladeNaam voor de groepering
-                if (ladeNaam !== huidigeLadeIdV1) {
-                    huidigeLadeIdV1 = ladeNaam;
-                    const titel = document.createElement('h3');
-                    titel.className = 'schuif-titel';
-                    titel.textContent = ladeNaam;
-                    lijstVriezer1.appendChild(titel);
-                }
-                lijstVriezer1.appendChild(li);
-            } else if (item.vriezer === 'Vriezer 2') {
-                countV2++; 
-                // Gebruik ladeNaam voor de groepering
-                if (ladeNaam !== huidigeLadeIdV2) {
-                    huidigeLadeIdV2 = ladeNaam;
-                    const titel = document.createElement('h3');
-                    titel.className = 'schuif-titel';
-                    titel.textContent = ladeNaam;
-                    lijstVriezer2.appendChild(titel);
-                }
-                lijstVriezer2.appendChild(li);
-            }
-        });
-        
-        // Update dashboard
-        dashTotaal.textContent = `Totaal: ${countV1 + countV2}`;
-        dashV1.textContent = `Vriezer 1: ${countV1}`;
-        dashV2.textContent = `Vriezer 2: ${countV2}`;
-        
-        // Vul autocomplete
-        const datalist = document.getElementById('product-suggesties');
-        datalist.innerHTML = ''; 
-        uniekeProductNamen.forEach(naam => {
-            const option = document.createElement('option');
-            option.value = naam;
-            datalist.appendChild(option);
-        });
-
-    }, (error) => {
-        console.error("Fout bij ophalen items: ", error);
-        if (error.code === 'failed-precondition') {
-             alert("FOUT: De database query is mislukt. Waarschijnlijk moet je een 'composite index' (voor vriezer/ladeNaam) aanmaken in je Firebase Console. Check de JavaScript console (F12) voor een directe link om dit te fixen.");
-        }
-    });
-}
-
-// ---
-// STAP 5: Items Verwijderen & Bewerken (Listeners) - NU MET ladeNaam
-// ---
-function handleItemLijstClick(e) {
-    const editButton = e.target.closest('.edit-btn');
-    const deleteButton = e.target.closest('.delete-btn');
-
-    if (deleteButton) {
-        const id = deleteButton.dataset.id;
-        if (confirm("Weet je zeker dat je dit item wilt verwijderen?")) {
-            itemsCollectie.doc(id).delete();
-        }
-    }
-    
-    if (editButton) {
-        const id = editButton.dataset.id;
-        itemsCollectie.doc(id).get().then((doc) => {
-            const item = doc.data();
-            editId.value = id;
-            editNaam.value = item.naam;
-            editAantal.value = item.aantal;
-            editEenheid.value = item.eenheid || 'stuks';
-            editVriezer.value = item.vriezer;
-            editSchuif.innerHTML = ''; 
-            const gefilterdeLades = alleLades.filter(lade => lade.vriezer === item.vriezer);
-            gefilterdeLades.forEach(lade => {
-                const option = document.createElement('option');
-                option.value = lade.id;
-                option.textContent = lade.naam;
-                editSchuif.appendChild(option);
-            });
-            editSchuif.value = item.ladeId;
-            editModal.style.display = 'flex';
-        });
-    }
-}
-lijstVriezer1.addEventListener('click', handleItemLijstClick);
-lijstVriezer2.addEventListener('click', handleItemLijstClick);
-
-editForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const id = editId.value;
-
-    // Pak de lade naam uit de dropdown voor correct sorteren
-    const schuifDropdown = document.getElementById('edit-item-schuif');
-    const geselecteerdeLadeId = schuifDropdown.value;
-    const geselecteerdeLadeNaam = schuifDropdown.options[schuifDropdown.selectedIndex].text;
-
-    itemsCollectie.doc(id).update({
-        naam: editNaam.value,
-        aantal: parseFloat(editAantal.value),
-        eenheid: editEenheid.value,
-        vriezer: editVriezer.value,
-        ladeId: geselecteerdeLadeId,
-        ladeNaam: geselecteerdeLadeNaam // <-- VELD VOOR SORTEREN
-    })
-    .then(sluitItemModal);
-});
-function sluitItemModal() { editModal.style.display = 'none'; }
-btnCancel.addEventListener('click', sluitItemModal);
-
-
-// ---
-// STAP 6: LADE BEHEER LOGICA
-// ---
-beheerLadesKnop.addEventListener('click', () => {
-    ladeBeheerModal.style.display = 'flex';
-});
-sluitLadeBeheerKnop.addEventListener('click', () => {
-    ladeBeheerModal.style.display = 'none';
-});
-
-function vulLadeBeheerLijst() {
-    ladesLijstV1.innerHTML = '';
-    ladesLijstV2.innerHTML = '';
-    alleLades.forEach(lade => {
-        const li = document.createElement('li');
-        const naamInput = document.createElement('input');
-        naamInput.type = 'text';
-        naamInput.value = lade.naam;
-        naamInput.className = 'lade-naam-input';
-        naamInput.dataset.id = lade.id; 
-        const vriezerTekst = document.createElement('span');
-        vriezerTekst.textContent = `(${lade.vriezer})`;
-        
-        const buttons = document.createElement('div');
-        buttons.className = 'item-buttons';
-        buttons.innerHTML = `
-            <button class="save-btn" data-id="${lade.id}" title="Opslaan">
-                <i class="fas fa-save"></i>
+            <!-- Halve breedte (links) -->
+            <button type="button" id="barcode-scan-btn" title="Scan barcode met camera">
+                <i class="fas fa-camera"></i> Scan Barcode
             </button>
-            <button class="delete-btn" data-id="${lade.id}" title="Verwijder">
-                <i class="fas fa-trash-alt"></i>
+            
+            <!-- Halve breedte (rechts) -->
+            <button type="button" id="barcode-search-btn" title="Zoek product op EAN-code">
+                <i class="fas fa-search"></i> Zoek EAN
             </button>
-        `;
-        
-        li.appendChild(naamInput);
-        li.appendChild(vriezerTekst);
-        li.appendChild(buttons);
-        if (lade.vriezer === 'Vriezer 1') {
-            ladesLijstV1.appendChild(li);
-        } else {
-            ladesLijstV2.appendChild(li);
-        }
-    });
-}
+            
+            <!-- Halve breedte (links) -->
+            <input type="number" id="item-aantal" placeholder="Aantal" value="1" step="0.25" min="0.25" required>
+            
+            <!-- Halve breedte (rechts) -->
+            <select id="item-eenheid" required>
+                <option value="stuks">Stuks (x)</option>
+                <option value="zak">Zak</option>
+                <option value="boterpot">Boterpot</option>
+                <option value="ijsdoos">Ijsdoos</option>
+                <option value="gram">Gram (g)</option>
+                <option value="kilo">Kilo (kg)</option>
+                <option value="bakje">Bakje(s)</option>
+                <option value="portie">Portie(s)</option>
+            </select>
+            
+            <!-- Halve breedte (links) -->
+            <select id="item-vriezer" required>
+                <option value="" disabled selected>Kies een vriezer...</option> 
+                <option value="Vriezer 1">Vriezer 1 (Klein)</option>
+                <option value="Vriezer 2">Vriezer 2 (Groot)</option>
+            </select>
+            
+            <!-- Halve breedte (rechts) -->
+            <select id="item-schuif" required>
+                <option value="" disabled selected>Kies eerst een vriezer...</option> 
+            </select>
+            
+            <!-- Volle breedte -->
+            <div class="checkbox-container">
+                <input type="checkbox" id="remember-drawer-check">
+                <label for="remember-drawer-check">Onthoud vriezer en lade</label>
+            </div>
 
-addLadeForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const naam = document.getElementById('lade-naam').value;
-    const vriezer = document.getElementById('lade-vriezer').value;
-    ladesCollectie.add({
-        naam: naam,
-        vriezer: vriezer
-    })
-    .then(() => {
-        addLadeForm.reset();
-    });
-});
-
-async function handleLadeLijstClick(e) {
-    const deleteButton = e.target.closest('.delete-btn');
-    const saveButton = e.target.closest('.save-btn');
-
-    if (deleteButton) {
-        const id = deleteButton.dataset.id;
-        const itemsCheck = await itemsCollectie.where("ladeId", "==", id).limit(1).get();
-        if (!itemsCheck.empty) {
-            alert("Kan lade niet verwijderen: er zitten nog items in! Verplaats deze items eerst.");
-            return;
-        }
-        if (confirm("Weet je zeker dat je deze (lege) lade wilt verwijderen?")) {
-            ladesCollectie.doc(id).delete();
-        }
-    }
+            <!-- Volle breedte -->
+            <button type="submit">Toevoegen</button>
+        </form>
+        <hr>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-bar" placeholder="Zoek een product...">
+        </div>
+        <div class="vriezer-container">
+            <div class="vriezer-kolom">
+                <h2>Vriezer 1 (Klein)</h2>
+                <ul id="lijst-vriezer-1"></ul>
+            </div>
+            <div class="vriezer-kolom">
+                <h2>Vriezer 2 (Groot)</h2>
+                <ul id="lijst-vriezer-2"></ul>
+            </div>
+        </div>
+    </div>
     
-    if (saveButton) {
-        const id = saveButton.dataset.id;
-        const parentLi = saveButton.closest('li');
-        const inputVeld = parentLi.querySelector('.lade-naam-input');
-        const newNaam = inputVeld.value;
-        if (newNaam) {
-            ladesCollectie.doc(id).update({
-                naam: newNaam
-            })
-            .then(() => alert("Lade hernoemd!"));
-        }
-    }
-}
-ladesLijstV1.addEventListener('click', handleLadeLijstClick);
-ladesLijstV2.addEventListener('click', handleLadeLijstClick);
+    <!-- Item Bewerken Modal -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Item Bewerken</h2>
+            <form id="edit-item-form">
+                <input type="hidden" id="edit-item-id">
+                <label for="edit-item-naam">Naam:</label>
+                <input type="text" id="edit-item-naam" required>
+                <label for="edit-item-aantal">Aantal:</label>
+                <input type="number" id="edit-item-aantal" step="0.25" min="0.25" required>
+                <label for="edit-item-eenheid">Eenheid:</label>
+                <select id="edit-item-eenheid" required>
+                    <option value="stuks">Stuks (x)</option>
+                    <option value="zak">Zak</option>
+                    <option value="boterpot">Boterpot</option>
+                    <option value="ijsdoos">Ijsdoos</option>
+                    <option value="gram">Gram (g)</option>
+                    <option value="kilo">Kilo (kg)</option>
+                    <option value="bakje">Bakje(s)</option>
+                    <option value="portie">Portie(s)</option>
+                </select>
+                <label for="edit-item-vriezer">Vriezer:</label>
+                <select id="edit-item-vriezer" required>
+                    <option value="Vriezer 1">Vriezer 1 (Klein)</option>
+                    <option value="Vriezer 2">Vriezer 2 (Groot)</option>
+                </select>
+                <label for="edit-item-schuif">Schuif/Lade:</label>
+                <select id="edit-item-schuif" required></select>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">Opslaan</button>
+                    <button type="button" id="btn-cancel" class="btn-cancel">Annuleren</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-// ---
-// STAP 7: UITLOGGEN LOGICA
-// ---
-logoutBtn.addEventListener('click', () => {
-    if (confirm("Weet je zeker dat je wilt uitloggen?")) {
-        auth.signOut()
-            .then(() => {
-                console.log("Gebruiker uitgelogd.");
-            })
-            .catch((error) => {
-                console.error("Fout bij uitloggen:", error);
-                alert("Er is een fout opgetreden bij het uitloggen.");
-            });
-    }
-});
-
-// ---
-// STAP 8: ZOEKBALK LOGICA
-// ---
-searchBar.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    filterItems(searchTerm);
-});
-
-function filterItems(term) {
-    const items = document.querySelectorAll('#lijst-vriezer-1 li, #lijst-vriezer-2 li');
+    <!-- Lade Beheer Modal -->
+    <div id="lade-beheer-modal" class="modal-overlay">
+        <div class="modal-content"> 
+            <div class="modal-header">
+                <h2>Beheer Lades</h2>
+                <button type="button" id="btn-sluit-lade-beheer" class="btn-cancel">Sluiten</button>
+            </div>
+            
+            <form id="add-lade-form">
+                <h3>Nieuwe Lade Toevoegen</h3>
+                <input type="text" id="lade-naam" placeholder="Naam van nieuwe lade" required>
+                <select id="lade-vriezer" required>
+                    <option value="" disabled selected>Kies vriezer...</option>
+                    <option value="Vriezer 1">Vriezer 1 (Klein)</option>
+                    <option value="Vriezer 2">Vriezer 2 (Groot)</option> 
+                </select>
+                <button type="submit">Lade Toevoegen</button>
+            </form>
+            <hr>
+            <h3>Bestaande Lades</h3>
+            <div class="lade-beheer-container">
+                <div class="lade-beheer-kolom">
+                    <h4>Vriezer 1 (Klein)</h4>
+                    <ul id="lades-lijst-v1"></ul>
+                </div>
+                <div class="lade-beheer-kolom">
+                    <h4>Vriezer 2 (Groot)</h4>
+                    <ul id="lades-lijst-v2"></ul>
+                </div>
+            </div>
+        </div> 
+    </div>
     
-    items.forEach(item => {
-        const itemText = item.querySelector('.item-text strong').textContent.toLowerCase();
-        
-        if (itemText.startsWith(term)) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-    checkLadesInLijst(document.getElementById('lijst-vriezer-1'));
-    checkLadesInLijst(document.getElementById('lijst-vriezer-2'));
-}
+    <!-- Barcode Scanner Modal -->
+    <div id="scanner-modal" class="modal-overlay" style="align-items: flex-start; padding-top: 50px;">
+        <div class="modal-content" style="max-width: 640px; padding: 15px;">
+            <div class="modal-header">
+                <h2>Scan Barcode</h2>
+                <button type="button" id="scanner-sluit-btn" class="btn-cancel">Annuleren</button>
+            </div>
+            <video id="scanner-video" style="width: 100%; height: auto; border-radius: 5px;"></video>
+            <p style="text-align: center; margin-top: 10px;">Richt de camera op een barcode.</p>
+        </div>
+    </div>
 
-function checkLadesInLijst(lijstElement) {
-    const lades = lijstElement.querySelectorAll('.schuif-titel');
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
-    lades.forEach(ladeTitel => {
-        let nextElement = ladeTitel.nextElementSibling;
-        let itemsInDezeLade = 0;
-        let zichtbareItems = 0;
+    <!-- DEZE IS CRUCIAAL: Scanner Bibliotheek -->
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest/umd/zxing.min.js"></script>
+    
+    <!-- Je eigen app script (altijd als laatste) -->
+    <script src="app.js"></script>
 
-        while (nextElement && nextElement.tagName === 'LI') {
-            itemsInDezeLade++;
-            if (nextElement.style.display !== 'none') {
-                zichtbareItems++;
-            }
-            nextElement = nextElement.nextElementSibling;
-        }
-
-        if (itemsInDezeLade > 0 && zichtbareItems === 0) {
-            ladeTitel.style.display = 'none';
-        } else {
-            ladeTitel.style.display = 'block';
-        }
-    });
-}
-
-// ---
-// STAP 9: PRINT LOGICA
-// ---
-printBtn.addEventListener('click', () => {
-    window.print();
-});
-
-
-// ---
-// ALLES STARTEN
-// ---
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log("Ingelogd als:", user.displayName || user.email || user.uid);
-        laadLades(); // Hoofdfunctie die alles start
-        initBarcodeScanner(); // <-- HIER WORDT DE SCANNER GESTART
-    } else {
-        console.log("Niet ingelogd, terug naar index.html");
-        window.location.replace('index.html');
-    }
-});
+</body>
+</html>
 
 
