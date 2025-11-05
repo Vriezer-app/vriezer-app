@@ -620,3 +620,4 @@ auth.onAuthStateChanged((user) => {
         window.location.replace('index.html');
     }
 });
+
