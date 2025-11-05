@@ -1,17 +1,17 @@
-/* Globale instellingen & Lichte Modus achtergrond */
+/* --- AANGEPAST: Globale instellingen (Mobile-first) --- */
 body {
     font-family: 'Inter', system-ui, sans-serif;
     background-color: #f4f7f6;
     color: #333;
     margin: 0;
-    padding: 20px;
+    padding: 10px; /* AANGEPAST: Minder padding voor mobiel */
     line-height: 1.6;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 25px;
+    padding: 15px; /* AANGEPAST: Minder padding voor mobiel */
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -24,6 +24,8 @@ body {
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap; /* AANGEPAST: Zorgt dat knoppen onder de titel springen op kleine schermen */
+    gap: 10px; /* Ruimte tussen titel en knoppen als ze wrappen */
 }
 
 h1 { color: #66DDAA; margin: 0; padding: 0; border: none; }
@@ -50,10 +52,48 @@ h2 {
 
 hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 
-/* --- De Formulieren --- */
+/* --- NIEUW: Visuele Feedback Berichten --- */
+.feedback {
+    padding: 15px;
+    margin-bottom: 20px; /* Ruimte onder het bericht */
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid transparent;
+    
+    /* Standaard verborgen */
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    transform: translateY(-10px); /* Begin iets naar boven */
+}
+
+/* Klasse om te tonen (toegevoegd door JS) */
+.feedback.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stijlen voor succes (groen) */
+.feedback.success {
+    background-color: #d1e7dd; /* Zacht groen */
+    color: #0f5132; /* Donker groen */
+    border-color: #badbcc;
+}
+
+/* Stijlen voor fout (rood) */
+.feedback.error {
+    background-color: #f8d7da; /* Zacht rood */
+    color: #842029; /* Donker rood */
+    border-color: #f5c2c7;
+}
+
+
+/* --- AANGEPAST: De Formulieren (Mobile-first) --- */
 #add-item-form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr; /* AANGEPAST: 1 kolom standaard voor mobiel */
     gap: 15px;
 }
 #add-lade-form {
@@ -63,15 +103,21 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 }
 #add-lade-form button { background-color: #4A90E2; }
 
-#item-naam { grid-column: 1 / 3; }
+#item-naam { grid-column: 1 / 2; } /* AANGEPAST: 1 kolom */
 #item-aantal, #item-eenheid, #item-vriezer, #item-schuif {
     width: 100%;
     box-sizing: border-box;
 }
-#add-item-form button { grid-column: 1 / 3; width: 100%; }
+#add-item-form button { grid-column: 1 / 2; width: 100%; } /* AANGEPAST: 1 kolom */
 #add-lade-form button { grid-column: 1 / 2; width: 100%; }
 
-/* NIEUW: Label voor "Onthoud Lade" checkbox stylen */
+/* AANGEPAST: Zorg dat de checkbox-div ook 1 kolom pakt */
+/* BELANGRIJK: Verwijder de inline 'style="grid-column: 1 / 3;"' uit je HTML voor de beste werking! */
+#add-item-form div[style*="grid-column"] {
+    grid-column: 1 / 2 !important; /* Hacky, maar werkt. Beter is inline style te verwijderen. */
+}
+
+/* Label voor "Onthoud Lade" checkbox stylen */
 #add-item-form label[for="remember-drawer-check"] {
     display: inline;
     margin: 0;
@@ -107,6 +153,29 @@ button[type="submit"] {
 button[type="submit"]:hover { background-color: #88FFCC; }
 
 
+/* --- NIEUW: Lade Filter Dropdown --- */
+.lade-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.lade-filter-container label {
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #555;
+    flex-shrink: 0; /* Voorkom dat label krimpt */
+}
+.lade-filter {
+    /* Overruled de globale 'select' stijl */
+    width: auto;
+    flex-grow: 1; /* Pakt de rest van de ruimte */
+    padding: 8px; /* Iets compacter */
+    font-size: 15px;
+    /* Gebruikt verder de globale 'select' stijlen */
+}
+
+
 /* --- De Voorraadlijst Container (2 kolommen) --- */
 .vriezer-container { display: flex; flex-wrap: wrap; gap: 25px; }
 .vriezer-kolom { flex: 1; min-width: 300px; }
@@ -134,11 +203,20 @@ li {
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 10px;
-    flex-wrap: wrap; 
+    flex-wrap: wrap; /* AANGEPAST: Cruciaal voor mobiel */
+    gap: 10px; /* AANGEPAST: Ruimte tussen text en knoppen op mobiel */
 }
-li .item-text { flex-grow: 1; margin-right: 15px; }
+li .item-text { 
+    flex-grow: 1; 
+    margin-right: 15px;
+    min-width: 150px; /* Zorgt dat de tekst niet te smal wordt */
+}
 li strong { font-size: 1.1em; color: #333; }
-li .item-buttons { display: flex; gap: 10px; }
+li .item-buttons { 
+    display: flex; 
+    gap: 10px;
+    flex-shrink: 0; /* Voorkom dat knoppen krimpen */
+}
 
 /* Icoon-knoppen (Bewerken, Verwijder, Opslaan) */
 .edit-btn, .delete-btn, .save-btn {
@@ -267,9 +345,28 @@ li .item-buttons { display: flex; gap: 10px; }
     display: none;
 }
 
-/* --- MEDIA QUERY VOOR GROTERE SCHERMEN --- */
+/* --- AANGEPAST: MEDIA QUERY VOOR GROTERE SCHERMEN --- */
 @media (min-width: 768px) {
-    /* Verander de item-lijsten naar een grid */
+    
+    /* AANGEPAST: Zet padding terug naar desktop-waarde */
+    body { padding: 20px; }
+    .container { padding: 25px; }
+    
+    /* AANGEPAST: Zet formulier terug naar 2 kolommen */
+    #add-item-form {
+        grid-template-columns: 1fr 1fr;
+    }
+    #item-naam {
+        grid-column: 1 / 3; /* Naam over de volledige breedte */
+    }
+    #add-item-form button {
+        grid-column: 1 / 3; /* Knop over de volledige breedte */
+    }
+    #add-item-form div[style*="grid-column"] {
+        grid-column: 1 / 3 !important; /* Checkbox-div ook over 2 kolommen */
+    }
+    
+    /* Verander de item-lijsten naar een grid (jouw bestaande code) */
     #lijst-vriezer-1,
     #lijst-vriezer-2 {
         display: grid;
@@ -287,6 +384,7 @@ li .item-buttons { display: flex; gap: 10px; }
         flex-direction: row; /* items naast elkaar */
         align-items: center; /* centreren */
         padding: 15px;
+        gap: 0; /* Reset gap van mobiel */
     }
 
     #lijst-vriezer-1 li .item-text,
@@ -332,7 +430,7 @@ li .item-buttons { display: flex; gap: 10px; }
 }
 
 
-/* --- NIEUW: STIJLEN VOOR KLEURCODERING --- */
+/* --- STIJLEN VOOR KLEURCODERING --- */
 /* Deze horen hier, buiten de media queries */
 li.item-fresh { 
     border-left: 5px solid #66DDAA; /* Groen */
@@ -357,7 +455,8 @@ li.item-old {
     hr,
     .item-buttons,
     #add-item-form label[for="remember-drawer-check"],
-    input[type="checkbox"] {
+    input[type="checkbox"],
+    .lade-filter-container { /* NIEUW: Verberg filters bij printen */
         display: none !important; /* Forceer verbergen */
     }
 
