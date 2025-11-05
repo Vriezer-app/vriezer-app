@@ -17,7 +17,7 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* --- AANGEPAST: HEADER VOOR MOBIEL --- */
+/* --- Header Stijlen (Stapelt op mobiel) --- */
 .header-bar {
     display: flex;
     justify-content: space-between;
@@ -25,23 +25,20 @@ body {
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* Toestaan om te 'wrappen' */
+    flex-wrap: wrap; 
     gap: 15px; 
 }
-
-/* Container voor de knoppen in de header */
 .header-buttons {
-    display: grid; /* GEWIJZIGD: Standaard op grid */
-    grid-template-columns: 1fr; /* GEWIJZIGD: Eén kolom (gestapeld) */
+    display: grid; 
+    grid-template-columns: 1fr; /* 1 kolom = gestapeld */
     gap: 10px;
-    width: 100%; /* GEWIJZIGD: Volledige breedte op mobiel */
+    width: 100%; /* Volledige breedte op mobiel */
 }
-
 .header-buttons .btn-beheer {
-    width: 100%; /* Zorgt dat knoppen de grid vullen */
-    box-sizing: border-box; /* Zorgt dat padding netjes past */
+    width: 100%; 
+    box-sizing: border-box; 
 }
-/* --- EINDE AANPASSING HEADER --- */
+/* --- Einde Header Stijlen --- */
 
 
 h1 { color: #66DDAA; margin: 0; padding: 0; border: none; }
@@ -68,10 +65,10 @@ h2 {
 
 hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 
-/* --- De Formulieren --- */
+/* --- AANGEPAST: Formulier Grid --- */
 #add-item-form {
     display: grid;
-    grid-template-columns: 1fr; /* GEWIJZIGD: Standaard één kolom voor mobiel */
+    grid-template-columns: 1fr 1fr; /* 2 kolommen grid */
     gap: 15px;
 }
 #add-lade-form {
@@ -81,19 +78,31 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 }
 #add-lade-form button { background-color: #4A90E2; }
 
-#item-naam { grid-column: 1 / -1; } /* Vult de ene kolom */
-#item-aantal, #item-eenheid, #item-vriezer, #item-schuif {
-    width: 100%;
-    box-sizing: border-box;
-}
-#add-item-form button { grid-column: 1 / -1; width: 100%; }
-#add-lade-form button { grid-column: 1 / -1; width: 100%; }
+/* --- Stijlen voor items IN het grid --- */
 
-#add-item-form label[for="remember-drawer-check"] {
-    display: inline;
+/* Volle breedte items (span 2 kolommen) */
+#item-naam,
+#item-barcode,
+.checkbox-container,
+#add-item-form > button[type="submit"] {
+    grid-column: 1 / 3;
+}
+
+/* Stijl de checkbox container */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.checkbox-container input {
+    width: auto !important;
+}
+.checkbox-container label {
     margin: 0;
     font-weight: normal;
 }
+/* --- Einde Grid Item Stijlen --- */
+
 
 input[type="text"], input[type="number"], select {
     width: 100%;
@@ -110,7 +119,8 @@ select:required:invalid { color: #999; }
 option[value=""] { color: #999; }
 option { color: #333; }
 
-button[type="submit"] {
+/* Stijl voor alle knoppen in het formulier */
+#add-item-form button {
     background-color: #66DDAA;
     color: #1a1a1a;
     border: none;
@@ -120,11 +130,28 @@ button[type="submit"] {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Ruimte tussen icoon en tekst */
 }
-button[type="submit"]:hover { background-color: #88FFCC; }
+#add-item-form button:hover { background-color: #88FFCC; }
+
+/* Specifieke kleuren voor barcode knoppen */
+#barcode-scan-btn {
+    background-color: #66DDAA; /* Groen */
+    color: #1a1a1a;
+}
+#barcode-scan-btn:hover { background-color: #88FFCC; }
+
+#barcode-search-btn {
+    background-color: #4A90E2; /* Blauw */
+    color: white;
+}
+#barcode-search-btn:hover { background-color: #63a4f0; }
 
 
-/* --- De Voorraadlijst Container (2 kolommen) --- */
+/* --- De Voorraadlijst Container --- */
 .vriezer-container { display: flex; flex-wrap: wrap; gap: 25px; }
 .vriezer-kolom { flex: 1; min-width: 300px; }
 #lijst-vriezer-1, #lijst-vriezer-2 { list-style-type: none; padding: 0; margin: 0; }
@@ -141,7 +168,6 @@ button[type="submit"]:hover { background-color: #88FFCC; }
 }
 .vriezer-kolom h3:first-of-type { margin-top: 0; }
 
-/* Lijst items (inventaris) - Mobiele weergave */
 li {
     display: flex;
     justify-content: space-between;
@@ -253,7 +279,7 @@ li .item-buttons { display: flex; gap: 10px; }
 #lades-lijst-v1, #lades-lijst-v2 { list-style: none; padding: 0; }
 
 #lades-lijst-v1 li, #lades-lijst-v2 li {
-    background-color: #f9f9f9;
+    background-color: #f9f9ff;
     border: 1px solid #e9e9e9;
     padding: 10px 15px;
     margin-bottom: 8px;
@@ -290,28 +316,32 @@ li .item-buttons { display: flex; gap: 10px; }
     }
     .header-buttons {
         display: flex; /* Terug naar flex */
+        grid-template-columns: none; /* Reset grid */
         width: auto; /* Terug naar auto breedte */
     }
 
-    /* Formulier weer in twee kolommen */
+    /* Formulier layout voor desktop (blijft 2 kolommen) */
     #add-item-form {
-        grid-template-columns: 1fr 1fr; /* Terug naar twee kolommen */
-    }
-    #item-naam { grid-column: 1 / 3; }
-    #add-item-form button { grid-column: 1 / 3; }
-
-    /* Barcode container weer naast elkaar */
-    .barcode-container {
-        grid-column: 1 / 3;
-        display: flex; /* Terug naar flex */
-        flex-direction: row; /* Zeker zijn */
-        gap: 10px;
-    }
-    .barcode-container button {
-        width: 50px; /* Vaste breedte op desktop */
-        padding: 12px;
+        grid-template-columns: 1fr 1fr; 
     }
     
+    /* Zorg dat barcode knoppen op desktop ook netjes zijn */
+    #barcode-scan-btn,
+    #barcode-search-btn {
+        grid-column: auto; /* Reset de span */
+    }
+    
+    /* Layout voor desktop barcode container */
+    #item-barcode {
+        grid-column: 1 / 3; /* Volle breedte */
+    }
+    #barcode-scan-btn {
+        grid-column: 1 / 2; /* Halve breedte */
+    }
+    #barcode-search-btn {
+        grid-column: 2 / 3; /* Halve breedte */
+    }
+
     /* Voorraadlijst in een grid */
     #lijst-vriezer-1,
     #lijst-vriezer-2 {
@@ -372,52 +402,6 @@ li .item-buttons { display: flex; gap: 10px; }
     font-size: 1.1em;
 }
 
-/* --- HERSTELD: BARCODE ZOEKVELD STIJL --- */
-.barcode-container {
-    grid-column: 1 / -1; /* Zorgt dat het in de 1-kolom grid past */
-    display: grid; /* GEWIJZIGD: Standaard op grid */
-    grid-template-columns: 1fr; /* GEWIJZIGD: Eén kolom (gestapeld) */
-    gap: 10px;
-}
-.barcode-container input {
-    flex-grow: 1; 
-    min-width: 0; 
-}
-.barcode-container button {
-    flex-shrink: 0; 
-    background-color: #4A90E2; /* Blauw (Zoek) */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-size: 16px; 
-    
-    /* --- DE FIX --- */
-    padding: 12px; /* Zorgt voor correcte hoogte */
-    width: 100%;   /* GEWIJZIGD: Volledige breedte */
-    box-sizing: border-box; /* Zorgt dat padding netjes past */
-    /* aspect-ratio: 1 / 1;  <-- VERWIJDERD */
-    /* --- EINDE FIX --- */
-
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
-}
-.barcode-container button:hover {
-    background-color: #63a4f0;
-}
-/* Aparte stijl voor de groene Scan knop */
-.barcode-container button#barcode-scan-btn {
-    background-color: #66DDAA; /* Groen (Scan) */
-    color: #1a1a1a;
-}
-.barcode-container button#barcode-scan-btn:hover {
-    background-color: #88FFCC;
-}
-/* --- EINDE HERSTELDE STIJLEN --- */
-
-
 /* --- STIJLEN VOOR KLEURCODERING --- */
 li.item-fresh { 
     border-left: 5px solid #66DDAA; /* Groen */
@@ -432,7 +416,6 @@ li.item-old {
 
 /* --- PRINT STIJLEN --- */
 @media print {
-    /* Verberg alles wat je niet wilt printen */
     .header-bar,
     #add-item-form,
     .search-container,
@@ -440,8 +423,7 @@ li.item-old {
     .modal-overlay,
     hr,
     .item-buttons,
-    #add-item-form label[for="remember-drawer-check"],
-    input[type="checkbox"] {
+    .checkbox-container {
         display: none !important; 
     }
 
@@ -482,5 +464,3 @@ li.item-old {
         display: none !important;
     }
 }
-
-
