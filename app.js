@@ -53,10 +53,19 @@ const dashTotaal = document.getElementById('dash-totaal');
 const dashV1 = document.getElementById('dash-v1');
 const dashV2 = document.getElementById('dash-v2');
 
-// --- NIEUW: Snelkoppelingen voor feedback en filters ---
+// --- Snelkoppelingen voor feedback en filters ---
 const feedbackMessage = document.getElementById('feedback-message');
 const filterV1 = document.getElementById('filter-v1');
 const filterV2 = document.getElementById('filter-v2');
+
+// --- NIEUW: Snelkoppelingen voor Barcode Scanner ---
+const scanBtn = document.getElementById('scan-btn');
+const scanModal = document.getElementById('scan-modal');
+const stopScanBtn = document.getElementById('btn-stop-scan');
+const scannerContainerId = "barcode-scanner-container";
+
+// --- NIEUW: Globale variabele voor de scanner ---
+let html5QrCode;
 // ---------------------------------------------------
 
 
@@ -64,7 +73,7 @@ const filterV2 = document.getElementById('filter-v2');
 // HELPER FUNCTIES
 // ---
 
-// --- NIEUW: Functie voor visuele feedback ---
+// --- Functie voor visuele feedback ---
 /**
  * Toont een feedbackbericht aan de gebruiker voor 3 seconden.
  * @param {string} message - Het bericht dat getoond moet worden.
@@ -106,6 +115,123 @@ function formatDatum(timestamp) {
     return datum.toLocaleDateString('nl-BE');
 }
 
+// --- NIEUW: BARCODE SCANNER LOGICA ---
+
+/**
+ * Start de barcode scanner wanneer de modal opent.
+ */
+function startScanner() {
+    // Maak alleen een *nieuw* scanner object als het nog niet bestaat
+    if (!html5QrCode) {
+        // 'Html5Qrcode' komt van de script-tag die we in de HTML hebben geladen
+        html5QrCode = new Html5Qrcode(scannerContainerId);
+    }
+    
+    scanModal.style.display = 'flex';
+    
+    // We vragen de camera met 'environment' (achterkant telefoon)
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        {
+            fps: 10, // Scan 10x per seconde
+            qrbox: { width: 250, height: 150 } // Grootte van het scan-kader
+        },
+        onScanSuccess,  // Functie die afgaat bij succes
+        onScanFailure   // Functie voor errors (optioneel)
+    ).catch(err => {
+        // Dit vangt fouten op zoals "geen camera" of "geen permissie"
+        console.error("Kan camera niet starten:", err);
+        showFeedback("Kan camera niet starten. Heb je permissie gegeven?", "error");
+        sluitScanner();
+    });
+}
+
+/**
+ * Functie om de scanner en de modal te sluiten.
+ */
+function sluitScanner() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        // Stop de camera-feed
+        html5QrCode.stop().then(() => {
+            console.log("Scanner gestopt.");
+        }).catch(err => {
+            console.warn("Scanner kon niet netjes stoppen:", err);
+        });
+    }
+    scanModal.style.display = 'none';
+}
+
+/**
+ * Callback: Aangeroepen als een barcode succesvol is gelezen.
+ */
+function onScanSuccess(decodedText, decodedResult) {
+    // decodedText is de EAN code (het nummer)
+    console.log(`Scan succesvol, EAN: ${decodedText}`);
+    
+    // Stop de scanner en sluit de modal
+    sluitScanner();
+    
+    // Roep de API aan met de gevonden EAN code
+    fetchProductFromOFF(decodedText);
+}
+
+/**
+ * Callback: Wordt aangeroepen bij scan-fouten (meestal genegeerd).
+ */
+function onScanFailure(error) {
+    // console.warn(`Scan fout: ${error}`);
+}
+
+/**
+ * Haalt productinformatie op van Open Food Facts (API v2)
+ * en zoekt specifiek naar de NEDERLANDSE benaming.
+ */
+async function fetchProductFromOFF(ean) {
+    const url = `https://world.openfoodfacts.org/api/v2/product/${ean}.json`;
+    
+    // Geef feedback dat we aan het zoeken zijn
+    document.getElementById('item-naam').value = "Product zoeken...";
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Product niet gevonden (404)');
+        }
+        
+        const data = await response.json();
+        
+        // Check of het product bestaat in de database
+        if (data.status === 0 || !data.product) {
+            throw new Error('Product niet gevonden in Open Food Facts');
+        }
+
+        // --- HET BELANGRIJKE DEEL: DE NEDERLANDSE NAAM ---
+        
+        // 1. Probeer eerst de Nederlandse productnaam (product_name_nl)
+        // 2. Fallback naar de algemene productnaam (product_name)
+        // 3. Fallback naar de 'generic_name_nl' (bv. "Frisdrank")
+        const productName = data.product.product_name_nl || 
+                            data.product.product_name || 
+                            data.product.generic_name_nl ||
+                            null; // Zorg dat we 'null' hebben als niets is gevonden
+
+        if (productName) {
+            // Gevonden! Vul de naam in.
+            document.getElementById('item-naam').value = productName;
+            showFeedback('Productnaam ingevuld!', 'success');
+        } else {
+            // Wel gevonden, maar geen bruikbare naam
+            throw new Error('Product gevonden, maar geen (NL) naam beschikbaar');
+        }
+
+    } catch (error) {
+        console.error("Open Food Facts Fout:", error.message);
+        showFeedback(error.message, 'error');
+        document.getElementById('item-naam').value = ""; // Maak veld weer leeg
+    }
+}
+// --- EINDE BARCODE SCANNER LOGICA ---
+
 // ---
 // STAP 2: LADES OPHALEN & APP INITIALISEREN
 // ---
@@ -120,7 +246,7 @@ async function laadLades() {
         });
         vulLadeBeheerLijst();
         vulSchuifDropdowns();
-        vulLadeFilterDropdowns(); // --- NIEUW: Vul de filter-dropdowns ---
+        vulLadeFilterDropdowns(); // Vul de filter-dropdowns
         laadItems(); 
     });
 }
@@ -138,7 +264,7 @@ function vulSchuifDropdowns() {
 }
 vriezerSelect.addEventListener('change', vulSchuifDropdowns);
 
-// --- NIEUW: Functie om de filter-dropdowns te vullen ---
+// Functie om de filter-dropdowns te vullen
 function vulLadeFilterDropdowns() {
     // Reset de filters (behoud de 'Alle Lades' optie)
     filterV1.innerHTML = '<option value="alles">Alle Lades</option>';
@@ -180,7 +306,7 @@ form.addEventListener('submit', (e) => {
         ingevrorenOp: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then(() => {
-        // --- AANGEPAST: Visuele feedback ---
+        // Visuele feedback
         showFeedback(`'${itemNaam}' toegevoegd!`, 'success');
 
         const rememberCheck = document.getElementById('remember-drawer-check');
@@ -197,7 +323,7 @@ form.addEventListener('submit', (e) => {
             schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
         }
     })
-    // --- NIEUW: Foutafhandeling ---
+    // Foutafhandeling
     .catch((err) => {
         console.error("Fout bij toevoegen: ", err);
         showFeedback(`Fout bij toevoegen: ${err.message}`, 'error');
@@ -222,7 +348,7 @@ function laadItems() {
             const ladeNaam = ladesMap[item.ladeId] || "Onbekende Lade";
             const li = document.createElement('li');
             
-            // --- NIEUW: Data-attribuut toevoegen voor filtering ---
+            // Data-attribuut toevoegen voor filtering
             li.dataset.ladeId = item.ladeId;
             // ----------------------------------------------------
 
@@ -262,7 +388,6 @@ function laadItems() {
                     const titel = document.createElement('h3');
                     titel.className = 'schuif-titel';
                     titel.textContent = ladeNaam;
-                    // --- NIEUW: Data-attribuut ook op titel voor filtering ---
                     titel.dataset.ladeId = item.ladeId;
                     lijstVriezer1.appendChild(titel);
                 }
@@ -274,7 +399,6 @@ function laadItems() {
                     const titel = document.createElement('h3');
                     titel.className = 'schuif-titel';
                     titel.textContent = ladeNaam;
-                    // --- NIEUW: Data-attribuut ook op titel voor filtering ---
                     titel.dataset.ladeId = item.ladeId;
                     lijstVriezer2.appendChild(titel);
                 }
@@ -286,13 +410,13 @@ function laadItems() {
         dashV1.textContent = `Vriezer 1: ${countV1}`;
         dashV2.textContent = `Vriezer 2: ${countV2}`;
         
-        // --- AANGEPAST: Pas filters toe na het renderen ---
+        // Pas filters toe na het renderen
         updateItemVisibility();
         // ------------------------------------------------
 
     }, (error) => {
         console.error("Fout bij ophalen items: ", error);
-        showFeedback(`Databasefout: ${error.message}`, 'error'); // --- NIEUW ---
+        showFeedback(`Databasefout: ${error.message}`, 'error');
         if (error.code === 'failed-precondition') {
              alert("FOUT: De database query is mislukt. Waarschijnlijk moet je een 'composite index' (voor vriezer/ladeId) aanmaken in je Firebase Console. Check de JavaScript console (F12) voor een directe link om dit te fixen.");
         }
@@ -300,7 +424,7 @@ function laadItems() {
 }
 
 // ---
-// STAP 5: Items Verwijderen & Bewerken (Listeners) - AANGEPAST
+// STAP 5: Items Verwijderen & Bewerken (Listeners)
 // ---
 function handleItemLijstClick(e) {
     const editButton = e.target.closest('.edit-btn');
@@ -310,7 +434,6 @@ function handleItemLijstClick(e) {
         const id = deleteButton.dataset.id;
         if (confirm("Weet je zeker dat je dit item wilt verwijderen?")) {
             itemsCollectie.doc(id).delete()
-                // --- NIEUW: Feedback en foutafhandeling ---
                 .then(() => {
                     showFeedback('Item verwijderd.', 'success');
                 })
@@ -342,7 +465,6 @@ function handleItemLijstClick(e) {
                 editSchuif.value = item.ladeId;
                 editModal.style.display = 'flex';
             })
-            // --- NIEUW: Foutafhandeling ---
             .catch((err) => {
                 console.error("Fout bij ophalen voor bewerken: ", err);
                 showFeedback(`Fout bij ophalen: ${err.message}`, 'error');
@@ -370,10 +492,8 @@ editForm.addEventListener('submit', (e) => {
     })
     .then(() => {
         sluitItemModal();
-        // --- NIEUW: Feedback ---
         showFeedback('Item bijgewerkt!', 'success');
     })
-    // --- NIEUW: Foutafhandeling ---
     .catch((err) => {
         console.error("Fout bij bijwerken: ", err);
         showFeedback(`Fout bij bijwerken: ${err.message}`, 'error');
@@ -385,7 +505,7 @@ btnCancel.addEventListener('click', sluitItemModal);
 
 
 // ---
-// STAP 6: LADE BEHEER LOGICA - AANGEPAST
+// STAP 6: LADE BEHEER LOGICA
 // ---
 beheerLadesKnop.addEventListener('click', () => {
     ladeBeheerModal.style.display = 'flex';
@@ -439,10 +559,8 @@ addLadeForm.addEventListener('submit', (e) => {
     })
     .then(() => {
         addLadeForm.reset();
-        // --- NIEUW: Feedback ---
         showFeedback('Nieuwe lade toegevoegd!', 'success');
     })
-    // --- NIEUW: Foutafhandeling ---
     .catch((err) => {
         console.error("Fout bij toevoegen lade: ", err);
         showFeedback(`Fout: ${err.message}`, 'error');
@@ -457,13 +575,11 @@ async function handleLadeLijstClick(e) {
         const id = deleteButton.dataset.id;
         const itemsCheck = await itemsCollectie.where("ladeId", "==", id).limit(1).get();
         if (!itemsCheck.empty) {
-            // --- AANGEPAST: Gebruik feedback ipv alert ---
             showFeedback('Kan lade niet verwijderen: er zitten nog items in!', 'error');
             return;
         }
         if (confirm("Weet je zeker dat je deze (lege) lade wilt verwijderen?")) {
             ladesCollectie.doc(id).delete()
-                // --- NIEUW: Feedback en foutafhandeling ---
                 .then(() => {
                     showFeedback('Lade verwijderd.', 'success');
                 })
@@ -483,11 +599,9 @@ async function handleLadeLijstClick(e) {
             ladesCollectie.doc(id).update({
                 naam: nieuweNaam
             })
-            // --- AANGEPAST: Feedback ipv alert ---
             .then(() => {
                 showFeedback('Lade hernoemd!', 'success');
             })
-            // --- NIEUW: Foutafhandeling ---
             .catch((err) => {
                 console.error("Fout bij hernoemen lade: ", err);
                 showFeedback(`Fout: ${err.message}`, 'error');
@@ -509,22 +623,22 @@ logoutBtn.addEventListener('click', () => {
             })
             .catch((error) => {
                 console.error("Fout bij uitloggen:", error);
-                showFeedback(`Fout bij uitloggen: ${error.message}`, 'error'); // --- AANGEPAST ---
+                showFeedback(`Fout bij uitloggen: ${error.message}`, 'error');
             });
     }
 });
 
 // ---
-// STAP 8: ZOEKBALK & FILTER LOGICA (HEVIG AANGEPAST)
+// STAP 8: ZOEKBALK & FILTER LOGICA
 // ---
 
-// --- AANGEPAST: Listeners voor de nieuwe filters ---
+// Listeners voor de filters
 searchBar.addEventListener('input', updateItemVisibility);
 filterV1.addEventListener('change', updateItemVisibility);
 filterV2.addEventListener('change', updateItemVisibility);
 
 
-// --- AANGEPAST: Hernoemd van 'filterItems' en uitgebreid ---
+// Hernoemd van 'filterItems' en uitgebreid
 function updateItemVisibility() {
     // Haal alle huidige filterwaarden op
     const searchTerm = searchBar.value.toLowerCase();
@@ -601,6 +715,15 @@ function checkLadesInLijst(lijstElement) {
 // ---
 printBtn.addEventListener('click', () => {
     window.print();
+});
+
+// --- NIEUW: Event Listeners voor de Scanner ---
+scanBtn.addEventListener('click', () => {
+    startScanner();
+});
+
+stopScanBtn.addEventListener('click', () => {
+    sluitScanner();
 });
 
 
