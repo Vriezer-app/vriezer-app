@@ -54,7 +54,7 @@ const dashTotaal = document.getElementById('dash-totaal');
 const dashV1 = document.getElementById('dash-v1');
 const dashV2 = document.getElementById('dash-v2');
 
-// --- NIEUWE SNELKOPPELINGEN VOOR BARCODE ---
+// --- SNELKOPPELINGEN VOOR BARCODE ---
 const barcodeInput = document.getElementById('item-barcode');
 const barcodeSearchBtn = document.getElementById('barcode-search-btn');
 const barcodeScanBtn = document.getElementById('barcode-scan-btn');
@@ -620,4 +620,5 @@ auth.onAuthStateChanged((user) => {
         window.location.replace('index.html');
     }
 });
+
 
