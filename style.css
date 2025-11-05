@@ -17,7 +17,6 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* --- AANGEPAST: HEADER VOOR MOBIEL --- */
 .header-bar {
     display: flex;
     justify-content: space-between;
@@ -25,24 +24,7 @@ body {
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* Toestaan om te 'wrappen' */
-    gap: 15px; /* Ruimte tussen titel en knoppen als ze wrappen */
 }
-
-/* Container voor de knoppen in de header */
-.header-buttons {
-    display: grid; /* GEWIJZIGD: Standaard op grid */
-    grid-template-columns: 1fr; /* GEWIJZIGD: Eén kolom (gestapeld) */
-    gap: 10px;
-    width: 100%; /* GEWIJZIGD: Volledige breedte op mobiel */
-}
-
-.header-buttons .btn-beheer {
-    width: 100%; /* Zorgt dat knoppen de grid vullen */
-    box-sizing: border-box; /* Zorgt dat padding netjes past */
-}
-/* --- EINDE AANPASSING HEADER --- */
-
 
 h1 { color: #66DDAA; margin: 0; padding: 0; border: none; }
 
@@ -68,10 +50,10 @@ h2 {
 
 hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 
-/* --- AANGEPAST: Formulier Grid (Mobile-First) --- */
+/* --- De Formulieren --- */
 #add-item-form {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 kolommen grid */
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
 #add-lade-form {
@@ -81,33 +63,20 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 }
 #add-lade-form button { background-color: #4A90E2; }
 
-/* --- Stijlen voor items IN het grid --- */
+#item-naam { grid-column: 1 / 3; }
+#item-aantal, #item-eenheid, #item-vriezer, #item-schuif {
+    width: 100%;
+    box-sizing: border-box;
+}
+#add-item-form button { grid-column: 1 / 3; width: 100%; }
+#add-lade-form button { grid-column: 1 / 2; width: 100%; }
 
-/* Volle breedte items (span 2 kolommen) */
-#item-naam,
-#item-barcode,
-.checkbox-container,
-#add-item-form > button[type="submit"] {
-    grid-column: 1 / 3;
-}
-
-/* Stijl de checkbox container */
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    grid-column: 1 / 3; /* Zeker zijn dat deze vol is */
-}
-.checkbox-container input {
-    width: auto !important; /* Forceer auto breedte */
-    flex-shrink: 0;
-}
-.checkbox-container label {
+/* NIEUW: Label voor "Onthoud Lade" checkbox stylen */
+#add-item-form label[for="remember-drawer-check"] {
+    display: inline;
     margin: 0;
     font-weight: normal;
 }
-/* --- Einde Grid Item Stijlen --- */
-
 
 input[type="text"], input[type="number"], select {
     width: 100%;
@@ -124,8 +93,7 @@ select:required:invalid { color: #999; }
 option[value=""] { color: #999; }
 option { color: #333; }
 
-/* Stijl voor alle knoppen in het formulier */
-#add-item-form button {
+button[type="submit"] {
     background-color: #66DDAA;
     color: #1a1a1a;
     border: none;
@@ -135,29 +103,11 @@ option { color: #333; }
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px; /* Ruimte tussen icoon en tekst */
-    box-sizing: border-box; /* Zorgt dat padding netjes past */
 }
-#add-item-form button:hover { background-color: #88FFCC; }
-
-/* Specifieke kleuren voor barcode knoppen */
-#barcode-scan-btn {
-    background-color: #66DDAA; /* Groen */
-    color: #1a1a1a;
-}
-#barcode-scan-btn:hover { background-color: #88FFCC; }
-
-#barcode-search-btn {
-    background-color: #4A90E2; /* Blauw */
-    color: white;
-}
-#barcode-search-btn:hover { background-color: #63a4f0; }
+button[type="submit"]:hover { background-color: #88FFCC; }
 
 
-/* --- De Voorraadlijst Container --- */
+/* --- De Voorraadlijst Container (2 kolommen) --- */
 .vriezer-container { display: flex; flex-wrap: wrap; gap: 25px; }
 .vriezer-kolom { flex: 1; min-width: 300px; }
 #lijst-vriezer-1, #lijst-vriezer-2 { list-style-type: none; padding: 0; margin: 0; }
@@ -174,6 +124,7 @@ option { color: #333; }
 }
 .vriezer-kolom h3:first-of-type { margin-top: 0; }
 
+/* Lijst items (inventaris) - Mobiele weergave */
 li {
     display: flex;
     justify-content: space-between;
@@ -259,19 +210,6 @@ li .item-buttons { display: flex; gap: 10px; }
 .btn-cancel:hover { background-color: #bbb; }
 
 
-/* --- Stijl voor de nieuwe modal header --- */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.modal-header h2 {
-    margin: 0;
-    border: none;
-    padding: 0;
-}
-
 /* --- LADE BEHEER MODAL --- */
 .lade-beheer-container { display: flex; flex-wrap: wrap; gap: 20px; }
 .lade-beheer-kolom { flex: 1; min-width: 200px; }
@@ -282,31 +220,47 @@ li .item-buttons { display: flex; gap: 10px; }
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
 }
+/* --- Stijl voor de nieuwe modal header --- */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* Ruimte onder de header */
+}
+
+/* Zorg dat de h2 in de header geen extra margin heeft */
+.modal-header h2 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
 #lades-lijst-v1, #lades-lijst-v2 { list-style: none; padding: 0; }
 
+/* Dit is het cruciale blok dat is aangepast */
 #lades-lijst-v1 li, #lades-lijst-v2 li {
-    background-color: #f9f9ff;
+    background-color: #f9f9f9;
     border: 1px solid #e9e9e9;
     padding: 10px 15px;
     margin-bottom: 8px;
     display: flex;
-    flex-direction: row; 
-    align-items: center; 
+    flex-direction: row; /* Zorgt dat items NAAST elkaar staan */
+    align-items: center; /* Lijn ze verticaal uit in het midden */
     gap: 8px;
 }
 #lades-lijst-v1 li .item-buttons,
 #lades-lijst-v2 li .item-buttons {
     justify-content: flex-start;
-    flex-shrink: 0; 
+    flex-shrink: 0; /* Zorgt dat knoppen niet krimpen */
 }
 #lades-lijst-v1 li .lade-naam-input,
 #lades-lijst-v2 li .lade-naam-input {
     width: auto; 
-    flex-grow: 1; 
+    flex-grow: 1; /* Pakt alle beschikbare ruimte */
     box-sizing: border-box;
     margin-right: 0;
-    min-width: 0; 
+    min-width: 0; /* DEZE REGEL IS DE FIX! */
 }
+/* Einde van het cruciale blok */
 
 #lades-lijst-v1 li span,
 #lades-lijst-v2 li span {
@@ -315,34 +269,7 @@ li .item-buttons { display: flex; gap: 10px; }
 
 /* --- MEDIA QUERY VOOR GROTERE SCHERMEN --- */
 @media (min-width: 768px) {
-    
-    /* Header knoppen weer naast elkaar */
-    .header-bar {
-        flex-wrap: nowrap;
-    }
-    .header-buttons {
-        display: flex; /* Terug naar flex */
-        grid-template-columns: none; /* Reset grid */
-        width: auto; /* Terug naar auto breedte */
-    }
-
-    /* Formulier layout voor desktop (blijft 2 kolommen) */
-    #add-item-form {
-        grid-template-columns: 1fr 1fr; 
-    }
-    
-    /* Layout voor desktop barcode container */
-    #item-barcode {
-        grid-column: 1 / 3; /* Volle breedte */
-    }
-    #barcode-scan-btn {
-        grid-column: 1 / 2; /* Halve breedte */
-    }
-    #barcode-search-btn {
-        grid-column: 2 / 3; /* Halve breedte */
-    }
-
-    /* Voorraadlijst in een grid */
+    /* Verander de item-lijsten naar een grid */
     #lijst-vriezer-1,
     #lijst-vriezer-2 {
         display: grid;
@@ -354,10 +281,11 @@ li .item-buttons { display: flex; gap: 10px; }
         grid-column: 1 / -1;
     }
 
+    /* De "kaarten" in het grid */
     #lijst-vriezer-1 li,
     #lijst-vriezer-2 li {
-        flex-direction: row; 
-        align-items: center; 
+        flex-direction: row; /* items naast elkaar */
+        align-items: center; /* centreren */
         padding: 15px;
     }
 
@@ -374,9 +302,10 @@ li .item-buttons { display: flex; gap: 10px; }
         flex-shrink: 0;
     }
 }
+/* EINDE VAN DE MEDIA QUERY (min-width: 768px) */
 
 
-/* --- Stijlen (Logout & Zoekbalk) --- */
+/* --- Stijlen die je al had (Logout & Zoekbalk) --- */
 .btn-logout {
     background-color: #FF6B6B;
 }
@@ -386,7 +315,7 @@ li .item-buttons { display: flex; gap: 10px; }
 
 .search-container {
     position: relative;
-    margin-bottom: 25px; 
+    margin-bottom: 25px; /* Zorgt voor ruimte onder de zoekbalk */
 }
 
 .search-container .fa-search {
@@ -402,7 +331,9 @@ li .item-buttons { display: flex; gap: 10px; }
     font-size: 1.1em;
 }
 
-/* --- STIJLEN VOOR KLEURCODERING --- */
+
+/* --- NIEUW: STIJLEN VOOR KLEURCODERING --- */
+/* Deze horen hier, buiten de media queries */
 li.item-fresh { 
     border-left: 5px solid #66DDAA; /* Groen */
 }
@@ -414,19 +345,23 @@ li.item-old {
 }
 
 
-/* --- PRINT STIJLEN --- */
+/* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
+/* Deze horen helemaal op het einde, als een eigen blok */
 @media print {
+    /* Verberg alles wat je niet wilt printen */
     .header-bar,
     #add-item-form,
     .search-container,
-    #dashboard, 
+    #dashboard, /* Ook het dashboard verbergen */
     .modal-overlay,
     hr,
     .item-buttons,
-    .checkbox-container {
-        display: none !important; 
+    #add-item-form label[for="remember-drawer-check"],
+    input[type="checkbox"] {
+        display: none !important; /* Forceer verbergen */
     }
 
+    /* Zorg dat de lijsten de volledige breedte pakken */
     body, .container {
         padding: 0;
         margin: 0;
@@ -436,15 +371,16 @@ li.item-old {
         border: none;
     }
     
+    /* Reset de item-stijl voor print */
     li {
         box-shadow: none;
         border: 1px solid #ccc;
-        page-break-inside: avoid; 
-        border-left: none !important; 
+        page-break-inside: avoid; /* Zorg dat een item niet over 2 paginas splitst */
+        border-left: none !important; /* Verberg kleurcode bij printen */
     }
     
     .vriezer-container {
-        flex-direction: column; 
+        flex-direction: column; /* Zet vriezers onder elkaar */
         gap: 0;
     }
     
@@ -456,13 +392,12 @@ li.item-old {
         background-color: #eee !important;
         color: #000 !important;
         border: 1px solid #ccc;
-        -webkit-print-color-adjust: exact; 
+        -webkit-print-color-adjust: exact; /* Forceer achtergrondkleur bij printen */
         color-adjust: exact;
     }
     
+    /* Datum ook verbergen bij printen */
     li small {
         display: none !important;
     }
 }
-
-
