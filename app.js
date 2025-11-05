@@ -64,7 +64,7 @@ const scanModal = document.getElementById('scan-modal');
 const stopScanBtn = document.getElementById('btn-stop-scan');
 const scannerContainerId = "barcode-scanner-container";
 
-// --- NIEUW: Snelkoppeling voor Handmatige EAN ---
+// --- Snelkoppeling voor Handmatige EAN ---
 const manualEanBtn = document.getElementById('manual-ean-btn');
 
 // --- Globale variabele voor de scanner ---
@@ -208,15 +208,14 @@ async function fetchProductFromOFF(ean) {
             throw new Error('Product niet gevonden in Open Food Facts');
         }
 
-        // --- HET BELANGRIJKE DEEL: DE NEDERLANDSE NAAM ---
+        // --- AANGEPAST: Slimmere zoeklogica voor Nederlandse naam ---
         
-        // 1. Probeer eerst de Nederlandse productnaam (product_name_nl)
-        // 2. Fallback naar de algemene productnaam (product_name)
-        // 3. Fallback naar de 'generic_name_nl' (bv. "Frisdrank")
         const productName = data.product.product_name_nl || 
-                            data.product.product_name || 
-                            data.product.generic_name_nl ||
-                            null; // Zorg dat we 'null' hebben als niets is gevonden
+                            data.product.generic_name_nl || 
+                            data.product.product_name_en || 
+                            data.product.generic_name_en || 
+                            data.product.product_name ||
+                            null;
 
         if (productName) {
             // Gevonden! Vul de naam in.
@@ -374,7 +373,7 @@ function laadItems() {
                     <strong>${item.naam} (${aantalText})</strong>
                     <small style="display: block; color: #555;">Ingevroren op: ${datumText}</small>
                 </div>
-                <div class="item-buttons">
+                <div class.item-buttons">
                     <button class="edit-btn" data-id="${docId}" title="Bewerken">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
@@ -729,7 +728,7 @@ stopScanBtn.addEventListener('click', () => {
     sluitScanner();
 });
 
-// --- NIEUW: Event Listener voor Handmatige EAN ---
+// --- Event Listener voor Handmatige EAN ---
 manualEanBtn.addEventListener('click', () => {
     // Gebruik een simpele 'prompt' om het nummer te vragen
     const ean = prompt("Voer het EAN-nummer (barcode) handmatig in:", "");
