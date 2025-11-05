@@ -58,13 +58,16 @@ const feedbackMessage = document.getElementById('feedback-message');
 const filterV1 = document.getElementById('filter-v1');
 const filterV2 = document.getElementById('filter-v2');
 
-// --- NIEUW: Snelkoppelingen voor Barcode Scanner ---
+// --- Snelkoppelingen voor Barcode Scanner ---
 const scanBtn = document.getElementById('scan-btn');
 const scanModal = document.getElementById('scan-modal');
 const stopScanBtn = document.getElementById('btn-stop-scan');
 const scannerContainerId = "barcode-scanner-container";
 
-// --- NIEUW: Globale variabele voor de scanner ---
+// --- NIEUW: Snelkoppeling voor Handmatige EAN ---
+const manualEanBtn = document.getElementById('manual-ean-btn');
+
+// --- Globale variabele voor de scanner ---
 let html5QrCode;
 // ---------------------------------------------------
 
@@ -115,7 +118,7 @@ function formatDatum(timestamp) {
     return datum.toLocaleDateString('nl-BE');
 }
 
-// --- NIEUW: BARCODE SCANNER LOGICA ---
+// --- BARCODE SCANNER LOGICA ---
 
 /**
  * Start de barcode scanner wanneer de modal opent.
@@ -717,13 +720,25 @@ printBtn.addEventListener('click', () => {
     window.print();
 });
 
-// --- NIEUW: Event Listeners voor de Scanner ---
+// --- Event Listeners voor de Scanner ---
 scanBtn.addEventListener('click', () => {
     startScanner();
 });
 
 stopScanBtn.addEventListener('click', () => {
     sluitScanner();
+});
+
+// --- NIEUW: Event Listener voor Handmatige EAN ---
+manualEanBtn.addEventListener('click', () => {
+    // Gebruik een simpele 'prompt' om het nummer te vragen
+    const ean = prompt("Voer het EAN-nummer (barcode) handmatig in:", "");
+    
+    // Als de gebruiker iets invoert (en niet op 'Annuleren' klikt)
+    if (ean && ean.trim() !== "") {
+        // We hebben al een functie die precies doet wat we willen:
+        fetchProductFromOFF(ean.trim());
+    }
 });
 
 
