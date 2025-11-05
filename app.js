@@ -1,556 +1,603 @@
-/* --- AANGEPAST: Globale instellingen (Mobile-first) --- */
-body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    margin: 0;
-    padding: 10px; /* AANGEPAST: Minder padding voor mobiel */
-    line-height: 1.6;
-}
+// Stap 1: Initialiseer Firebase
+const firebaseConfig = typeof __firebase_config !== 'undefined' 
+    ? JSON.parse(__firebase_config) 
+    : {
+  apiKey: "AIzaSyB9KRUbVBknnDDkkWF2Z5nRskmY-9CkD24",
+  authDomain: "vriezer-app.firebaseapp.com",
+  projectId: "vriezer-app",
+  storageBucket: "vriezer-app.firebasestorage.app",
+  messagingSenderId: "788492326775",
+  appId: "1:788492326775:web:c2cd85deac708b44f27372"
+    };
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 15px; /* AANGEPAST: Minder padding voor mobiel */
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+// Initialiseer Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+const itemsCollectie = db.collection('items');
+const ladesCollectie = db.collection('lades');
 
-.header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap; /* AANGEPAST: Zorgt dat knoppen onder de titel springen op kleine schermen */
-    gap: 10px; /* Ruimte tussen titel en knoppen als ze wrappen */
-}
+// ---
+// GLOBALE VARIABELEN
+// ---
+let alleLades = [];
+let ladesMap = {};
 
-h1 { color: #66DDAA; margin: 0; padding: 0; border: none; }
+// ---
+// Snelkoppelingen naar elementen
+// ---
+const form = document.getElementById('add-item-form');
+const lijstVriezer1 = document.getElementById('lijst-vriezer-1');
+const lijstVriezer2 = document.getElementById('lijst-vriezer-2');
+const vriezerSelect = document.getElementById('item-vriezer');
+const schuifSelect = document.getElementById('item-schuif');
+const editModal = document.getElementById('edit-modal');
+const editForm = document.getElementById('edit-item-form');
+const editId = document.getElementById('edit-item-id');
+const editNaam = document.getElementById('edit-item-naam');
+const editAantal = document.getElementById('edit-item-aantal');
+const editEenheid = document.getElementById('edit-item-eenheid');
+const editVriezer = document.getElementById('edit-item-vriezer');
+const editSchuif = document.getElementById('edit-item-schuif');
+const btnCancel = document.getElementById('btn-cancel');
+const ladeBeheerModal = document.getElementById('lade-beheer-modal');
+const beheerLadesKnop = document.getElementById('beheer-lades-knop');
+const sluitLadeBeheerKnop = document.getElementById('btn-sluit-lade-beheer');
+const addLadeForm = document.getElementById('add-lade-form');
+const ladesLijstV1 = document.getElementById('lades-lijst-v1');
+const ladesLijstV2 = document.getElementById('lades-lijst-v2');
+const logoutBtn = document.getElementById('logout-btn');
+const searchBar = document.getElementById('search-bar');
+const printBtn = document.getElementById('print-btn');
+const dashTotaal = document.getElementById('dash-totaal');
+const dashV1 = document.getElementById('dash-v1');
+const dashV2 = document.getElementById('dash-v2');
 
-.btn-beheer {
-    background-color: #4A90E2; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-.btn-beheer:hover { background-color: #63a4f0; }
+// --- Snelkoppelingen voor feedback en filters ---
+const feedbackMessage = document.getElementById('feedback-message');
+const filterV1 = document.getElementById('filter-v1');
+const filterV2 = document.getElementById('filter-v2');
 
-h2 {
-    color: #66DDAA;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-    margin-top: 0;
-}
+// --- Snelkoppelingen voor Barcode Scanner ---
+const scanBtn = document.getElementById('scan-btn');
+const scanModal = document.getElementById('scan-modal');
+const stopScanBtn = document.getElementById('btn-stop-scan');
+const scannerContainerId = "barcode-scanner-container";
+const manualEanBtn = document.getElementById('manual-ean-btn');
+let html5QrCode;
+// ---------------------------------------------------
 
-hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 
-/* --- Visuele Feedback Berichten --- */
-.feedback {
-    padding: 15px;
-    margin-bottom: 20px; /* Ruimte onder het bericht */
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
-    border: 1px solid transparent;
+// ---
+// HELPER FUNCTIES
+// ---
+
+// --- Functie voor visuele feedback ---
+function showFeedback(message, type = 'success') {
+    feedbackMessage.textContent = message;
+    feedbackMessage.className = 'feedback'; // Reset klassen
+    feedbackMessage.classList.add(type);    // Voeg 'success' of 'error' toe
+    feedbackMessage.classList.add('show');
     
-    /* Standaard verborgen */
-    display: none;
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    transform: translateY(-10px); /* Begin iets naar boven */
+    setTimeout(() => {
+        feedbackMessage.classList.remove('show');
+    }, 3000);
 }
 
-/* Klasse om te tonen (toegevoegd door JS) */
-.feedback.show {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Stijlen voor succes (groen) */
-.feedback.success {
-    background-color: #d1e7dd; /* Zacht groen */
-    color: #0f5132; /* Donker groen */
-    border-color: #badbcc;
-}
-
-/* Stijlen voor fout (rood) */
-.feedback.error {
-    background-color: #f8d7da; /* Zacht rood */
-    color: #842029; /* Donker rood */
-    border-color: #f5c2c7;
-}
-
-
-/* --- AANGEPAST: De Formulieren (Mobile-first) --- */
-#add-item-form {
-    display: grid;
-    grid-template-columns: 1fr; /* AANGEPAST: 1 kolom standaard voor mobiel */
-    gap: 15px;
-}
-#add-lade-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-}
-#add-lade-form button { background-color: #4A90E2; }
-
-#item-naam { grid-column: 1 / 2; } /* AANGEPAST: 1 kolom */
-#item-aantal, #item-eenheid, #item-vriezer, #item-schuif {
-    width: 100%;
-    box-sizing: border-box;
-}
-#add-item-form button[type="submit"] { grid-column: 1 / 2; width: 100%; } /* AANGEPAST: 1 kolom */
-#add-lade-form button { grid-column: 1 / 2; width: 100%; }
-
-/* AANGEPAST: Zorg dat de checkbox-div ook 1 kolom pakt */
-#add-item-form div[style*="grid-column"] {
-    grid-column: 1 / 2 !important; 
-}
-
-/* Label voor "Onthoud Lade" checkbox stylen */
-#add-item-form label[for="remember-drawer-check"] {
-    display: inline;
-    margin: 0;
-    font-weight: normal;
-}
-
-input[type="text"], input[type="number"], select {
-    width: 100%;
-    box-sizing: border-box; 
-    background-color: #fdfdfd;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 12px;
-    font-size: 16px;
-    font-family: 'Inter', system-ui, sans-serif;
-}
-select:required:invalid { color: #999; }
-option[value=""] { color: #999; }
-option { color: #333; }
-
-button[type="submit"] {
-    background-color: #66DDAA;
-    color: #1a1a1a;
-    border: none;
-    border-radius: 5px;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-button[type="submit"]:hover { background-color: #88FFCC; }
-
-
-/* --- Lade Filter Dropdown --- */
-.lade-filter-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-.lade-filter-container label {
-    font-weight: bold;
-    font-size: 0.9em;
-    color: #555;
-    flex-shrink: 0; /* Voorkom dat label krimpt */
-}
-.lade-filter {
-    width: auto;
-    flex-grow: 1; /* Pakt de rest van de ruimte */
-    padding: 8px; /* Iets compacter */
-    font-size: 15px;
-}
-
-
-/* --- De Voorraadlijst Container (2 kolommen) --- */
-.vriezer-container { display: flex; flex-wrap: wrap; gap: 25px; }
-.vriezer-kolom { flex: 1; min-width: 300px; }
-#lijst-vriezer-1, #lijst-vriezer-2 { list-style-type: none; padding: 0; margin: 0; }
-
-.schuif-titel {
-    color: #444;
-    background-color: #f0f0f0;
-    padding: 8px 15px;
-    border-radius: 5px;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    font-size: 1em;
-    font-weight: bold;
-}
-.vriezer-kolom h3:first-of-type { margin-top: 0; }
-
-/* Lijst items (inventaris) - Mobiele weergave */
-li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #ffffff;
-    border: 1px solid #e9e9e9;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    flex-wrap: wrap; /* AANGEPAST: Cruciaal voor mobiel */
-    gap: 10px; /* AANGEPAST: Ruimte tussen text en knoppen op mobiel */
-}
-li .item-text { 
-    flex-grow: 1; 
-    margin-right: 15px;
-    min-width: 150px; /* Zorgt dat de tekst niet te smal wordt */
-    cursor: grab; /* NIEUW: Laat zien dat je dit deel kunt pakken */
-}
-li .item-buttons { 
-    display: flex; 
-    gap: 10px;
-    flex-shrink: 0; /* Voorkom dat knoppen krimpen */
-}
-
-/* Icoon-knoppen (Bewerken, Verwijder, Opslaan) */
-.edit-btn, .delete-btn, .save-btn {
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.edit-btn { background-color: #4A90E2; }
-.edit-btn:hover { background-color: #63a4f0; }
-.delete-btn { background-color: #FF6B6B; }
-.delete-btn:hover { background-color: #FF8F8F; }
-.save-btn { background-color: #66DDAA; color: #1a1a1a; }
-.save-btn:hover { background-color: #88FFCC; }
-
-
-/* --- STIJLEN VOOR ALLE MODALS --- */
-.modal-overlay {
-    display: none; 
-    position: fixed; 
-    z-index: 100;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
-}
-.modal-content {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-.modal-content h2, .modal-content h3 { margin-top: 0; color: #66DDAA; }
-.modal-content h3 { color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; margin-top: 20px; }
-#edit-item-form label {
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-}
-.modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-.btn-save, .btn-cancel {
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.btn-save { background-color: #66DDAA; color: #1a1a1a; }
-.btn-save:hover { background-color: #88FFCC; }
-.btn-cancel { background-color: #aaa; color: white; }
-.btn-cancel:hover { background-color: #bbb; }
-
-
-/* --- LADE BEHEER MODAL --- */
-.lade-beheer-container { display: flex; flex-wrap: wrap; gap: 20px; }
-.lade-beheer-kolom { flex: 1; min-width: 200px; }
-.modal-content h4 {
-    color: #4A90E2;
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-}
-/* --- Stijl voor de nieuwe modal header --- */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px; /* Ruimte onder de header */
-}
-
-/* Zorg dat de h2 in de header geen extra margin heeft */
-.modal-header h2 {
-    margin: 0;
-    border: none;
-    padding: 0;
-}
-#lades-lijst-v1, #lades-lijst-v2 { list-style: none; padding: 0; }
-
-#lades-lijst-v1 li, #lades-lijst-v2 li {
-    background-color: #f9f9f9;
-    border: 1px solid #e9e9e9;
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    display: flex;
-    flex-direction: row; 
-    align-items: center; 
-    gap: 8px;
-}
-#lades-lijst-v1 li .item-buttons,
-#lades-lijst-v2 li .item-buttons {
-    justify-content: flex-start;
-    flex-shrink: 0; 
-}
-#lades-lijst-v1 li .lade-naam-input,
-#lades-lijst-v2 li .lade-naam-input {
-    width: auto; 
-    flex-grow: 1; 
-    box-sizing: border-box;
-    margin-right: 0;
-    min-width: 0; 
-}
-#lades-lijst-v1 li span,
-#lades-lijst-v2 li span {
-    display: none;
-}
-
-/* --- AANGEPAST: MEDIA QUERY VOOR GROTERE SCHERMEN --- */
-@media (min-width: 768px) {
-    
-    body { padding: 20px; }
-    .container { padding: 25px; }
-    
-    #add-item-form {
-        grid-template-columns: 1fr 1fr;
+function formatAantal(aantal, eenheid) {
+    if (!eenheid || eenheid === 'stuks') {
+        return `${aantal}x`;
     }
-    #item-naam {
-        grid-column: 1 / 3; 
+    if (eenheid === 'zak') {
+        if (aantal === 1) return "1 zak";
+        if (aantal === 0.75) return "3/4 zak";
+        if (aantal === 0.5) return "1/2 zak";
+        if (aantal === 0.25) return "1/4 zak";
+        if (aantal > 1 && (aantal % 1 === 0)) return `${aantal} zakken`;
+        return `${aantal} zakken`;
     }
-    
-    .input-with-button[style*="grid-column"] {
-        grid-column: 1 / 3 !important;
-    }
-    
-    #add-item-form button[type="submit"] {
-        grid-column: 1 / 3; 
-    }
-    #add-item-form div[style*="grid-column"] {
-        grid-column: 1 / 3 !important; 
-    }
-    
-    #lijst-vriezer-1,
-    #lijst-vriezer-2 {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 15px;
-    }
+    return `${aantal} ${eenheid}`;
+}
 
-    .schuif-titel {
-        grid-column: 1 / -1;
-    }
+function formatDatum(timestamp) {
+    if (!timestamp) return 'Onbekende datum';
+    const datum = timestamp.toDate();
+    return datum.toLocaleDateString('nl-BE');
+}
 
-    #lijst-vriezer-1 li,
-    #lijst-vriezer-2 li {
-        flex-direction: row; 
-        align-items: center; 
-        padding: 15px;
-        gap: 0; /* Reset gap van mobiel */
+// --- BARCODE SCANNER LOGICA ---
+function startScanner() {
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode(scannerContainerId);
     }
+    scanModal.style.display = 'flex';
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: { width: 250, height: 150 } },
+        onScanSuccess,  
+        onScanFailure   
+    ).catch(err => {
+        console.error("Kan camera niet starten:", err);
+        showFeedback("Kan camera niet starten. Heb je permissie gegeven?", "error");
+        sluitScanner();
+    });
+}
+function sluitScanner() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch(err => console.warn("Scanner kon niet netjes stoppen:", err));
+    }
+    scanModal.style.display = 'none';
+}
+function onScanSuccess(decodedText, decodedResult) {
+    console.log(`Scan succesvol, EAN: ${decodedText}`);
+    sluitScanner();
+    fetchProductFromOFF(decodedText);
+}
+function onScanFailure(error) { /* Genegeerd */ }
+async function fetchProductFromOFF(ean) {
+    const url = `https://world.openfoodfacts.org/api/v2/product/${ean}.json`;
+    document.getElementById('item-naam').value = "Product zoeken...";
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Product niet gevonden (404)');
+        const data = await response.json();
+        if (data.status === 0 || !data.product) throw new Error('Product niet gevonden in Open Food Facts');
 
-    #lijst-vriezer-1 li .item-text,
-    #lijst-vriezer-2 li .item-text {
-        margin-right: 15px;
-        margin-bottom: 0;
-    }
-    
-    #lijst-vriezer-1 li .item-buttons,
-    #lijst-vriezer-2 li .item-buttons {
-        width: auto;
-        justify-content: flex-end;
-        flex-shrink: 0;
+        const productName = data.product.product_name_nl || 
+                            data.product.generic_name_nl || 
+                            data.product.product_name_en || 
+                            data.product.generic_name_en || 
+                            data.product.product_name ||
+                            null;
+
+        if (productName) {
+            document.getElementById('item-naam').value = productName;
+            showFeedback('Productnaam ingevuld!', 'success');
+        } else {
+            throw new Error('Product gevonden, maar geen (NL) naam beschikbaar');
+        }
+    } catch (error) {
+        console.error("Open Food Facts Fout:", error.message);
+        showFeedback(error.message, 'error');
+        document.getElementById('item-naam').value = "";
     }
 }
-/* EINDE VAN DE MEDIA QUERY (min-width: 768px) */
+// --- EINDE BARCODE SCANNER LOGICA ---
 
-
-/* --- Stijlen die je al had (Logout & Zoekbalk) --- */
-.btn-logout {
-    background-color: #FF6B6B;
-}
-.btn-logout:hover {
-    background-color: #FF8F8F;
-}
-
-.search-container {
-    position: relative;
-    margin-bottom: 25px; 
-}
-
-.search-container .fa-search {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
+// ---
+// STAP 2: LADES OPHALEN & APP INITIALISEREN
+// ---
+async function laadLades() {
+    ladesCollectie.orderBy("vriezer").orderBy("naam").onSnapshot(snapshot => {
+        alleLades = [];
+        ladesMap = {};
+        snapshot.docs.forEach(doc => {
+            const lade = { id: doc.id, ...doc.data() };
+            alleLades.push(lade);
+            ladesMap[lade.id] = lade.naam;
+        });
+        vulLadeBeheerLijst();
+        vulSchuifDropdowns();
+        vulLadeFilterDropdowns();
+        laadItems(); 
+    });
 }
 
-#search-bar {
-    padding-left: 45px;
-    font-size: 1.1em;
+function vulSchuifDropdowns() {
+    const geselecteerdeVriezer = vriezerSelect.value;
+    schuifSelect.innerHTML = '<option value="" disabled selected>Kies een schuif...</option>';
+    const gefilterdeLades = alleLades.filter(lade => lade.vriezer === geselecteerdeVriezer);
+    gefilterdeLades.forEach(lade => {
+        const option = document.createElement('option');
+        option.value = lade.id;
+        option.textContent = lade.naam;
+        schuifSelect.appendChild(option);
+    });
+}
+vriezerSelect.addEventListener('change', vulSchuifDropdowns);
+
+function vulLadeFilterDropdowns() {
+    filterV1.innerHTML = '<option value="alles">Alle Lades</option>';
+    filterV2.innerHTML = '<option value="alles">Alle Lades</option>';
+    alleLades.forEach(lade => {
+        const option = document.createElement('option');
+        option.value = lade.id;
+        option.textContent = lade.naam;
+        if (lade.vriezer === 'Vriezer 1') filterV1.appendChild(option);
+        else if (lade.vriezer === 'Vriezer 2') filterV2.appendChild(option);
+    });
 }
 
+// ---
+// STAP 3: Items Opslaan (Create)
+// ---
+form.addEventListener('submit', (e) => {
+    e.preventDefault(); 
+    const schuifDropdown = document.getElementById('item-schuif');
+    const geselecteerdeLadeId = schuifDropdown.value;
+    const geselecteerdeLadeNaam = schuifDropdown.options[schuifDropdown.selectedIndex].text;
+    const itemNaam = document.getElementById('item-naam').value;
+    itemsCollectie.add({
+        naam: itemNaam,
+        aantal: parseFloat(document.getElementById('item-aantal').value),
+        eenheid: document.getElementById('item-eenheid').value,
+        vriezer: document.getElementById('item-vriezer').value,
+        ladeId: geselecteerdeLadeId,
+        ladeNaam: geselecteerdeLadeNaam,
+        ingevrorenOp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        showFeedback(`'${itemNaam}' toegevoegd!`, 'success');
+        const rememberCheck = document.getElementById('remember-drawer-check');
+        if (rememberCheck.checked) {
+            document.getElementById('item-naam').value = '';
+            document.getElementById('item-aantal').value = 1;
+            document.getElementById('item-eenheid').value = "stuks";
+            document.getElementById('item-naam').focus();
+        } else {
+            form.reset();
+            document.getElementById('item-eenheid').value = "stuks";
+            document.getElementById('item-vriezer').value = "";
+            schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
+        }
+    }).catch((err) => {
+        console.error("Fout bij toevoegen: ", err);
+        showFeedback(`Fout bij toevoegen: ${err.message}`, 'error');
+    });
+});
 
-/* --- STIJLEN VOOR KLEURCODERING --- */
-li.item-fresh { 
-    border-left: 5px solid #66DDAA; /* Groen */
-}
-li.item-medium { 
-    border-left: 5px solid #FFC107; /* Oranje */
-}
-li.item-old { 
-    border-left: 5px solid #FF6B6B; /* Rood */
+// ---
+// STAP 4: Items Tonen (Read) - AANGEPAST VOOR DRAG-AND-DROP
+// ---
+function laadItems() {
+    itemsCollectie.orderBy("vriezer").orderBy("ladeNaam").onSnapshot((snapshot) => {
+        lijstVriezer1.innerHTML = '';
+        lijstVriezer2.innerHTML = '';
+        let countV1 = 0, countV2 = 0;
+        let huidigeLadeIdV1 = "", huidigeLadeIdV2 = "";
+
+        snapshot.docs.forEach((doc) => {
+            const item = doc.data();
+            const docId = doc.id;
+            const ladeNaam = ladesMap[item.ladeId] || "Onbekende Lade";
+            const li = document.createElement('li');
+            
+            // --- AANGEPAST: Data-attributen toevoegen voor Drag-and-Drop ---
+            li.dataset.id = docId;
+            li.dataset.ladeId = item.ladeId;
+            li.dataset.vriezer = item.vriezer;
+            // ----------------------------------------------------
+
+            li.dataset.ladeId = item.ladeId; // Ook voor filters
+            const aantalText = formatAantal(item.aantal, item.eenheid);
+            const datumText = formatDatum(item.ingevrorenOp);
+            
+            if (item.ingevrorenOp) {
+                const ingevrorenDatum = item.ingevrorenOp.toDate();
+                const diffDagen = Math.ceil(Math.abs(new Date() - ingevrorenDatum) / (1000 * 60 * 60 * 24));
+                if (diffDagen > 180) { li.classList.add('item-old'); }
+                else if (diffDagen > 90) { li.classList.add('item-medium'); }
+                else { li.classList.add('item-fresh'); }
+            }   
+            
+            li.innerHTML = `
+                <div class="item-text">
+                    <strong>${item.naam} (${aantalText})</strong>
+                    <small style="display: block; color: #555;">Ingevroren op: ${datumText}</small>
+                </div>
+                <div class="item-buttons">
+                    <button class="edit-btn" data-id="${docId}" title="Bewerken">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="delete-btn" data-id="${docId}" title="Verwijder">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+
+            if (item.vriezer === 'Vriezer 1') {
+                countV1++;
+                if (item.ladeId !== huidigeLadeIdV1) {
+                    huidigeLadeIdV1 = item.ladeId;
+                    const titel = document.createElement('h3');
+                    titel.className = 'schuif-titel';
+                    titel.textContent = ladeNaam;
+                    titel.dataset.ladeId = item.ladeId;
+                    lijstVriezer1.appendChild(titel);
+                }
+                lijstVriezer1.appendChild(li);
+            } else if (item.vriezer === 'Vriezer 2') {
+                countV2++;
+                if (item.ladeId !== huidigeLadeIdV2) {
+                    huidigeLadeIdV2 = item.ladeId;
+                    const titel = document.createElement('h3');
+                    titel.className = 'schuif-titel';
+                    titel.textContent = ladeNaam;
+                    titel.dataset.ladeId = item.ladeId;
+                    lijstVriezer2.appendChild(titel);
+                }
+                lijstVriezer2.appendChild(li);
+            }
+        });
+        
+        dashTotaal.textContent = `Totaal: ${countV1 + countV2}`;
+        dashV1.textContent = `Vriezer 1: ${countV1}`;
+        dashV2.textContent = `Vriezer 2: ${countV2}`;
+        
+        updateItemVisibility();
+    }, (error) => {
+        console.error("Fout bij ophalen items: ", error);
+        showFeedback(`Databasefout: ${error.message}`, 'error');
+        if (error.code === 'failed-precondition') {
+             alert("FOUT: De database query is mislukt. Waarschijnlijk moet je een 'composite index' (voor vriezer/ladeId) aanmaken in je Firebase Console. Check de JavaScript console (F12) voor een directe link om dit te fixen.");
+        }
+    });
 }
 
-/* --- Stijlen voor Scan Knop & Modal --- */
-.input-with-button {
-    display: flex;
-    gap: 10px;
-    align-items: center; 
-}
-.input-with-button input {
-    flex-grow: 1; 
-    width: auto; 
-}
-.input-with-button button {
-    flex-shrink: 0; 
-    padding: 0; 
-    width: 50px; 
-    height: 50px; 
-    font-size: 20px; 
-}
-
-#barcode-scanner-container {
-    background-color: #222;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-#barcode-scanner-container video {
-    width: 100% !important;
-    height: auto !important;
-}
-
-#html5-qrcode-button-camera-stop {
-    background-color: #FF6B6B !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 5px !important;
-    padding: 10px 15px !important;
-    font-size: 15px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    margin-top: 10px !important;
-    width: 100%;
-}
-
-
-/* --- NIEUW: Drag-and-Drop Stijlen --- */
-/* Stijl voor het item dat je vasthebt */
-li.sortable-chosen {
-    opacity: 0.8;
-    background-color: #e0f7fa;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    cursor: grabbing; /* Verander cursor naar 'pakken' */
-}
-
-/* Stijl voor de 'spook' placeholder waar het item zal landen */
-li.sortable-ghost {
-    opacity: 0.4;
-    border-style: dashed;
-    background-color: #f0f0f0;
-}
-/* Zorg dat lade-titels NIET versleepbaar zijn */
-.schuif-titel {
-    cursor: not-allowed;
-}
-
-
-/* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
-@media print {
-    /* Verberg alles wat je niet wilt printen */
-    .header-bar,
-    #add-item-form,
-    .search-container,
-    #dashboard, 
-    .modal-overlay,
-    hr,
-    .item-buttons,
-    #add-item-form label[for="remember-drawer-check"],
-    input[type="checkbox"],
-    .lade-filter-container,
-    .input-with-button button { 
-        display: none !important; 
+// ---
+// STAP 5: Items Verwijderen & Bewerken (Listeners)
+// ---
+function handleItemLijstClick(e) {
+    const editButton = e.target.closest('.edit-btn');
+    const deleteButton = e.target.closest('.delete-btn');
+    if (deleteButton) {
+        const id = deleteButton.dataset.id;
+        if (confirm("Weet je zeker dat je dit item wilt verwijderen?")) {
+            itemsCollectie.doc(id).delete()
+                .then(() => showFeedback('Item verwijderd.', 'success'))
+                .catch((err) => showFeedback(`Fout bij verwijderen: ${err.message}`, 'error'));
+        }
     }
-
-    body, .container {
-        padding: 0;
-        margin: 0;
-        box-shadow: none;
-        width: 100%;
-        max-width: 100%;
-        border: none;
-    }
-    
-    li {
-        box-shadow: none;
-        border: 1px solid #ccc;
-        page-break-inside: avoid; 
-        border-left: none !important; 
-    }
-    
-    .vriezer-container {
-        flex-direction: column; 
-        gap: 0;
-    }
-    
-    .vriezer-kolom {
-        min-width: 100%;
-    }
-    
-    h2, .schuif-titel {
-        background-color: #eee !important;
-        color: #000 !important;
-        border: 1px solid #ccc;
-        -webkit-print-color-adjust: exact; 
-        color-adjust: exact;
-    }
-    
-    li small {
-        display: none !important;
+    if (editButton) {
+        const id = editButton.dataset.id;
+        itemsCollectie.doc(id).get().then((doc) => {
+            const item = doc.data();
+            editId.value = id;
+            editNaam.value = item.naam;
+            editAantal.value = item.aantal;
+            editEenheid.value = item.eenheid || 'stuks';
+            editVriezer.value = item.vriezer;
+            editSchuif.innerHTML = '';
+            alleLades.filter(lade => lade.vriezer === item.vriezer).forEach(lade => {
+                const option = document.createElement('option');
+                option.value = lade.id;
+                option.textContent = lade.naam;
+                editSchuif.appendChild(option);
+            });
+            editSchuif.value = item.ladeId;
+            editModal.style.display = 'flex';
+        }).catch((err) => showFeedback(`Fout bij ophalen: ${err.message}`, 'error'));
     }
 }
+lijstVriezer1.addEventListener('click', handleItemLijstClick);
+lijstVriezer2.addEventListener('click', handleItemLijstClick);
+
+editForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = editId.value;
+    const schuifDropdown = document.getElementById('edit-item-schuif');
+    const geselecteerdeLadeId = schuifDropdown.value;
+    const geselecteerdeLadeNaam = schuifDropdown.options[schuifDropdown.selectedIndex].text;
+    itemsCollectie.doc(id).update({
+        naam: editNaam.value,
+        aantal: parseFloat(editAantal.value),
+        eenheid: editEenheid.value,
+        vriezer: editVriezer.value,
+        ladeId: geselecteerdeLadeId,
+        ladeNaam: geselecteerdeLadeNaam
+    }).then(() => {
+        sluitItemModal();
+        showFeedback('Item bijgewerkt!', 'success');
+    }).catch((err) => showFeedback(`Fout bij bijwerken: ${err.message}`, 'error'));
+});
+function sluitItemModal() { editModal.style.display = 'none'; }
+btnCancel.addEventListener('click', sluitItemModal);
+
+
+// ---
+// STAP 6: LADE BEHEER LOGICA
+// ---
+beheerLadesKnop.addEventListener('click', () => ladeBeheerModal.style.display = 'flex');
+sluitLadeBeheerKnop.addEventListener('click', () => ladeBeheerModal.style.display = 'none');
+function vulLadeBeheerLijst() {
+    ladesLijstV1.innerHTML = '';
+    ladesLijstV2.innerHTML = '';
+    alleLades.forEach(lade => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <input type="text" value="${lade.naam}" class="lade-naam-input" data-id="${lade.id}">
+            <span>(${lade.vriezer})</span>
+            <div class="item-buttons">
+                <button class="save-btn" data-id="${lade.id}" title="Opslaan"><i class="fas fa-save"></i></button>
+                <button class="delete-btn" data-id="${lade.id}" title="Verwijder"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        `;
+        if (lade.vriezer === 'Vriezer 1') ladesLijstV1.appendChild(li);
+        else ladesLijstV2.appendChild(li);
+    });
+}
+addLadeForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const naam = document.getElementById('lade-naam').value;
+    const vriezer = document.getElementById('lade-vriezer').value;
+    ladesCollectie.add({ naam: naam, vriezer: vriezer })
+        .then(() => {
+            addLadeForm.reset();
+            showFeedback('Nieuwe lade toegevoegd!', 'success');
+        })
+        .catch((err) => showFeedback(`Fout: ${err.message}`, 'error'));
+});
+async function handleLadeLijstClick(e) {
+    const deleteButton = e.target.closest('.delete-btn');
+    const saveButton = e.target.closest('.save-btn');
+    if (deleteButton) {
+        const id = deleteButton.dataset.id;
+        const itemsCheck = await itemsCollectie.where("ladeId", "==", id).limit(1).get();
+        if (!itemsCheck.empty) {
+            showFeedback('Kan lade niet verwijderen: er zitten nog items in!', 'error');
+            return;
+        }
+        if (confirm("Weet je zeker dat je deze (lege) lade wilt verwijderen?")) {
+            ladesCollectie.doc(id).delete()
+                .then(() => showFeedback('Lade verwijderd.', 'success'))
+                .catch((err) => showFeedback(`Fout: ${err.message}`, 'error'));
+        }
+    }
+    if (saveButton) {
+        const id = saveButton.dataset.id;
+        const nieuweNaam = saveButton.closest('li').querySelector('.lade-naam-input').value;
+        if (nieuweNaam) {
+            ladesCollectie.doc(id).update({ naam: nieuweNaam })
+                .then(() => showFeedback('Lade hernoemd!', 'success'))
+                .catch((err) => showFeedback(`Fout: ${err.message}`, 'error'));
+        }
+    }
+}
+ladesLijstV1.addEventListener('click', handleLadeLijstClick);
+ladesLijstV2.addEventListener('click', handleLadeLijstClick);
+
+// ---
+// STAP 7: UITLOGGEN LOGICA
+// ---
+logoutBtn.addEventListener('click', () => {
+    if (confirm("Weet je zeker dat je wilt uitloggen?")) {
+        auth.signOut().catch((error) => showFeedback(`Fout bij uitloggen: ${error.message}`, 'error'));
+    }
+});
+
+// ---
+// STAP 8: ZOEKBALK & FILTER LOGICA
+// ---
+searchBar.addEventListener('input', updateItemVisibility);
+filterV1.addEventListener('change', updateItemVisibility);
+filterV2.addEventListener('change', updateItemVisibility);
+function updateItemVisibility() {
+    const searchTerm = searchBar.value.toLowerCase();
+    const geselecteerdeFilterV1 = filterV1.value;
+    const geselecteerdeFilterV2 = filterV2.value;
+    document.querySelectorAll('#lijst-vriezer-1 li').forEach(item => {
+        const matchesSearch = item.querySelector('.item-text strong').textContent.toLowerCase().startsWith(searchTerm);
+        const matchesFilter = (geselecteerdeFilterV1 === 'alles' || item.dataset.ladeId === geselecteerdeFilterV1);
+        item.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
+    });
+    document.querySelectorAll('#lijst-vriezer-2 li').forEach(item => {
+        const matchesSearch = item.querySelector('.item-text strong').textContent.toLowerCase().startsWith(searchTerm);
+        const matchesFilter = (geselecteerdeFilterV2 === 'alles' || item.dataset.ladeId === geselecteerdeFilterV2);
+        item.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
+    });
+    checkLadesInLijst(document.getElementById('lijst-vriezer-1'));
+    checkLadesInLijst(document.getElementById('lijst-vriezer-2'));
+}
+function checkLadesInLijst(lijstElement) {
+    const lades = lijstElement.querySelectorAll('.schuif-titel');
+    lades.forEach(ladeTitel => {
+        let nextElement = ladeTitel.nextElementSibling;
+        let itemsInDezeLade = 0, zichtbareItems = 0;
+        while (nextElement && nextElement.tagName === 'LI') {
+            itemsInDezeLade++;
+            if (nextElement.style.display !== 'none') zichtbareItems++;
+            nextElement = nextElement.nextElementSibling;
+        }
+        ladeTitel.style.display = (itemsInDezeLade > 0 && zichtbareItems === 0) ? 'none' : 'block';
+    });
+}
+
+// ---
+// STAP 9: PRINT LOGICA
+// ---
+printBtn.addEventListener('click', () => window.print());
+
+// --- Event Listeners voor de Scanner ---
+scanBtn.addEventListener('click', startScanner);
+stopScanBtn.addEventListener('click', sluitScanner);
+manualEanBtn.addEventListener('click', () => {
+    const ean = prompt("Voer het EAN-nummer (barcode) handmatig in:", "");
+    if (ean && ean.trim() !== "") fetchProductFromOFF(ean.trim());
+});
+
+// --- NIEUW: Drag-and-Drop Logica ---
+function initDragAndDrop() {
+    // Functie die wordt aangeroepen wanneer het slepen stopt
+    const onDragEnd = (event) => {
+        const itemEl = event.item; // Het <li> element dat is verplaatst
+        const itemId = itemEl.dataset.id;
+        const oldLadeId = itemEl.dataset.ladeId;
+        const oldVriezer = itemEl.dataset.vriezer;
+
+        // Bepaal de nieuwe vriezer
+        const newVriezerEl = event.to; // De <ul> waar het in is gedropt
+        const newVriezer = (newVriezerEl.id === 'lijst-vriezer-1') ? 'Vriezer 1' : 'Vriezer 2';
+
+        // Vind de lade-titel (H3) die het dichtst boven het item staat
+        let currentElement = itemEl.previousElementSibling;
+        let ladeTitelElement = null;
+        while (currentElement) {
+            if (currentElement.tagName === 'H3' && currentElement.classList.contains('schuif-titel')) {
+                ladeTitelElement = currentElement;
+                break;
+            }
+            currentElement = currentElement.previousElementSibling;
+        }
+
+        if (!ladeTitelElement) {
+            console.error("Kon de nieuwe lade-titel niet vinden. Verplaatsing geannuleerd.");
+            // Dit zou niet mogen gebeuren als de lijst correct is
+            return; 
+        }
+
+        const newLadeId = ladeTitelElement.dataset.ladeId;
+        const newLadeNaam = ladeTitelElement.textContent;
+
+        // Check of er daadwerkelijk iets is gewijzigd
+        if (oldLadeId === newLadeId && oldVriezer === newVriezer) {
+            console.log("Item verplaatst binnen dezelfde lade. Geen DB update nodig.");
+            return;
+        }
+
+        console.log(`Verplaats item ${itemId} naar Vriezer: ${newVriezer}, Lade: ${newLadeNaam}`);
+        
+        // Update het item in de database
+        itemsCollectie.doc(itemId).update({
+            vriezer: newVriezer,
+            ladeId: newLadeId,
+            ladeNaam: newLadeNaam
+        })
+        .then(() => {
+            showFeedback('Item verplaatst!', 'success');
+            // De onSnapshot listener zal de lijst automatisch correct opnieuw renderen.
+        })
+        .catch((err) => {
+            console.error("Fout bij verplaatsen:", err);
+            showFeedback(`Fout bij verplaatsen: ${err.message}`, 'error');
+        });
+    };
+
+    // Initialiseer SortableJS op beide lijsten
+    const options = {
+        animation: 150,
+        group: 'vriezer-items', // Zorgt dat je tussen lijsten kunt slepen
+        handle: '.item-text',   // Alleen sleepbaar via de tekst (niet de knoppen)
+        filter: '.schuif-titel', // Zorgt dat je de titels niet kunt slepen
+        preventOnFilter: true, // Verplicht voor 'filter'
+        ghostClass: 'sortable-ghost', // CSS-klasse voor de placeholder
+        chosenClass: 'sortable-chosen', // CSS-klasse voor het item dat je vasthebt
+        onEnd: onDragEnd // Koppel onze functie aan het 'einde' event
+    };
+
+    // 'Sortable' komt van de script-tag die we in de HTML hebben geladen
+    new Sortable(lijstVriezer1, options);
+    new Sortable(lijstVriezer2, options);
+}
+
+// ---
+// ALLES STARTEN
+// ---
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("Ingelogd als:", user.displayName || user.email || user.uid);
+        initDragAndDrop(); // --- NIEUW: Activeer drag-and-drop
+        laadLades(); // Dit start de hele ketting
+    } else {
+        console.log("Niet ingelogd, terug naar index.html");
+        window.location.replace('index.html');
+    }
+});
