@@ -25,7 +25,6 @@
 <body>
 
     <div class="container">
-        <!-- AANGEPAST: De knoppen-div heeft nu een class voor styling -->
         <div class="header-bar">
             <h2>Vriezer Voorraad</h2>
             <div class="header-buttons">
@@ -35,33 +34,35 @@
             </div>
         </div>
 
-        <!-- Dashboard -->
         <div id="dashboard" style="display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; margin-bottom: 20px;">
             <strong id="dash-totaal">Laden...</strong>
             <span id="dash-v1">Laden...</span>
             <span id="dash-v2">Laden...</span>
         </div>
 
+        <!-- DIT FORMULIER IS NU AANGEPAST VOOR DE NIEUWE GRID-INDELING -->
         <form id="add-item-form">
+            <!-- Volle breedte -->
             <input type="text" id="item-naam" placeholder="Productnaam" required list="product-suggesties">
             <datalist id="product-suggesties"></datalist>
 
-            <!-- Barcode Scanner Blok -->
-            <div class="barcode-container">
-                <input type="text" id="item-barcode" placeholder="Typ EAN-code..." inputmode="numeric">
-                
-                <button type="button" id="barcode-scan-btn" title="Scan barcode met camera">
-                    <i class="fas fa-camera"></i>
-                </button>
-                
-                <button type="button" id="barcode-search-btn" title="Zoek product op EAN-code">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-            <!-- Einde Barcode Blok -->
-
+            <!-- Volle breedte -->
+            <input type="text" id="item-barcode" placeholder="Typ EAN-code..." inputmode="numeric">
+            
+            <!-- Halve breedte (links) -->
+            <button type="button" id="barcode-scan-btn" title="Scan barcode met camera">
+                <i class="fas fa-camera"></i> Scan Barcode
+            </button>
+            
+            <!-- Halve breedte (rechts) -->
+            <button type="button" id="barcode-search-btn" title="Zoek product op EAN-code">
+                <i class="fas fa-search"></i> Zoek EAN
+            </button>
+            
+            <!-- Halve breedte (links) -->
             <input type="number" id="item-aantal" placeholder="Aantal" value="1" step="0.25" min="0.25" required>
             
+            <!-- Halve breedte (rechts) -->
             <select id="item-eenheid" required>
                 <option value="stuks">Stuks (x)</option>
                 <option value="zak">Zak</option>
@@ -73,20 +74,25 @@
                 <option value="portie">Portie(s)</option>
             </select>
             
+            <!-- Halve breedte (links) -->
             <select id="item-vriezer" required>
                 <option value="" disabled selected>Kies een vriezer...</option> 
                 <option value="Vriezer 1">Vriezer 1 (Klein)</option>
                 <option value="Vriezer 2">Vriezer 2 (Groot)</option>
             </select>
+            
+            <!-- Halve breedte (rechts) -->
             <select id="item-schuif" required>
                 <option value="" disabled selected>Kies eerst een vriezer...</option> 
             </select>
             
-            <div style="grid-column: 1 / 3; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="remember-drawer-check" style="width: auto;">
-                <label for="remember-drawer-check" style="margin: 0; font-weight: normal;">Onthoud vriezer en lade</label>
+            <!-- Volle breedte -->
+            <div class="checkbox-container">
+                <input type="checkbox" id="remember-drawer-check">
+                <label for="remember-drawer-check">Onthoud vriezer en lade</label>
             </div>
 
+            <!-- Volle breedte -->
             <button type="submit">Toevoegen</button>
         </form>
         <hr>
