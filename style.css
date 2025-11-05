@@ -108,7 +108,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     width: 100%;
     box-sizing: border-box;
 }
-#add-item-form button { grid-column: 1 / 2; width: 100%; } /* AANGEPAST: 1 kolom */
+#add-item-form button[type="submit"] { grid-column: 1 / 2; width: 100%; } /* AANGEPAST: 1 kolom */
 #add-lade-form button { grid-column: 1 / 2; width: 100%; }
 
 /* AANGEPAST: Zorg dat de checkbox-div ook 1 kolom pakt */
@@ -359,7 +359,13 @@ li .item-buttons {
     #item-naam {
         grid-column: 1 / 3; /* Naam over de volledige breedte */
     }
-    #add-item-form button {
+    
+    /* AANGEPAST: De input-met-knop div over 2 kolommen */
+    .input-with-button[style*="grid-column"] {
+        grid-column: 1 / 3 !important;
+    }
+    
+    #add-item-form button[type="submit"] {
         grid-column: 1 / 3; /* Knop over de volledige breedte */
     }
     #add-item-form div[style*="grid-column"] {
@@ -442,6 +448,52 @@ li.item-old {
     border-left: 5px solid #FF6B6B; /* Rood */
 }
 
+/* --- NIEUW: Stijlen voor Scan Knop & Modal --- */
+
+/* Wrapper voor de input + scan knop */
+.input-with-button {
+    display: flex;
+    gap: 10px;
+    align-items: center; /* Zorgt dat ze verticaal uitgelijnd zijn */
+}
+.input-with-button input {
+    flex-grow: 1; /* Input pakt alle beschikbare ruimte */
+    width: auto; /* Overtuled de globale 100% */
+}
+.input-with-button button {
+    flex-shrink: 0; /* Knop krimpt niet */
+    padding: 0; /* We willen alleen het icoon */
+    width: 50px; /* Vaste breedte */
+    height: 50px; /* Vaste hoogte (matcht ca. de input) */
+    font-size: 20px; /* Iets groter icoon */
+}
+
+/* De scanner container in de modal */
+#barcode-scanner-container {
+    background-color: #222;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Zorgt dat de video-feed de container vult */
+#barcode-scanner-container video {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* Knop om de camera-permissie te stoppen */
+#html5-qrcode-button-camera-stop {
+    background-color: #FF6B6B !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 10px 15px !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    margin-top: 10px !important;
+    width: 100%;
+}
 
 /* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
 /* Deze horen helemaal op het einde, als een eigen blok */
@@ -456,7 +508,8 @@ li.item-old {
     .item-buttons,
     #add-item-form label[for="remember-drawer-check"],
     input[type="checkbox"],
-    .lade-filter-container { /* NIEUW: Verberg filters bij printen */
+    .lade-filter-container,
+    .input-with-button button { /* Scan knop niet printen */
         display: none !important; /* Forceer verbergen */
     }
 
