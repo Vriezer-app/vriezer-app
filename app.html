@@ -33,6 +33,8 @@
             </div>
         </div>
 
+        <div id="feedback-message" class="feedback"></div>
+
         <div id="dashboard" style="display: flex; gap: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; margin-bottom: 20px;">
             <strong id="dash-totaal">Laden...</strong>
             <span id="dash-v1">Laden...</span>
@@ -80,10 +82,26 @@
         <div class="vriezer-container">
             <div class="vriezer-kolom">
                 <h2>Vriezer 1 (Klein)</h2>
+                
+                <div class="lade-filter-container">
+                    <label for="filter-v1">Filter lade:</label>
+                    <select id="filter-v1" class="lade-filter">
+                        <option value="alles">Alle Lades</option>
+                        </select>
+                </div>
+                
                 <ul id="lijst-vriezer-1"></ul>
             </div>
             <div class="vriezer-kolom">
                 <h2>Vriezer 2 (Groot)</h2>
+
+                <div class="lade-filter-container">
+                    <label for="filter-v2">Filter lade:</label>
+                    <select id="filter-v2" class="lade-filter">
+                        <option value="alles">Alle Lades</option>
+                        </select>
+                </div>
+
                 <ul id="lijst-vriezer-2"></ul>
             </div>
         </div>
@@ -163,4 +181,3 @@
 
 </body>
 </html>
-
