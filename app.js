@@ -523,10 +523,10 @@ async function handleLadeLijstClick(e) {
         const id = saveButton.dataset.id;
         const parentLi = saveButton.closest('li');
         const inputVeld = parentLi.querySelector('.lade-naam-input');
-        const nieuweNaam = inputVeld.value;
-        if (nieuweNaam) {
+        const newNaam = inputVeld.value;
+        if (newNaam) {
             ladesCollectie.doc(id).update({
-                naam: nieuweNaam
+                naam: newNaam
             })
             .then(() => alert("Lade hernoemd!"));
         }
@@ -620,4 +620,5 @@ auth.onAuthStateChanged((user) => {
         window.location.replace('index.html');
     }
 });
+
 
