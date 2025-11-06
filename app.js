@@ -238,7 +238,7 @@ function renderDynamischeLijsten() {
             
             const filterLabel = document.createElement('label');
             filterLabel.htmlFor = `filter-${vriezer.id}`;
-            filterLabel.textContent = 'Toon schuif:';
+            filterLabel.textContent = 'Toon:';
             
             const filterSelect = document.createElement('select');
             filterSelect.id = `filter-${vriezer.id}`;
