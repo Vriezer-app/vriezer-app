@@ -3,165 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mijn Vriezer App</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Vriezer Voorraad</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
 
     <div class="container">
-        <header>
-            <div class="title-bar">
-                <h1><i class="fas fa-cubes"></i> Vriezer App</h1>
+        <div class="header-bar">
+            <h2>Vriezer Voorraad</h2>
+            <div>
+                <button id="beheer-lades-knop" class="btn-beheer">Beheer Lades</button>
+                <button id="print-btn" class="btn-beheer" style="margin-left: 10px; background-color: #777;">Print</button>
+                <button id="logout-btn" class="btn-beheer btn-logout" style="margin-left: 10px;">Uitloggen</button>
             </div>
-            <div class="action-buttons">
-                <button id="print-btn" title="Print Lijst"><i class="fas fa-print"></i></button>
-                <button id="scan-btn" title="Scan Barcode"><i class="fas fa-barcode"></i></button>
-                <button id="vriezer-beheer-knop" title="Beheer Vriezers"><i class="fas fa-cog"></i></button>
-                <button id="logout-btn" title="Uitloggen"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
-        </header>
+        </div>
 
-        <section class="dashboard">
-            <div class="dash-item">
-                <span class="dash-label">Totaal Items</span>
-                <span class="dash-value" id="dash-totaal">...</span>
-            </div>
-        </section>
+        <div id="feedback-message" class="feedback"></div>
 
-        <section class="add-form">
-            <h2><i class="fas fa-plus-circle"></i> Item Toevoegen</h2>
-            <form id="add-item-form">
-                <div class="form-grid">
-                    <input type="text" id="item-naam" placeholder="Naam (bv. Spinazie)" required>
-                    <input type="number" id="item-aantal" value="1" min="0.1" step="any" required>
-                    <select id="item-eenheid">
-                        <option value="stuks" selected>stuks</option>
-                        <option value="gram">gram</option>
-                        <option value="kg">kg</option>
-                        <option value="pak">pak</option>
-                        <option value="zak">zak</option>
-                        <option value="portie(s)">portie(s)</option>
-                    </select>
-                    <select id="item-vriezer" required>
-                        <option value="" disabled selected>Kies een vriezer...</option>
-                    </select>
-                    <select id="item-schuif" required>
-                        <option value="" disabled selected>Kies eerst een vriezer...</option>
-                    </select>
-                    <button type="submit" class="btn-primary">Toevoegen</button>
-                </div>
-                <div class="form-footer">
-                    <input type="checkbox" id="remember-drawer-check">
-                    <label for="remember-drawer-check">Onthoud vriezer & lade</label>
-                </div>
-            </form>
-        </section>
+        <div id="dashboard" style="display: flex; gap: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; margin-bottom: 20px;">
+            <strong id="dash-totaal">Laden...</strong>
+            <span id="dash-v1">Laden...</span>
+            <span id="dash-v2">Laden...</span>
+        </div>
 
-        <section class="search-section">
-            <i class="fas fa-search"></i>
-            <input type="search" id="search-bar" placeholder="Zoek items...">
-        </section>
-
-        <main class="content-area">
-            <div id="vriezer-lijsten-container">
-                <p style="text-align: center; color: #777;"><i>Items laden...</i></p>
-            </div>
-        </main>
-
-        <div id="feedback-message" style="display: none;"></div>
-
-    </div> <div id="vriezer-beheer-modal" class="modal-overlay">
-        <div class="modal-content beheer-modal-content">
-            <span class="modal-close" id="btn-sluit-beheer">&times;</span>
-            <h2>Vriezer Beheer</h2>
+        <form id="add-item-form">
             
-            <div class="beheer-container">
-                <div class="beheer-kolom">
-                    <h3>Mijn Vriezers</h3>
-                    <form id="add-vriezer-form" class="beheer-form">
-                        <input type="text" id="vriezer-naam" placeholder="Nieuwe vriezer naam" required>
-                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i></button>
-                    </form>
-                    <ul id="vriezer-beheer-lijst" class="beheer-lijst">
-                        </ul>
+            <div class="input-with-button" style="grid-column: 1 / 3;">
+                <input type="text" id="item-naam" placeholder="Productnaam" required list="product-suggesties">
+                <button type="button" id="scan-btn" class="btn-beheer" title="Scan barcode">
+                    <i class="fas fa-barcode"></i>
+                </button>
+                <button type="button" id="manual-ean-btn" class="btn-beheer" title="Handmatig EAN invoeren">
+                    <i class="fas fa-keyboard"></i>
+                </button>
+            </div>
+            
+            <datalist id="product-suggesties"></datalist>
+
+            <input type="number" id="item-aantal" placeholder="Aantal" value="1" step="0.25" min="0.25" required>
+            
+            <select id="item-eenheid" required>
+                <option value="stuks">Stuks (x)</option>
+                <option value="zak">Zak</option>
+                <option value="boterpot">Boterpot</option>
+                <option value="ijsdoos">Ijsdoos</option>
+                <option value="gram">Gram (g)</option>
+                <option value="kilo">Kilo (kg)</option>
+                <option value="bakje">Bakje(s)</option>
+                <option value="portie">Portie(s)</option>
+            </select>
+            
+            <select id="item-vriezer" required>
+                <option value="" disabled selected>Kies een vriezer...</option> 
+                <option value="Vriezer 1">Vriezer 1 (Klein)</option>
+                <option value="Vriezer 2">Vriezer 2 (Groot)</option>
+            </select>
+            <select id="item-schuif" required>
+                <option value="" disabled selected>Kies eerst een vriezer...</option> 
+            </select>
+            
+            <div style="grid-column: 1 / 3; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="remember-drawer-check" style="width: auto;">
+                <label for="remember-drawer-check" style="margin: 0; font-weight: normal;">Onthoud vriezer en lade</label>
+            </div>
+
+            <button type="submit">Toevoegen</button>
+        </form>
+        <hr>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-bar" placeholder="Zoek een product...">
+        </div>
+        <div class="vriezer-container">
+            <div class="vriezer-kolom">
+                <h2>Vriezer 1 (Klein)</h2>
+                
+                <div class="lade-filter-container">
+                    <label for="filter-v1">Filter lade:</label>
+                    <select id="filter-v1" class="lade-filter">
+                        <option value="alles">Alle Lades</option>
+                    </select>
                 </div>
                 
-                <div class="beheer-kolom">
-                    <h3 id="lades-beheer-titel">Selecteer een vriezer...</h3>
-                    <hr id="lades-beheer-hr" style="display: none;">
-                    <form id="add-lade-form" class="beheer-form" style="display: none;">
-                        <input type="text" id="lade-naam" placeholder="Nieuwe lade naam" required>
-                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i></button>
-                    </form>
-                    <ul id="lade-beheer-lijst" class="beheer-lijst">
-                        </ul>
+                <ul id="lijst-vriezer-1"></ul>
+            </div>
+            <div class="vriezer-kolom">
+                <h2>Vriezer 2 (Groot)</h2>
+
+                <div class="lade-filter-container">
+                    <label for="filter-v2">Filter lade:</label>
+                    <select id="filter-v2" class="lade-filter">
+                        <option value="alles">Alle Lades</option>
+                    </select>
                 </div>
+
+                <ul id="lijst-vriezer-2"></ul>
             </div>
         </div>
     </div>
-
+    
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content">
-            <span class="modal-close" id="btn-cancel">&times;</span>
             <h2>Item Bewerken</h2>
             <form id="edit-item-form">
                 <input type="hidden" id="edit-item-id">
-                
                 <label for="edit-item-naam">Naam:</label>
                 <input type="text" id="edit-item-naam" required>
-                
-                <div class="form-grid-edit">
-                    <div>
-                        <label for="edit-item-aantal">Aantal:</label>
-                        <input type="number" id="edit-item-aantal" min="0.1" step="any" required>
-                    </div>
-                    <div>
-                        <label for="edit-item-eenheid">Eenheid:</label>
-                        <select id="edit-item-eenheid">
-                            <option value="stuks">stuks</option>
-                            <option value="gram">gram</option>
-                            <option value="kg">kg</option>
-                            <option value="pak">pak</option>
-                            <option value="zak">zak</option>
-                            <option value="portie(s)">portie(s)</option>
-                        </select>
-                    </div>
-                </div>
-                
+                <label for="edit-item-aantal">Aantal:</label>
+                <input type="number" id="edit-item-aantal" step="0.25" min="0.25" required>
+                <label for="edit-item-eenheid">Eenheid:</label>
+                <select id="edit-item-eenheid" required>
+                    <option value="stuks">Stuks (x)</option>
+                    <option value="zak">Zak</option>
+                    <option value="boterpot">Boterpot</option>
+                    <option value="ijsdoos">Ijsdoos</option>
+                    <option value="gram">Gram (g)</option>
+                    <option value="kilo">Kilo (kg)</option>
+                    <option value="bakje">Bakje(s)</option>
+                    <option value="portie">Portie(s)</option>
+                </select>
                 <label for="edit-item-vriezer">Vriezer:</label>
                 <select id="edit-item-vriezer" required>
-                    </select>
-                
-                <label for="edit-item-schuif">Lade:</label>
-                <select id="edit-item-schuif" required>
-                    </select>
-                
-                <button type="submit" class="btn-primary">Opslaan</button>
+                    <option value="Vriezer 1">Vriezer 1 (Klein)</option>
+                    <option value="Vriezer 2">Vriezer 2 (Groot)</option>
+                </select>
+                <label for="edit-item-schuif">Schuif/Lade:</label>
+                <select id="edit-item-schuif" required></select>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">Opslaan</button>
+                    <button type="button" id="btn-cancel" class="btn-cancel">Annuleren</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <div id="scan-modal" class="modal-overlay">
-        <div class="modal-content scan-modal-content">
-            <h2>Scan Barcode</h2>
-            <div id="barcode-scanner-container"></div>
-            <div class="modal-buttons">
-                <button id="manual-ean-btn">Handmatig invoeren</button>
-                <button id="btn-stop-scan" class="btn-danger">Annuleren</button>
+    <div id="lade-beheer-modal" class="modal-overlay">
+        
+        <div class="modal-content"> 
+        
+            <div class="modal-header">
+                <h2>Beheer Lades</h2>
+                <button type="button" id="btn-sluit-lade-beheer" class="btn-cancel">Sluiten</button>
             </div>
-        </div>
+            
+            <form id="add-lade-form">
+                <h3>Nieuwe Lade Toevoegen</h3>
+                <input type="text" id="lade-naam" placeholder="Naam van nieuwe lade" required>
+                <select id="lade-vriezer" required>
+                    <option value="" disabled selected>Kies vriezer...</option>
+                    <option value="Vriezer 1">Vriezer 1 (Klein)</option>
+                    <option value="Vriezer 2">Vriezer 2 (Groot)</option> 
+                </select>
+                <button type="submit">Lade Toevoegen</button>
+            </form>
+            <hr>
+            <h3>Bestaande Lades</h3>
+            <div class="lade-beheer-container">
+                <div class="lade-beheer-kolom">
+                    <h4>Vriezer 1 (Klein)</h4>
+                    <ul id="lades-lijst-v1"></ul>
+                </div>
+                <div class="lade-beheer-kolom">
+                    <h4>Vriezer 2 (Groot)</h4>
+                    <ul id="lades-lijst-v2"></ul>
+                </div>
+            </div>
+        </div> 
     </div>
 
+    <div id="scan-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Scan Barcode</h2>
+                <button type="button" id="btn-stop-scan" class="btn-cancel">Annuleren</button>
+            </div>
+            <div id="barcode-scanner-container" style="width: 100%; max-width: 450px; margin: 20px auto;"></div>
+            <p style="text-align: center; color: #777;">Richt de camera op een barcode.</p>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
-    <script src="config.js"></script> <script src="app.js"></script>
+    <script src="app.js"></script>
 
 </body>
 </html>
