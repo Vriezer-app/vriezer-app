@@ -52,7 +52,7 @@ h2 {
 
 hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 
-/* --- NIEUW: Visuele Feedback Berichten --- */
+/* --- Visuele Feedback Berichten --- */
 .feedback {
     padding: 15px;
     margin-bottom: 20px; /* Ruimte onder het bericht */
@@ -96,12 +96,15 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     grid-template-columns: 1fr; /* AANGEPAST: 1 kolom standaard voor mobiel */
     gap: 15px;
 }
-#add-lade-form {
+/* AANGEPAST: Formulieren in de beheer-modal */
+#add-vriezer-form, #add-lade-form {
     display: grid;
     grid-template-columns: 1fr;
     gap: 15px;
 }
 #add-lade-form button { background-color: #4A90E2; }
+#add-vriezer-form button { background-color: #66DDAA; }
+
 
 #item-naam { grid-column: 1 / 2; } /* AANGEPAST: 1 kolom */
 #item-aantal, #item-eenheid, #item-vriezer, #item-schuif {
@@ -109,12 +112,10 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     box-sizing: border-box;
 }
 #add-item-form button[type="submit"] { grid-column: 1 / 2; width: 100%; } /* AANGEPAST: 1 kolom */
-#add-lade-form button { grid-column: 1 / 2; width: 100%; }
 
 /* AANGEPAST: Zorg dat de checkbox-div ook 1 kolom pakt */
-/* BELANGRIJK: Verwijder de inline 'style="grid-column: 1 / 3;"' uit je HTML voor de beste werking! */
 #add-item-form div[style*="grid-column"] {
-    grid-column: 1 / 2 !important; /* Hacky, maar werkt. Beter is inline style te verwijderen. */
+    grid-column: 1 / 2 !important; 
 }
 
 /* Label voor "Onthoud Lade" checkbox stylen */
@@ -153,7 +154,7 @@ button[type="submit"] {
 button[type="submit"]:hover { background-color: #88FFCC; }
 
 
-/* --- NIEUW: Lade Filter Dropdown --- */
+/* --- Lade Filter Dropdown --- */
 .lade-filter-container {
     display: flex;
     align-items: center;
@@ -167,12 +168,10 @@ button[type="submit"]:hover { background-color: #88FFCC; }
     flex-shrink: 0; /* Voorkom dat label krimpt */
 }
 .lade-filter {
-    /* Overruled de globale 'select' stijl */
     width: auto;
     flex-grow: 1; /* Pakt de rest van de ruimte */
     padding: 8px; /* Iets compacter */
     font-size: 15px;
-    /* Gebruikt verder de globale 'select' stijlen */
 }
 
 
@@ -210,8 +209,8 @@ li .item-text {
     flex-grow: 1; 
     margin-right: 15px;
     min-width: 150px; /* Zorgt dat de tekst niet te smal wordt */
+    cursor: grab; /* NIEUW: Laat zien dat je dit deel kunt pakken */
 }
-li strong { font-size: 1.1em; color: #333; }
 li .item-buttons { 
     display: flex; 
     gap: 10px;
@@ -264,6 +263,11 @@ li .item-buttons {
     max-height: 90vh;
     overflow-y: auto;
 }
+/* NIEUW: Grotere modal voor Beheer */
+.modal-content.modal-groot {
+    max-width: 800px;
+}
+
 .modal-content h2, .modal-content h3 { margin-top: 0; color: #66DDAA; }
 .modal-content h3 { color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; margin-top: 20px; }
 #edit-item-form label {
@@ -288,9 +292,16 @@ li .item-buttons {
 .btn-cancel:hover { background-color: #bbb; }
 
 
-/* --- LADE BEHEER MODAL --- */
-.lade-beheer-container { display: flex; flex-wrap: wrap; gap: 20px; }
-.lade-beheer-kolom { flex: 1; min-width: 200px; }
+/* --- AANGEPAST: VRIEZER BEHEER MODAL --- */
+.beheer-container { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 30px; 
+}
+.beheer-kolom { 
+    flex: 1; 
+    min-width: 300px; 
+}
 .modal-content h4 {
     color: #4A90E2;
     margin-top: 0;
@@ -298,81 +309,108 @@ li .item-buttons {
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
 }
-/* --- Stijl voor de nieuwe modal header --- */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px; /* Ruimte onder de header */
+    margin-bottom: 20px;
 }
 
-/* Zorg dat de h2 in de header geen extra margin heeft */
 .modal-header h2 {
     margin: 0;
     border: none;
     padding: 0;
 }
-#lades-lijst-v1, #lades-lijst-v2 { list-style: none; padding: 0; }
+#vriezer-beheer-lijst, #lade-beheer-lijst { 
+    list-style: none; 
+    padding: 0; 
+}
 
-/* Dit is het cruciale blok dat is aangepast */
-#lades-lijst-v1 li, #lades-lijst-v2 li {
+/* Stijl voor de lijsten in de beheer modal */
+#vriezer-beheer-lijst li, 
+#lade-beheer-lijst li {
     background-color: #f9f9f9;
     border: 1px solid #e9e9e9;
     padding: 10px 15px;
     margin-bottom: 8px;
     display: flex;
-    flex-direction: row; /* Zorgt dat items NAAST elkaar staan */
-    align-items: center; /* Lijn ze verticaal uit in het midden */
+    flex-direction: row; 
+    align-items: center; 
     gap: 8px;
+    border-left: 4px solid #e9e9e9; /* Standaard rand */
+    transition: background-color 0.2s, border-left-color 0.2s;
 }
-#lades-lijst-v1 li .item-buttons,
-#lades-lijst-v2 li .item-buttons {
+
+/* NIEUW: Stijl voor een *selecteerbare* vriezer */
+#vriezer-beheer-lijst li {
+    cursor: pointer;
+}
+#vriezer-beheer-lijst li:hover {
+    background-color: #f0f0f0;
+}
+#vriezer-beheer-lijst li.selected {
+    background-color: #e0f7fa;
+    border-left-color: #4A90E2;
+    font-weight: bold;
+}
+
+
+#vriezer-beheer-lijst li .item-buttons,
+#lade-beheer-lijst li .item-buttons {
     justify-content: flex-start;
-    flex-shrink: 0; /* Zorgt dat knoppen niet krimpen */
+    flex-shrink: 0; 
+    margin-left: auto; /* Knoppen naar rechts duwen */
 }
-#lades-lijst-v1 li .lade-naam-input,
-#lades-lijst-v2 li .lade-naam-input {
+#vriezer-beheer-lijst li .beheer-naam-input,
+#lade-beheer-lijst li .beheer-naam-input {
     width: auto; 
-    flex-grow: 1; /* Pakt alle beschikbare ruimte */
+    flex-grow: 1; 
     box-sizing: border-box;
     margin-right: 0;
-    min-width: 0; /* DEZE REGEL IS DE FIX! */
-}
-/* Einde van het cruciale blok */
-
-#lades-lijst-v1 li span,
-#lades-lijst-v2 li span {
+    min-width: 0; 
+    /* Verberg de input, toon de span */
     display: none;
 }
+#vriezer-beheer-lijst li span,
+#lade-beheer-lijst li span {
+    flex-grow: 1; /* Tekst pakt de ruimte */
+}
+
+/* NIEUW: Toon de input als we in 'edit-mode' zijn */
+#vriezer-beheer-lijst li.edit-mode span,
+#lade-beheer-lijst li.edit-mode span {
+    display: none;
+}
+#vriezer-beheer-lijst li.edit-mode .beheer-naam-input,
+#lade-beheer-lijst li.edit-mode .beheer-naam-input {
+    display: block;
+}
+
 
 /* --- AANGEPAST: MEDIA QUERY VOOR GROTERE SCHERMEN --- */
 @media (min-width: 768px) {
     
-    /* AANGEPAST: Zet padding terug naar desktop-waarde */
     body { padding: 20px; }
     .container { padding: 25px; }
     
-    /* AANGEPAST: Zet formulier terug naar 2 kolommen */
     #add-item-form {
         grid-template-columns: 1fr 1fr;
     }
     #item-naam {
-        grid-column: 1 / 3; /* Naam over de volledige breedte */
+        grid-column: 1 / 3; 
     }
     
-    /* AANGEPAST: De input-met-knop div over 2 kolommen */
     .input-with-button[style*="grid-column"] {
         grid-column: 1 / 3 !important;
     }
     
     #add-item-form button[type="submit"] {
-        grid-column: 1 / 3; /* Knop over de volledige breedte */
+        grid-column: 1 / 3; 
     }
     #add-item-form div[style*="grid-column"] {
-        grid-column: 1 / 3 !important; /* Checkbox-div ook over 2 kolommen */
+        grid-column: 1 / 3 !important; 
     }
     
-    /* Verander de item-lijsten naar een grid (jouw bestaande code) */
     #lijst-vriezer-1,
     #lijst-vriezer-2 {
         display: grid;
@@ -384,11 +422,10 @@ li .item-buttons {
         grid-column: 1 / -1;
     }
 
-    /* De "kaarten" in het grid */
     #lijst-vriezer-1 li,
     #lijst-vriezer-2 li {
-        flex-direction: row; /* items naast elkaar */
-        align-items: center; /* centreren */
+        flex-direction: row; 
+        align-items: center; 
         padding: 15px;
         gap: 0; /* Reset gap van mobiel */
     }
@@ -419,7 +456,7 @@ li .item-buttons {
 
 .search-container {
     position: relative;
-    margin-bottom: 25px; /* Zorgt voor ruimte onder de zoekbalk */
+    margin-bottom: 25px; 
 }
 
 .search-container .fa-search {
@@ -437,7 +474,6 @@ li .item-buttons {
 
 
 /* --- STIJLEN VOOR KLEURCODERING --- */
-/* Deze horen hier, buiten de media queries */
 li.item-fresh { 
     border-left: 5px solid #66DDAA; /* Groen */
 }
@@ -448,40 +484,35 @@ li.item-old {
     border-left: 5px solid #FF6B6B; /* Rood */
 }
 
-/* --- NIEUW: Stijlen voor Scan Knop & Modal --- */
-
-/* Wrapper voor de input + scan knop */
+/* --- Stijlen voor Scan Knop & Modal --- */
 .input-with-button {
     display: flex;
     gap: 10px;
-    align-items: center; /* Zorgt dat ze verticaal uitgelijnd zijn */
+    align-items: center; 
 }
 .input-with-button input {
-    flex-grow: 1; /* Input pakt alle beschikbare ruimte */
-    width: auto; /* Overtuled de globale 100% */
+    flex-grow: 1; 
+    width: auto; 
 }
 .input-with-button button {
-    flex-shrink: 0; /* Knop krimpt niet */
-    padding: 0; /* We willen alleen het icoon */
-    width: 50px; /* Vaste breedte */
-    height: 50px; /* Vaste hoogte (matcht ca. de input) */
-    font-size: 20px; /* Iets groter icoon */
+    flex-shrink: 0; 
+    padding: 0; 
+    width: 50px; 
+    height: 50px; 
+    font-size: 20px; 
 }
 
-/* De scanner container in de modal */
 #barcode-scanner-container {
     background-color: #222;
     border-radius: 8px;
     overflow: hidden;
 }
 
-/* Zorgt dat de video-feed de container vult */
 #barcode-scanner-container video {
     width: 100% !important;
     height: auto !important;
 }
 
-/* Knop om de camera-permissie te stoppen */
 #html5-qrcode-button-camera-stop {
     background-color: #FF6B6B !important;
     color: white !important;
@@ -495,25 +526,42 @@ li.item-old {
     width: 100%;
 }
 
+
+/* --- Drag-and-Drop Stijlen --- */
+li.sortable-chosen {
+    opacity: 0.8;
+    background-color: #e0f7fa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: grabbing; 
+}
+
+li.sortable-ghost {
+    opacity: 0.4;
+    border-style: dashed;
+    background-color: #f0f0f0;
+}
+.schuif-titel {
+    cursor: not-allowed;
+}
+
+
 /* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
-/* Deze horen helemaal op het einde, als een eigen blok */
 @media print {
     /* Verberg alles wat je niet wilt printen */
     .header-bar,
     #add-item-form,
     .search-container,
-    #dashboard, /* Ook het dashboard verbergen */
+    #dashboard, 
     .modal-overlay,
     hr,
     .item-buttons,
     #add-item-form label[for="remember-drawer-check"],
     input[type="checkbox"],
     .lade-filter-container,
-    .input-with-button button { /* Scan knop niet printen */
-        display: none !important; /* Forceer verbergen */
+    .input-with-button button { 
+        display: none !important; 
     }
 
-    /* Zorg dat de lijsten de volledige breedte pakken */
     body, .container {
         padding: 0;
         margin: 0;
@@ -523,16 +571,15 @@ li.item-old {
         border: none;
     }
     
-    /* Reset de item-stijl voor print */
     li {
         box-shadow: none;
         border: 1px solid #ccc;
-        page-break-inside: avoid; /* Zorg dat een item niet over 2 paginas splitst */
-        border-left: none !important; /* Verberg kleurcode bij printen */
+        page-break-inside: avoid; 
+        border-left: none !important; 
     }
     
     .vriezer-container {
-        flex-direction: column; /* Zet vriezers onder elkaar */
+        flex-direction: column; 
         gap: 0;
     }
     
@@ -544,11 +591,10 @@ li.item-old {
         background-color: #eee !important;
         color: #000 !important;
         border: 1px solid #ccc;
-        -webkit-print-color-adjust: exact; /* Forceer achtergrondkleur bij printen */
+        -webkit-print-color-adjust: exact; 
         color-adjust: exact;
     }
     
-    /* Datum ook verbergen bij printen */
     li small {
         display: none !important;
     }
