@@ -175,7 +175,7 @@ form.addEventListener('submit', (e) => {
         userId: currentUser.uid,
         vriezerId: geselecteerdeVriezerId,
         ladeId: geselecteerdeLadeId,
-        ladeNaam: geselecteerdeLadeNaam 
+        ladeNaam: geselecteerdeLadeNaam,
         ingevrorenOp: new date (nieuweDatum)
     })
     .then(() => {
