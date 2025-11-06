@@ -227,15 +227,15 @@ function renderDynamischeLijsten() {
         kolomDiv.className = 'vriezer-kolom';
         kolomDiv.innerHTML = `<h2>${vriezer.naam}</h2>`;
 
-        // --- NIEUW: Filter Dropdown Toevoegen ---
         const vriezerLades = alleLades
             .filter(lade => lade.vriezerId === vriezer.id)
             .sort((a, b) => a.naam.localeCompare(b.naam));
 
-        // Maak de filter container alleen als er lades zijn
+        // --- FILTER (was al aanwezig, is prima) ---
         if (vriezerLades.length > 0) {
             const filterContainer = document.createElement('div');
             filterContainer.className = 'lade-filter-container';
+            // ... (de rest van je filter logica blijft hier ongewijzigd) ...
             
             const filterLabel = document.createElement('label');
             filterLabel.htmlFor = `filter-${vriezer.id}`;
@@ -245,13 +245,11 @@ function renderDynamischeLijsten() {
             filterSelect.id = `filter-${vriezer.id}`;
             filterSelect.className = 'lade-filter-select';
             
-            // Optie "Alles"
             const allOption = document.createElement('option');
             allOption.value = 'all';
             allOption.textContent = 'Alle schuiven';
             filterSelect.appendChild(allOption);
 
-            // Vul opties voor elke lade
             vriezerLades.forEach(lade => {
                 const ladeOption = document.createElement('option');
                 ladeOption.value = lade.id;
@@ -259,35 +257,49 @@ function renderDynamischeLijsten() {
                 filterSelect.appendChild(ladeOption);
             });
 
-            // Koppel de filterfunctie aan deze dropdown
             filterSelect.addEventListener('change', updateItemVisibility); 
             
             filterContainer.appendChild(filterLabel);
             filterContainer.appendChild(filterSelect);
-            kolomDiv.appendChild(filterContainer); // Voeg filter toe aan kolom
+            kolomDiv.appendChild(filterContainer);
         }
-        // --- EINDE NIEUW ---
         
-        const ul = document.createElement('ul');
-        ul.id = `vriezer-${vriezer.id}`; 
-            
         const vriezerItems = alleItems.filter(item => item.vriezerId === vriezer.id);
         
+        // --- DIT IS DE GROTE WIJZIGING ---
         vriezerLades.forEach(lade => {
-            const titel = document.createElement('h3');
-            titel.className = 'schuif-titel';
-            titel.textContent = lade.naam;
-            titel.dataset.ladeId = lade.id; // Belangrijk voor de filter!
-            ul.appendChild(titel);
+            // 1. Maak de groep-wrapper
+            const ladeGroup = document.createElement('div');
+            // Start ingeklapt (verwijder 'collapsed' om open te starten)
+            ladeGroup.className = 'lade-group collapsed'; 
+            ladeGroup.dataset.ladeId = lade.id; // Voor de filter-logica
+
+            // 2. Maak de klikbare header
+            const ladeHeader = document.createElement('button');
+            ladeHeader.className = 'lade-header';
+            // Data-attributen voor drag-and-drop
+            ladeHeader.dataset.ladeId = lade.id;
+            ladeHeader.dataset.ladeNaam = lade.naam;
+            ladeHeader.innerHTML = `<h3>${lade.naam}</h3> <i class="fas fa-chevron-down chevron"></i>`;
+
+            // 3. Maak de content-wrapper (voor de <ul>)
+            const ladeContent = document.createElement('div');
+            ladeContent.className = 'lade-content';
+
+            // 4. Maak de UL specifiek voor DEZE lade
+            const ladeUl = document.createElement('ul');
+            // Data-attribuut voor drag-and-drop
+            ladeUl.dataset.vriezerId = vriezer.id; 
             
             const ladeItems = vriezerItems
                 .filter(item => item.ladeId === lade.id)
                 .sort((a, b) => a.naam.localeCompare(b.naam));
                 
+            // 5. Vul de UL met items (deze logica is ongewijzigd)
             ladeItems.forEach(item => {
                 const li = document.createElement('li');
                 li.dataset.id = item.id;
-                li.dataset.ladeId = item.ladeId; // Belangrijk voor de filter!
+                li.dataset.ladeId = item.ladeId; 
                 li.dataset.vriezerId = item.vriezerId;
                 
                 if (item.ingevrorenOp) {
@@ -307,11 +319,19 @@ function renderDynamischeLijsten() {
                         <button class="delete-btn" title="Verwijder"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
-                ul.appendChild(li);
+                ladeUl.appendChild(li);
             });
+            
+            // 6. Bouw de structuur samen
+            ladeContent.appendChild(ladeUl);
+            ladeGroup.appendChild(ladeHeader);
+            ladeGroup.appendChild(ladeContent);
+            
+            // 7. Voeg de hele groep toe aan de kolom
+            kolomDiv.appendChild(ladeGroup);
         });
+        // --- EINDE GROTE WIJZIGING ---
         
-        kolomDiv.appendChild(ul);
         vriezerLijstenContainer.appendChild(kolomDiv);
     });
     
@@ -337,30 +357,28 @@ function updateDashboard() {
 }
 
 function initDragAndDrop() {
-    const lijsten = document.querySelectorAll('.vriezer-kolom ul');
+    // Vind nu alle lade-specifieke ULs
+    const lijsten = document.querySelectorAll('.lade-content ul');
+    
     const onDragEnd = (event) => {
         const itemEl = event.item; 
         const itemId = itemEl.dataset.id;
         const oldLadeId = itemEl.dataset.ladeId;
-        const newVriezerUL = event.to;
-        const newVriezerId = newVriezerUL.id.replace('vriezer-', ''); 
-        let currentElement = itemEl.previousElementSibling;
-        let ladeTitelElement = null;
-        while (currentElement) {
-            if (currentElement.tagName === 'H3' && currentElement.classList.contains('schuif-titel')) {
-                ladeTitelElement = currentElement;
-                break;
-            }
-            currentElement = currentElement.previousElementSibling;
-        }
-        if (!ladeTitelElement) {
-            console.error("Kon de nieuwe lade-titel niet vinden.");
-            renderDynamischeLijsten(); 
-            return; 
-        }
-        const newLadeId = ladeTitelElement.dataset.ladeId;
-        const newLadeNaam = ladeTitelElement.textContent;
+        
+        const newUL = event.to; // De <ul> waar het item in landt
+        const newVriezerId = newUL.dataset.vriezerId; // Van de <ul>
+
+        // Vind de bijbehorende header-knop
+        const ladeContentDiv = newUL.parentElement;
+        const ladeHeaderBtn = ladeContentDiv.previousElementSibling;
+        
+        const newLadeId = ladeHeaderBtn.dataset.ladeId;
+        const newLadeNaam = ladeHeaderBtn.dataset.ladeNaam;
+
+        // Geen update nodig als het in dezelfde lade blijft
         if (oldLadeId === newLadeId) return; 
+        
+        // Update Firestore
         itemsCollectie.doc(itemId).update({
             vriezerId: newVriezerId,
             ladeId: newLadeId,
@@ -369,13 +387,14 @@ function initDragAndDrop() {
         .then(() => showFeedback('Item verplaatst!', 'success'))
         .catch((err) => showFeedback(`Fout bij verplaatsen: ${err.message}`, 'error'));
     };
+    
     lijsten.forEach(lijst => {
         new Sortable(lijst, {
             animation: 150,
             group: 'vriezer-items', 
             handle: '.item-text',   
-            filter: '.schuif-titel', 
-            preventOnFilter: true, 
+            // filter: '.schuif-titel', // Deze is niet meer nodig
+            // preventOnFilter: true, 
             ghostClass: 'sortable-ghost', 
             chosenClass: 'sortable-chosen', 
             onEnd: onDragEnd
@@ -384,9 +403,23 @@ function initDragAndDrop() {
 }
 
 vriezerLijstenContainer.addEventListener('click', (e) => {
+    
+    // NIEUW: Check voor lade-header klik
+    const ladeHeader = e.target.closest('.lade-header');
+    if (ladeHeader) {
+        const ladeGroup = ladeHeader.parentElement;
+        ladeGroup.classList.toggle('collapsed');
+        return; // Stop hier, het was een klik op de header
+    }
+
+    // Bestaande code:
     const editButton = e.target.closest('.edit-btn');
     const deleteButton = e.target.closest('.delete-btn');
     const li = e.target.closest('li');
+
+    // Als er niet op een item is geklikt (maar bv. ernaast), stop.
+    if (!li) return; 
+
     if (deleteButton) {
         const id = li.dataset.id;
         if (confirm("Weet je zeker dat je dit item wilt verwijderen?")) {
@@ -395,6 +428,7 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
                 .catch((err) => showFeedback(`Fout bij verwijderen: ${err.message}`, 'error'));
         }
     }
+    
     if (editButton) {
         const id = li.dataset.id;
         const item = alleItems.find(i => i.id === id);
@@ -412,18 +446,13 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
             editVriezer.appendChild(option);
         });
         vulEditLadeDropdown(item.vriezerId, item.ladeId);
-        // --- NIEUW: Datum vullen ---
-        // item.ingevrorenOp is een Firestore Timestamp. Converteer naar Date-object.
+        
         const jsDate = item.ingevrorenOp ? item.ingevrorenOp.toDate() : new Date();
-
-        // Formatteer handmatig naar YYYY-MM-DD voor de input.
-        // (toISOString() gebruikt UTC en kan de datum een dag verschuiven)
         const year = jsDate.getFullYear();
-        const month = (jsDate.getMonth() + 1).toString().padStart(2, '0'); // Maanden zijn 0-11
+        const month = (jsDate.getMonth() + 1).toString().padStart(2, '0');
         const day = jsDate.getDate().toString().padStart(2, '0');
         
         editDatum.value = `${year}-${month}-${day}`;
-        // --- EINDE NIEUW ---
         editModal.style.display = 'flex';
     }
 });
@@ -665,48 +694,39 @@ function updateItemVisibility() {
     // Ga door ELKE vriezer-kolom
     document.querySelectorAll('.vriezer-kolom').forEach(kolom => {
         
-        // 1. Wat is de status van de lade-filter voor DEZE kolom?
         const ladeFilter = kolom.querySelector('.lade-filter-select');
-        // Als er geen filter is (bv. geen lades), is de waarde 'all'
         const geselecteerdeLadeId = ladeFilter ? ladeFilter.value : 'all';
 
-        // We hebben een tracker nodig om te zien of een lade
-        // titels (H3) moet tonen.
-        const ladeHeeftZichtbareItems = {}; // { ladeId: true }
+        const ladeHeeftZichtbareItems = {}; 
 
-        // 2. Loop 1: Bepaal zichtbaarheid ITEMS (LI)
+        // 1. Loop 1: Bepaal zichtbaarheid ITEMS (LI) - Deze logica is ongewijzigd
         kolom.querySelectorAll('li').forEach(item => {
             const itemLadeId = item.dataset.ladeId;
-
-            // Check 1: Matcht het de lade-filter?
             const matchesLade = (geselecteerdeLadeId === 'all' || geselecteerdeLadeId === itemLadeId);
-
-            // Check 2: Matcht het de zoekbalk?
             const itemText = item.querySelector('.item-text strong').textContent.toLowerCase();
             const matchesSearch = itemText.startsWith(searchTerm);
 
             if (matchesLade && matchesSearch) {
                 item.style.display = 'flex';
-                // Markeer deze lade als "heeft zichtbare items"
                 ladeHeeftZichtbareItems[itemLadeId] = true; 
             } else {
                 item.style.display = 'none';
             }
         });
 
-        // 3. Loop 2: Bepaal zichtbaarheid LADE TITELS (H3)
-        kolom.querySelectorAll('.schuif-titel').forEach(titel => {
-            const titelLadeId = titel.dataset.ladeId;
+        // 2. Loop 2: Bepaal zichtbaarheid LADE GROEPEN (H3) - Deze is aangepast
+        // We verbergen/tonen nu de hele '.lade-group' i.p.v. alleen de '.schuif-titel'
+        kolom.querySelectorAll('.lade-group').forEach(group => {
+            const groupLadeId = group.dataset.ladeId;
             
             if (geselecteerdeLadeId === 'all') {
-                // "Alles" modus: Toon titel alleen als er zichtbare items onder staan
-                const heeftItems = ladeHeeftZichtbareItems[titelLadeId] === true;
-                titel.style.display = heeftItems ? 'block' : 'none';
+                // "Alles" modus: Toon group alleen als er zichtbare items in zitten
+                const heeftItems = ladeHeeftZichtbareItems[groupLadeId] === true;
+                group.style.display = heeftItems ? 'block' : 'none';
             } else {
-                // "Specifieke Lade" modus: Toon de titel als het de geselecteerde lade is.
-                // De items (LI) eronder worden nog steeds gefilterd door de zoekbalk.
-                const isGeselecteerdeTitel = (geselecteerdeLadeId === titelLadeId);
-                titel.style.display = isGeselecteerdeTitel ? 'block' : 'none';
+                // "Specifieke Lade" modus: Toon de group als het de geselecteerde lade is.
+                const isGeselecteerdeGroup = (geselecteerdeLadeId === groupLadeId);
+                group.style.display = isGeselecteerdeGroup ? 'block' : 'none';
             }
         });
     });
