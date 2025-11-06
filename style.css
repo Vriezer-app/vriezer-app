@@ -547,60 +547,6 @@ li.sortable-ghost {
 .schuif-titel {
     cursor: not-allowed;
 }
-
-
-/* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
-@media print {
-    .header-bar,
-    #add-item-form,
-    .search-container,
-    #dashboard, 
-    .modal-overlay,
-    hr,
-    .item-buttons,
-    #add-item-form label[for="remember-drawer-check"],
-    input[type="checkbox"],
-    .lade-filter-container,
-    .input-with-button button { 
-        display: none !important; 
-    }
-
-    body, .container {
-        padding: 0;
-        margin: 0;
-        box-shadow: none;
-        width: 100%;
-        max-width: 100%;
-        border: none;
-    }
-    
-    li {
-        box-shadow: none;
-        border: 1px solid #ccc;
-        page-break-inside: avoid; 
-        border-left: none !important; 
-    }
-    
-    .vriezer-container {
-        flex-direction: column; 
-        gap: 0;
-    }
-    
-    .vriezer-kolom {
-        min-width: 100%;
-    }
-    
-    h2, .schuif-titel {
-        background-color: #eee !important;
-        color: #000 !important;
-        border: 1px solid #ccc;
-        -webkit-print-color-adjust: exact; 
-        color-adjust: exact;
-    }
-    
-    li small {
-        display: none !important;
-    }
 /* --- ACCORDION VOOR LADES --- */
 
 .lade-group {
@@ -667,4 +613,57 @@ li.sortable-ghost {
 .sortable-ghost {
     background: #f0f8ff;
 }
+
+/* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
+@media print {
+    .header-bar,
+    #add-item-form,
+    .search-container,
+    #dashboard, 
+    .modal-overlay,
+    hr,
+    .item-buttons,
+    #add-item-form label[for="remember-drawer-check"],
+    input[type="checkbox"],
+    .lade-filter-container,
+    .input-with-button button { 
+        display: none !important; 
+    }
+
+    body, .container {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        width: 100%;
+        max-width: 100%;
+        border: none;
+    }
+    
+    li {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid; 
+        border-left: none !important; 
+    }
+    
+    .vriezer-container {
+        flex-direction: column; 
+        gap: 0;
+    }
+    
+    .vriezer-kolom {
+        min-width: 100%;
+    }
+    
+    h2, .schuif-titel {
+        background-color: #eee !important;
+        color: #000 !important;
+        border: 1px solid #ccc;
+        -webkit-print-color-adjust: exact; 
+        color-adjust: exact;
+    }
+    
+    li small {
+        display: none !important;
+    }
 }
