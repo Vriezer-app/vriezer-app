@@ -29,7 +29,7 @@
         <div class="header-bar">
             <h2>Vriezer Voorraad</h2>
             <div>
-                <button id="beheer-lades-knop" class="btn-beheer">Beheer Lades</button>
+                <button id="vriezer-beheer-knop" class="btn-beheer">Vriezer Beheer</button>
                 <button id="print-btn" class="btn-beheer" style="margin-left: 10px; background-color: #777;">Print</button>
                 <button id="logout-btn" class="btn-beheer btn-logout" style="margin-left: 10px;">Uitloggen</button>
             </div>
@@ -37,11 +37,8 @@
 
         <div id="feedback-message" class="feedback"></div>
 
-        <div id="dashboard" style="display: flex; gap: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; margin-bottom: 20px;">
-            <strong id="dash-totaal">Laden...</strong>
-            <span id="dash-v1">Laden...</span>
-            <span id="dash-v2">Laden...</span>
-        </div>
+        <div id="dashboard" class="dashboard-container">
+            </div>
 
         <form id="add-item-form">
             
@@ -72,8 +69,6 @@
             
             <select id="item-vriezer" required>
                 <option value="" disabled selected>Kies een vriezer...</option> 
-                <option value="Vriezer 1">Vriezer 1 (Klein)</option>
-                <option value="Vriezer 2">Vriezer 2 (Groot)</option>
             </select>
             <select id="item-schuif" required>
                 <option value="" disabled selected>Kies eerst een vriezer...</option> 
@@ -87,36 +82,14 @@
             <button type="submit">Toevoegen</button>
         </form>
         <hr>
+        
         <div class="search-container">
             <i class="fas fa-search"></i>
             <input type="text" id="search-bar" placeholder="Zoek een product...">
         </div>
-        <div class="vriezer-container">
-            <div class="vriezer-kolom">
-                <h2>Vriezer 1 (Klein)</h2>
-                
-                <div class="lade-filter-container">
-                    <label for="filter-v1">Filter lade:</label>
-                    <select id="filter-v1" class="lade-filter">
-                        <option value="alles">Alle lades</option>
-                    </select>
-                </div>
-                
-                <ul id="lijst-vriezer-1"></ul>
+        
+        <div class="vriezer-container" id="vriezer-lijsten-container">
             </div>
-            <div class="vriezer-kolom">
-                <h2>Vriezer 2 (Groot)</h2>
-
-                <div class="lade-filter-container">
-                    <label for="filter-v2">Filter lade:</label>
-                    <select id="filter-v2" class="lade-filter">
-                        <option value="alles">Alle lades</option>
-                    </select>
-                </div>
-
-                <ul id="lijst-vriezer-2"></ul>
-            </div>
-        </div>
     </div>
     
     <div id="edit-modal" class="modal-overlay">
@@ -140,10 +113,7 @@
                     <option value="portie">Portie(s)</option>
                 </select>
                 <label for="edit-item-vriezer">Vriezer:</label>
-                <select id="edit-item-vriezer" required>
-                    <option value="Vriezer 1">Vriezer 1 (Klein)</option>
-                    <option value="Vriezer 2">Vriezer 2 (Groot)</option>
-                </select>
+                <select id="edit-item-vriezer" required></select>
                 <label for="edit-item-schuif">Schuif/Lade:</label>
                 <select id="edit-item-schuif" required></select>
                 <div class="modal-buttons">
@@ -154,35 +124,30 @@
         </div>
     </div>
 
-    <div id="lade-beheer-modal" class="modal-overlay">
-        
-        <div class="modal-content"> 
-        
+    <div id="vriezer-beheer-modal" class="modal-overlay">
+        <div class="modal-content modal-groot"> 
             <div class="modal-header">
-                <h2>Beheer Lades</h2>
-                <button type="button" id="btn-sluit-lade-beheer" class="btn-cancel">Sluiten</button>
+                <h2>Vriezer & Lade Beheer</h2>
+                <button type="button" id="btn-sluit-beheer" class="btn-cancel">Sluiten</button>
             </div>
-            
-            <form id="add-lade-form">
-                <h3>Nieuwe Lade Toevoegen</h3>
-                <input type="text" id="lade-naam" placeholder="Naam van nieuwe lade" required>
-                <select id="lade-vriezer" required>
-                    <option value="" disabled selected>Kies vriezer...</option>
-                    <option value="Vriezer 1">Vriezer 1 (Klein)</option>
-                    <option value="Vriezer 2">Vriezer 2 (Groot)</option> 
-                </select>
-                <button type="submit">Lade Toevoegen</button>
-            </form>
-            <hr>
-            <h3>Bestaande Lades</h3>
-            <div class="lade-beheer-container">
-                <div class="lade-beheer-kolom">
-                    <h4>Vriezer 1 (Klein)</h4>
-                    <ul id="lades-lijst-v1"></ul>
+            <div class="beheer-container">
+                <div class="beheer-kolom">
+                    <h3>Mijn Vriezers</h3>
+                    <form id="add-vriezer-form">
+                        <input type="text" id="vriezer-naam" placeholder="Naam nieuwe vriezer" required>
+                        <button type="submit">Vriezer Toevoegen</button>
+                    </form>
+                    <hr>
+                    <ul id="vriezer-beheer-lijst"></ul>
                 </div>
-                <div class="lade-beheer-kolom">
-                    <h4>Vriezer 2 (Groot)</h4>
-                    <ul id="lades-lijst-v2"></ul>
+                <div class="beheer-kolom">
+                    <h3 id="lades-beheer-titel">Selecteer een vriezer...</h3>
+                    <form id="add-lade-form" style="display: none;">
+                        <input type="text" id="lade-naam" placeholder="Naam nieuwe lade" required>
+                        <button type="submit">Lade Toevoegen</button>
+                    </form>
+                    <hr id="lades-beheer-hr" style="display: none;">
+                    <ul id="lade-beheer-lijst"></ul>
                 </div>
             </div>
         </div> 
@@ -202,9 +167,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
     <script src="app.js"></script>
 
 </body>
