@@ -176,6 +176,7 @@ form.addEventListener('submit', (e) => {
         vriezerId: geselecteerdeVriezerId,
         ladeId: geselecteerdeLadeId,
         ladeNaam: geselecteerdeLadeNaam 
+        ingevrorenOp: new date (nieuweDatum)
     })
     .then(() => {
         showFeedback(`'${itemNaam}' toegevoegd!`, 'success');
