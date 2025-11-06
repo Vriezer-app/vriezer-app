@@ -601,4 +601,70 @@ li.sortable-ghost {
     li small {
         display: none !important;
     }
+/* --- ACCORDION VOOR LADES --- */
+
+.lade-group {
+    margin-bottom: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #eee;
+    background-color: #fff;
+}
+
+.lade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    font: inherit; /* Zorgt dat de button-stijl gereset wordt */
+    color: #333;
+    text-align: left;
+}
+
+.lade-header:hover {
+    background-color: #f1f1f1;
+}
+
+.lade-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    /* Zorg dat de <h3> zelf niet klikbaar is, de button regelt het */
+    pointer-events: none; 
+}
+
+.lade-header .chevron {
+    transition: transform 0.2s ease;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Wanneer ingeklapt, draai de pijl */
+.lade-group.collapsed .chevron {
+    transform: rotate(-90deg);
+}
+
+.lade-content {
+    padding: 0 15px 15px 15px;
+    background-color: #ffffff;
+}
+
+/* Wanneer ingeklapt, verberg de content */
+.lade-group.collapsed .lade-content {
+    display: none;
+}
+
+.lade-content ul {
+    padding-left: 0;
+    list-style: none;
+    margin: 10px 0 0 0;
+}
+
+/* Zorg dat de drag-ghost er goed uit ziet */
+.sortable-ghost {
+    background: #f0f8ff;
+}
 }
