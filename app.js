@@ -254,7 +254,16 @@ function laadItems() {
                 // Maak een container voor deze vriezer
                 const vriezerDiv = document.createElement('div');
                 vriezerDiv.className = 'vriezer-container';
-                vriezerDiv.innerHTML = `<h2><i class="fas fa-snowflake"></i> ${vriezer.naam}</h2>`;
+                // Tel alle items in deze vriezer (snapshot is alle items van de gebruiker)
+const itemsInVriezer = snapshot.docs.filter(doc => doc.data().vriezerId === vriezer.id);
+
+vriezerDiv.innerHTML = `
+    <h2>
+        <i class="fas fa-snowflake"></i> ${vriezer.naam} 
+        <span class="item-count">(${itemsInVriezer.length})</span>
+    </h2>
+`;
+
 
                 // 2. Filter de globale 'alleLades' voor deze vriezer
                 const ladesInVriezer = alleLades.filter(l => l.vriezerId === vriezer.id);
@@ -269,14 +278,19 @@ function laadItems() {
                     const ladeDiv = document.createElement('div');
                     ladeDiv.className = 'lade-container';
                     // We geven de UL de ID van de lade, handig voor drag-and-drop later
-                    ladeDiv.innerHTML = `
-                        <h3>${lade.naam}</h3>
-                        <ul class="item-lijst" id="lijst-${lade.id}" data-lade-id="${lade.id}"></ul>
-                    `;
-                    const ul = ladeDiv.querySelector('.item-lijst');
-
                     // 4. Filter de items (uit de snapshot) voor deze lade
-                    const itemsInLade = snapshot.docs.filter(doc => doc.data().ladeId === lade.id);
+// (Deze regel heb je al, we verplaatsen hem VOOR de innerHTML)
+const itemsInLade = snapshot.docs.filter(doc => doc.data().ladeId === lade.id);
+
+ladeDiv.innerHTML = `
+    <h3>
+        ${lade.naam}
+        <span class="item-count">(${itemsInLade.length})</span>
+    </h3>
+    <ul class="item-lijst" id="lijst-${lade.id}" data-lade-id="${lade.id}"></ul>
+`;
+
+                    const ul = ladeDiv.querySelector('.item-lijst');
                     
                     if (itemsInLade.length === 0) {
                         ul.innerHTML = `<li class="empty-lade-msg"><i>Leeg</i></li>`;
@@ -295,6 +309,8 @@ function laadItems() {
             
             // Update het dashboard (Stap 8, maar we kunnen de totalen al tellen)
             dashTotaal.textContent = snapshot.size;
+            // NIEUW: Zorg dat de filtering klopt bij het laden
+            updateItemVisibility();
 
         }, err => {
             console.error("Fout bij laden items: ", err);
@@ -793,13 +809,81 @@ async function handleVerwijderLade(id, naam) {
 logoutBtn.addEventListener('click', () => { /* ... (je bestaande code) ... */ });
 
 // ---
-// STAP 8: ZOEKBALK & FILTER LOGICA (TIJDELIJK STUK)
+// STAP 8: ZOEKBALK & FILTER LOGICA (HERSCHREVEN)
 // ---
+
+// De listeners blijven, maar we verwijderen de oude, statische filters
 searchBar.addEventListener('input', updateItemVisibility);
-filterV1.addEventListener('change', updateItemVisibility);
-filterV2.addEventListener('change', updateItemVisibility);
-function updateItemVisibility() { console.log("Filters (tijdelijk stuk)"); }
-function checkLadesInLijst(lijstElement) { /* ... */ }
+// VERWIJDER DEZE REGELS (deze filters bestaan niet meer):
+// filterV1.addEventListener('change', updateItemVisibility);
+// filterV2.addEventListener('change', updateItemVisibility);
+
+
+// HERSCHREVEN: updateItemVisibility
+// Deze functie filtert nu de items op basis van de zoekbalk
+function updateItemVisibility() {
+    const zoekTerm = searchBar.value.toLowerCase().trim();
+
+    // 1. Loop door alle items (li) op de pagina
+    const alleItems = document.querySelectorAll('.item-lijst li');
+    
+    alleItems.forEach(item => {
+        // Sla 'empty-lade-msg' over
+        if (item.classList.contains('empty-lade-msg')) return; 
+
+        const itemNaam = item.dataset.naam; // We gebruiken het data-attribuut!
+        
+        // Verberg/toon op basis van de zoekterm
+        if (itemNaam.includes(zoekTerm)) {
+            item.style.display = 'flex'; // 'flex' (of 'list-item')
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    // 2. Na het filteren, check welke lades/vriezers leeg zijn
+    checkLegeContainers();
+}
+
+// HERSCHREVEN: Deze functie heette 'checkLadesInLijst'
+// Verbergt nu lege lades én lege vriezers
+function checkLegeContainers() {
+    // Loop door alle lade-containers
+    document.querySelectorAll('.lade-container').forEach(ladeDiv => {
+        const ul = ladeDiv.querySelector('.item-lijst');
+        const legeMsg = ladeDiv.querySelector('.empty-lade-msg');
+        
+        // Zoek naar ZICHTBARE items (display != 'none')
+        const zichtbareItems = ul.querySelectorAll('li[style*="display: flex"]');
+        
+        // Als er geen lege-boodschap is (dus er waren items)
+        if (!legeMsg) {
+            if (zichtbareItems.length === 0) {
+                // Alle items zijn weggefilterd, verberg de lade-titel
+                ladeDiv.querySelector('h3').style.display = 'none';
+                ul.style.display = 'none'; // Verberg de hele UL
+            } else {
+                // Er zijn items, toon de titel en lijst
+                ladeDiv.querySelector('h3').style.display = 'block';
+                ul.style.display = 'block';
+            }
+        }
+    });
+
+    // Loop door alle vriezer-containers
+    document.querySelectorAll('.vriezer-container').forEach(vriezerDiv => {
+        // Zoek naar ZICHTBARE lade-titels
+        const zichtbareLades = vriezerDiv.querySelectorAll('h3[style*="display: block"]');
+        
+        if (zichtbareLades.length === 0) {
+            // Geen zichtbare lades, verberg de vriezer-titel
+            vriezerDiv.querySelector('h2').style.display = 'none';
+        } else {
+            // Er zijn lades, toon de vriezer-titel
+            vriezerDiv.querySelector('h2').style.display = 'flex'; // 'flex' (of 'block')
+        }
+    });
+}
 
 // ---
 // STAP 9: PRINT LOGICA (blijft hetzelfde)
