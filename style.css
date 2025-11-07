@@ -645,54 +645,85 @@ li.sortable-ghost {
 }
 /* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
 @media print {
-    .header-bar,
-    #add-item-form,
-    .search-container,
-    #dashboard, 
-    .modal-overlay,
-    hr,
-    .item-buttons,
-    #add-item-form label[for="remember-drawer-check"],
-    input[type="checkbox"],
-    .lade-filter-container,
-    .input-with-button button { 
-        display: none !important; 
-    }
+            /* Verberg alles wat niet geprint moet worden */
+            .header-bar,
+            #add-item-form,
+            .search-container,
+            .toggle-alles-container,
+            #feedback-message,
+            #dashboard,
+            hr,
+            .modal-overlay,
+            .item-buttons,
+            .lade-filter-container,
+            #scan-btn,
+            #manual-ean-btn {
+                display: none !important;
+            }
 
-    body, .container {
-        padding: 0;
-        margin: 0;
-        box-shadow: none;
-        width: 100%;
-        max-width: 100%;
-        border: none;
-    }
-    
-    li {
-        box-shadow: none;
-        border: 1px solid #ccc;
-        page-break-inside: avoid; 
-        border-left: none !important; 
-    }
-    
-    .vriezer-container {
-        flex-direction: column; 
-        gap: 0;
-    }
-    
-    .vriezer-kolom {
-        min-width: 100%;
-    }
-    
-    h2, .schuif-titel {
-        background-color: #eee !important;
-        color: #000 !important;
-        border: 1px solid #ccc;
-        -webkit-print-color-adjust: exact; 
-        color-adjust: exact;
-    }
-    
-    li small {
-        display: none !important;
-    }
+            /* Zorg dat de body de volledige breedte gebruikt */
+            body, .container {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+                background-color: #ffffff; /* Zorg voor witte achtergrond */
+            }
+
+            /* Toon de vriezer-container */
+            .vriezer-container {
+                display: block !important;
+                /* Kolommen onder elkaar op papier */
+                flex-direction: column;
+            }
+            
+            .vriezer-kolom {
+                width: 100% !important;
+                 /* Voorkom dat een kolom halverwege een pagina breekt */
+                page-break-inside: avoid;
+            }
+
+            /* Forceer alle lades om open te zijn */
+            .lade-group {
+                 /* Voorkom dat een lade halverwege een pagina breekt */
+                page-break-inside: avoid;
+            }
+            
+            .lade-group.collapsed .lade-content,
+            .lade-content {
+                /* Forceer de inhoud (de <ul>) om zichtbaar te zijn */
+                display: block !important;
+                max-height: none !important; /* Overschrijf eventuele JS/CSS hoogte animaties */
+            }
+            
+            /* Verberg de 'chevron' (pijltje) in de lade-header */
+            .lade-header .chevron {
+                display: none !important;
+            }
+            
+            /* Zorg dat alle items (li) getoond worden */
+            .vriezer-kolom li {
+                display: flex !important;
+                /* Voorkom dat een item halverwege een pagina breekt */
+                page-break-inside: avoid;
+            }
+            
+            /* Stijl de item-tekst voor print */
+            .item-text {
+                flex-grow: 1;
+                color: #000000; /* Zorg voor zwarte tekst */
+            }
+            
+            /* Haal de achtergrondkleur en rand van 'oude' items weg */
+            .item-old, .item-medium, .item-fresh {
+                background-color: transparent !important;
+                border-left: none !important;
+                color: #000000;
+            }
+
+            /* Zorg dat de titels ook duidelijk zijn */
+            h1, h2, h3, small {
+                color: #000000 !important;
+            }
 }
