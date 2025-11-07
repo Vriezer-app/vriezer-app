@@ -807,17 +807,6 @@ btnToggleAlles.addEventListener('click', () => {
         btnToggleAlles.innerHTML = '<i class="fas fa-plus-square"></i> Alles Openen';
     }
 });
-
-// Functie om alle lades te sluiten
-btnAllesSluiten.addEventListener('click', () => {
-    // Zoek alle lade-groepen in de container
-    const alleLades = vriezerLijstenContainer.querySelectorAll('.lade-group');
-    
-    alleLades.forEach(lade => {
-        // Voeg de 'collapsed' class toe om ze te sluiten
-        lade.classList.add('collapsed');
-    });
-});
 // ---
 // ALLES STARTEN (AANGEPAST - DE FIX)
 // ---
