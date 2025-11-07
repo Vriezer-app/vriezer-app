@@ -43,6 +43,18 @@ h1 { color: #66DDAA; margin: 0; padding: 0; border: none; }
 }
 .btn-beheer:hover { background-color: #63a4f0; }
 
+/* NIEUWE STIJL VOOR ADMIN KNOP */
+.btn-admin {
+    background-color: #FF6B6B; /* Opvallende kleur */
+}
+.btn-admin:hover {
+    background-color: #FF8F8F;
+}
+.btn-admin i {
+    margin-right: 5px;
+}
+
+
 h2 {
     color: #66DDAA;
     border-bottom: 2px solid #e0e0e0;
@@ -395,6 +407,37 @@ li .item-buttons {
     display: block;
 }
 
+/* --- NIEUW: STIJLEN VOOR ADMIN MODAL --- */
+.admin-user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+.admin-user-list li {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 0;
+    border-radius: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.admin-user-list li:last-child {
+    border-bottom: none;
+}
+.admin-user-list li:hover {
+    background-color: #f9f9f9;
+}
+.admin-user-list li small {
+    color: #777;
+    font-size: 0.8em;
+}
+
 
 /* --- AANGEPAST: MEDIA QUERY VOOR GROTERE SCHERMEN --- */
 @media (min-width: 768px) {
@@ -649,7 +692,8 @@ li.sortable-ghost {
             .item-buttons,
             .lade-filter-container,
             #scan-btn,
-            #manual-ean-btn {
+            #manual-ean-btn,
+            #admin-beheer-knop /* Verberg admin knop ook */ {
                 display: none !important;
             }
 
@@ -721,3 +765,4 @@ li.sortable-ghost {
             }
 
 }
+
