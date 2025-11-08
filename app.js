@@ -42,6 +42,9 @@ let beheerdeUserId = null;
 let beheerdeUserEmail = null;
 let eigenUserId = null; 
 
+// NIEUW: Notificatie vlag
+let isEersteNotificatieCheck = true;
+
 // --- Snelkoppelingen naar elementen ---
 const form = document.getElementById('add-item-form');
 const vriezerSelect = document.getElementById('item-vriezer'); 
@@ -56,7 +59,7 @@ const editVriezer = document.getElementById('edit-item-vriezer');
 const editSchuif = document.getElementById('edit-item-schuif');
 const editDatum = document.getElementById('edit-item-datum');
 const btnCancel = document.getElementById('btn-cancel');
-const logoutBtn = document.getElementById('logout-btn'); // Zit nu in profiel modal
+const logoutBtn = document.getElementById('logout-btn');
 const searchBar = document.getElementById('search-bar');
 const printBtn = document.getElementById('print-btn');
 const dashboard = document.getElementById('dashboard'); 
@@ -69,7 +72,6 @@ const manualEanBtn = document.getElementById('manual-ean-btn');
 let html5QrCode;
 const vriezerLijstenContainer = document.getElementById('vriezer-lijsten-container');
 const vriezerBeheerModal = document.getElementById('vriezer-beheer-modal');
-// const vriezerBeheerKnop = document.getElementById('vriezer-beheer-knop'); // VERWIJDERD
 const sluitBeheerKnop = document.getElementById('btn-sluit-beheer');
 const addVriezerForm = document.getElementById('add-vriezer-form');
 const vriezerBeheerLijst = document.getElementById('vriezer-beheer-lijst');
@@ -87,10 +89,10 @@ const adminUserLijst = document.getElementById('admin-user-lijst');
 const adminBeheertTitel = document.getElementById('admin-beheert-titel');
 const adminTerugKnop = document.getElementById('admin-terug-knop');
 
-// --- NIEUW: Profiel Modal Elementen ---
+// Profiel Modal Elementen
 const profileBtn = document.getElementById('profile-btn');
 const profileImg = document.getElementById('profile-img');
-const profileIcon = profileBtn.querySelector('i'); // Het 'fa-user-circle' icoon
+const profileIcon = profileBtn.querySelector('i'); 
 const profileModal = document.getElementById('profile-modal');
 const sluitProfileModalKnop = document.getElementById('btn-sluit-profile');
 const profileModalImg = document.getElementById('profile-modal-img');
@@ -98,10 +100,38 @@ const profileModalIcon = profileModal.querySelector('.profile-header i');
 const profileEmailEl = document.getElementById('profile-email');
 const profileVriezerBeheerBtn = document.getElementById('profile-vriezer-beheer-btn');
 
+// --- NIEUW: Nieuwe Profiel Knoppen ---
+const exportDataBtn = document.getElementById('export-data-btn');
+const profileShareBtn = document.getElementById('profile-share-btn');
+
+// --- NIEUW: Notificatie Modal Elementen ---
+const notificatieModal = document.getElementById('notificatie-modal');
+const notificatieLijst = document.getElementById('notificatie-lijst');
+const sluitNotificatieKnop = document.getElementById('btn-sluit-notificatie');
+
+// --- NIEUW: Deel Modal Elementen ---
+const shareModal = document.getElementById('share-modal');
+const sluitShareKnop = document.getElementById('btn-sluit-share');
+const shareInviteForm = document.getElementById('share-invite-form');
+
 
 // ---
-// HELPER FUNCTIES (Onveranderd)
+// HELPER FUNCTIES (Modal & Aantal)
 // ---
+// Aangepaste modal show/hide functies
+function showModal(modalElement) {
+    if (modalElement) {
+        // modalElement.style.display = 'flex'; // Oude manier
+        modalElement.classList.add('show');
+    }
+}
+function hideModal(modalElement) {
+    if (modalElement) {
+        // modalElement.style.display = 'none'; // Oude manier
+        modalElement.classList.remove('show');
+    }
+}
+
 function showFeedback(message, type = 'success') {
     feedbackMessage.textContent = message;
     feedbackMessage.className = 'feedback';
@@ -127,10 +157,39 @@ function formatDatum(timestamp) {
     if (!timestamp) return 'Onbekende datum';
     return timestamp.toDate().toLocaleDateString('nl-BE');
 }
-// Scanner functies (onveranderd)
+
+// --- NIEUW: Helper voor Aantal Knoppen (UX) ---
+function handleAantalKlik(e) {
+    const target = e.target.closest('.aantal-btn');
+    if (!target) return;
+
+    const wrapper = target.parentElement;
+    const input = wrapper.querySelector('input[type="number"]');
+    if (!input) return;
+
+    const action = target.dataset.action;
+    const step = parseFloat(input.step) || 1;
+    let currentValue = parseFloat(input.value) || 0;
+
+    if (action === 'plus') {
+        currentValue += step;
+    } else if (action === 'minus') {
+        currentValue -= step;
+    }
+    
+    const min = parseFloat(input.min) || 0;
+    if (currentValue < min) {
+        currentValue = min;
+    }
+
+    input.value = currentValue;
+}
+
+
+// --- Scanner functies (onveranderd) ---
 function startScanner() {
     html5QrCode = new Html5Qrcode(scannerContainerId);
-    scanModal.style.display = 'flex';
+    showModal(scanModal);
     html5QrCode.start(
         { facingMode: "environment" },
         {
@@ -149,13 +208,13 @@ function sluitScanner() {
     if (html5QrCode) {
         html5QrCode.stop().then(() => {
             console.log("Scanner gestopt.");
-            scanModal.style.display = 'none';
+            hideModal(scanModal);
         }).catch(err => {
             console.log("Fout bij stoppen scanner:", err);
-            scanModal.style.display = 'none';
+            hideModal(scanModal);
         });
     } else {
-        scanModal.style.display = 'none';
+        hideModal(scanModal);
     }
 }
 function onScanSuccess(decodedText, decodedResult) {
@@ -205,35 +264,31 @@ auth.onAuthStateChanged((user) => {
         
         beheerdeUserId = user.uid;
         beheerdeUserEmail = user.email || "Jezelf";
+        isEersteNotificatieCheck = true; // Reset notificatie vlag bij inloggen
 
         registreerGebruiker(user);
         checkAdminStatus(user.uid);
         
-        // --- NIEUW: Profiel Knop & Modal Info Instellen ---
+        // Profiel Knop & Modal Info Instellen
         const userPhoto = user.photoURL;
         const userEmail = user.email || 'Geen e-mailadres';
         
-        // 1. Header Profiel Knop
         if (userPhoto) {
             profileImg.src = userPhoto;
             profileImg.style.display = 'block';
             profileIcon.style.display = 'none';
-        } else {
-            profileImg.style.display = 'none';
-            profileIcon.style.display = 'block';
-        }
-        
-        // 2. Profiel Modal Header
-        if (userPhoto) {
             profileModalImg.src = userPhoto;
             profileModalImg.style.display = 'block';
             profileModalIcon.style.display = 'none';
         } else {
+            profileImg.src = '';
+            profileImg.style.display = 'none';
+            profileIcon.style.display = 'block';
+            profileModalImg.src = '';
             profileModalImg.style.display = 'none';
             profileModalIcon.style.display = 'block';
         }
         profileEmailEl.textContent = userEmail;
-        // --- EINDE NIEUW ---
 
         // Start de data listeners
         startAlleDataListeners();
@@ -256,9 +311,9 @@ auth.onAuthStateChanged((user) => {
         
         // Knoppen resetten/verbergen
         adminBeheerKnop.style.display = 'none';
-        adminBeheerModal.style.display = 'none';
+        hideModal(adminBeheerModal);
         
-        // --- NIEUW: Profiel Knop Resetten ---
+        // Profiel Knop Resetten
         profileImg.src = '';
         profileImg.style.display = 'none';
         profileIcon.style.display = 'block';
@@ -266,14 +321,13 @@ auth.onAuthStateChanged((user) => {
         profileModalImg.src = '';
         profileModalImg.style.display = 'none';
         profileModalIcon.style.display = 'block';
-        // --- EINDE NIEUW ---
         
         window.location.replace('index.html');
     }
 });
 
 // (Functies 'registreerGebruiker', 'checkAdminStatus', 'schakelBeheer', 'updateAdminUI' 
-// zijn onveranderd en blijven hier)
+// zijn onveranderd)
 async function registreerGebruiker(user) {
     try {
         await usersCollectie.doc(user.uid).set({
@@ -292,7 +346,7 @@ async function checkAdminStatus(uid) {
         if (adminDoc.exists) {
             console.log("ADMIN STATUS: Ja");
             isAdmin = true;
-            adminBeheerKnop.style.display = 'inline-flex'; // 'inline-flex' gebruiken ipv 'inline-block'
+            adminBeheerKnop.style.display = 'inline-flex';
             startAdminUserListener(); 
         } else {
             console.log("ADMIN STATUS: Nee");
@@ -310,12 +364,10 @@ async function checkAdminStatus(uid) {
 function schakelBeheer(naarUserId, naarUserEmail) {
     if (beheerdeUserId === naarUserId) return; 
 
-    console.log(`Schakelen van beheer...
-    Van: ${beheerdeUserId}
-    Naar: ${naarUserId} (${naarUserEmail})`);
-
+    console.log(`Schakelen van beheer... Naar: ${naarUserId}`);
     beheerdeUserId = naarUserId;
     beheerdeUserEmail = naarUserEmail || 'Onbekende Gebruiker';
+    isEersteNotificatieCheck = true; // Reset notificatie vlag bij schakelen
 
     stopAlleDataListeners();
 
@@ -327,7 +379,7 @@ function schakelBeheer(naarUserId, naarUserEmail) {
     startAlleDataListeners();
     updateAdminUI();
     
-    adminBeheerModal.style.display = 'none';
+    hideModal(adminBeheerModal);
     showFeedback(`Je beheert nu de vriezers van: ${beheerdeUserEmail}`, 'success');
 }
 
@@ -346,7 +398,7 @@ function updateAdminUI() {
 }
 
 // ---
-// STAP 3: DATA LISTENERS (Onveranderd)
+// STAP 3: DATA LISTENERS (AANGEPAST)
 // ---
 function startAlleDataListeners() {
     if (!beheerdeUserId) return; 
@@ -376,7 +428,7 @@ function startAlleDataListeners() {
             renderDynamischeLijsten(); 
         }, (err) => console.error("Fout bij lades listener:", err.message));
 
-    // 3. Items Listener
+    // 3. Items Listener (AANGEPAST: triggert notificatie check)
     if (itemsListener) itemsListener(); 
     itemsListener = itemsCollectieBasis
         .where("userId", "==", beheerdeUserId)
@@ -385,6 +437,12 @@ function startAlleDataListeners() {
             console.log("Items geladen:", alleItems.length);
             renderDynamischeLijsten(); 
             updateDashboard(); 
+            
+            // NIEUW: Notificatie check
+            if (isEersteNotificatieCheck && alleItems.length > 0) {
+                checkHoudbaarheidNotificaties();
+                isEersteNotificatieCheck = false; // Zorg dat dit maar 1x runt
+            }
         }, (error) => {
             console.error("Fout bij ophalen items: ", error);
             showFeedback(error.message, "error");
@@ -435,17 +493,8 @@ function startAdminUserListener() {
         }, (err) => console.error("Fout bij laden gebruikerslijst:", err.message));
 }
 
-function stopAdminUserListener() {
-    if (userListListener) {
-        userListListener();
-        userListListener = null;
-    }
-}
-
 // ---
-// STAP 4: UI RENDERING (Dropdowns & Lijsten) (Onveranderd)
-// (functies 'vulToevoegVriezerDropdown', 'updateLadeDropdown', 'renderDynamischeLijsten', 
-// 'updateDashboard', 'initDragAndDrop' zijn onveranderd)
+// STAP 4: UI RENDERING (Dropdowns & Lijsten) (AANGEPAST)
 // ---
 function vulToevoegVriezerDropdown() {
     const geselecteerdeId = vriezerSelect.value;
@@ -496,7 +545,7 @@ function updateLadeDropdown(vriezerId, ladeSelectElement, resetSelectie) {
     }
 }
 
-// AANGEPAST in vorige stap (onthoudt open lades)
+// AANGEPAST: Voegt 'consume-btn' toe
 function renderDynamischeLijsten() {
     
     const openLadeIds = new Set();
@@ -588,19 +637,24 @@ function renderDynamischeLijsten() {
                 li.dataset.ladeId = item.ladeId; 
                 li.dataset.vriezerId = item.vriezerId;
                 
+                let diffDagen = 0;
                 if (item.ingevrorenOp) {
-                    const diffDagen = Math.ceil(Math.abs(new Date() - item.ingevrorenOp.toDate()) / (1000 * 60 * 60 * 24));
+                    diffDagen = Math.ceil(Math.abs(new Date() - item.ingevrorenOp.toDate()) / (1000 * 60 * 60 * 24));
                     if (diffDagen > 180) { li.classList.add('item-old'); }
                     else if (diffDagen > 90) { li.classList.add('item-medium'); }
                     else { li.classList.add('item-fresh'); }
                 }
+                
+                li.dataset.dagen = diffDagen; // Sla dagen op voor notificaties
 
                 li.innerHTML = `
                     <div class="item-text">
                         <strong>${item.naam} (${formatAantal(item.aantal, item.eenheid)})</strong>
-                        <small style="display: block; color: #555;">Ingevroren op: ${formatDatum(item.ingevrorenOp)}</small>
+                        <small style="display: block; color: #555;">Ingevroren op: ${formatDatum(item.ingevrorenOp)} (${diffDagen}d)</small>
                     </div>
                     <div class="item-buttons">
+                        <!-- NIEUW: Consume Knop -->
+                        <button class="consume-btn" title="Gebruik 1"><i class="fas fa-utensils"></i></button>
                         <button class="edit-btn" title="Bewerken"><i class="fas fa-pencil-alt"></i></button>
                         <button class="delete-btn" title="Verwijder"><i class="fas fa-trash-alt"></i></button>
                     </div>
@@ -680,10 +734,7 @@ function initDragAndDrop() {
 
 
 // ---
-// STAP 5: Items CRUD (Onveranderd)
-// (functies 'form.addEventListener', 'vriezerLijstenContainer.addEventListener', 
-// 'editVriezer.addEventListener', 'editForm.addEventListener', 'sluitItemModal', 'btnCancel.addEventListener')
-// zijn onveranderd.
+// STAP 5: Items CRUD (AANGEPAST)
 // ---
 form.addEventListener('submit', (e) => {
     e.preventDefault(); 
@@ -723,6 +774,7 @@ form.addEventListener('submit', (e) => {
         } else {
             form.reset();
             document.getElementById('item-eenheid').value = "stuks";
+            document.getElementById('item-aantal').value = 1; // Reset aantal ook
             vriezerSelect.value = "";
             schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
         }
@@ -733,6 +785,7 @@ form.addEventListener('submit', (e) => {
     });
 });
 
+// AANGEPAST: Luistert nu ook naar 'consume-btn'
 vriezerLijstenContainer.addEventListener('click', (e) => {
     
     const ladeHeader = e.target.closest('.lade-header');
@@ -742,25 +795,34 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
         return; 
     }
 
-    const deleteButton = e.target.closest('.delete-btn');
     const li = e.target.closest('li');
     if (!li) return; 
+    
+    const id = li.dataset.id;
+    const item = alleItems.find(i => i.id === id);
+    if (!item) return;
 
+    // 1. Check voor Consume Knop
+    const consumeButton = e.target.closest('.consume-btn');
+    if (consumeButton) {
+        handleConsumeItem(item);
+        return;
+    }
+
+    // 2. Check voor Delete Knop
+    const deleteButton = e.target.closest('.delete-btn');
     if (deleteButton) {
-        const id = li.dataset.id;
-        if (confirm("Weet je zeker dat je dit item wilt verwijderen?")) {
+        if (confirm(`Weet je zeker dat je '${item.naam}' wilt verwijderen?`)) {
             itemsCollectieBasis.doc(id).delete()
                 .then(() => showFeedback('Item verwijderd.', 'success'))
                 .catch((err) => showFeedback(`Fout bij verwijderen: ${err.message}`, 'error'));
         }
+        return;
     }
     
+    // 3. Check voor Edit Knop
     const editButton = e.target.closest('.edit-btn');
     if (editButton) {
-        const id = li.dataset.id;
-        const item = alleItems.find(i => i.id === id);
-        if (!item) return;
-        
         editId.value = id;
         editNaam.value = item.naam;
         editAantal.value = item.aantal;
@@ -784,9 +846,35 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
         const day = jsDate.getDate().toString().padStart(2, '0');
         editDatum.value = `${year}-${month}-${day}`;
         
-        editModal.style.display = 'flex';
+        showModal(editModal);
+        return;
     }
 });
+
+// --- NIEUW: Functie voor Snel Gebruiken (UX) ---
+function handleConsumeItem(item) {
+    const huidigAantal = parseFloat(item.aantal);
+    const stap = 0.25; // Gebruik de kleinste stap
+    let nieuwAantal = huidigAantal - 1; // Verminder altijd met 1 (of pas logica aan indien gewenst)
+
+    // Als de stap 0.25 is, en we hebben 0.5, wordt het -0.5, wat we als 0 willen
+    if (nieuwAantal < 0.25 && nieuwAantal > -0.75) {
+        nieuwAantal = 0;
+    }
+
+    if (nieuwAantal <= 0) {
+        if (confirm(`Aantal is ${huidigAantal}. Wil je de laatste '${item.naam}' verwijderen?`)) {
+            itemsCollectieBasis.doc(item.id).delete()
+                .then(() => showFeedback(`'${item.naam}' verwijderd.`, 'success'))
+                .catch((err) => showFeedback(`Fout: ${err.message}`, 'error'));
+        }
+    } else {
+        itemsCollectieBasis.doc(item.id).update({ aantal: nieuwAantal })
+            .then(() => showFeedback(`'${item.naam}' verminderd naar ${nieuwAantal}.`, 'success'))
+            .catch((err) => showFeedback(`Fout: ${err.message}`, 'error'));
+    }
+}
+
 
 editVriezer.addEventListener('change', () => {
     updateLadeDropdown(editVriezer.value, editSchuif, true); 
@@ -816,29 +904,18 @@ editForm.addEventListener('submit', (e) => {
     })
     .catch((err) => showFeedback(`Fout bij bijwerken: ${err.message}`, 'error'));
 });
-function sluitItemModal() { editModal.style.display = 'none'; }
+function sluitItemModal() { hideModal(editModal); }
 btnCancel.addEventListener('click', sluitItemModal);
 
 
 // ---
-// STAP 6: VRIEZER BEHEER LOGICA (AANGEPAST)
+// STAP 6: VRIEZER BEHEER LOGICA (Onveranderd)
 // ---
-
-// --- DE OUDE LISTENER IS VERWIJDERD ---
-// vriezerBeheerKnop.addEventListener('click', ...);
-
-// De knop om de modal te *openen* zit nu in de Profiel Modal listeners (zie STAP 10)
-
-// De rest van de Vriezer Beheer logica (functies 'sluitBeheerKnop.addEventListener', 
-// 'addVriezerForm.addEventListener', 'laadVriezersBeheer', 'addLadeForm.addEventListener',
-// 'laadLadesBeheer', 'vriezerBeheerLijst.addEventListener', 'ladeBeheerLijst.addEventListener',
-// 'handleHernoem', 'handleVerwijderVriezer', 'handleVerwijderLade') is onveranderd.
-
 let vriezerBeheerListener = null; 
 let ladeBeheerListener = null; 
 
 sluitBeheerKnop.addEventListener('click', () => {
-    vriezerBeheerModal.style.display = 'none';
+    hideModal(vriezerBeheerModal);
     if (vriezerBeheerListener) { 
         vriezerBeheerListener();
         vriezerBeheerListener = null;
@@ -1037,10 +1114,10 @@ async function handleVerwijderLade(id, naam) {
 // STAP 7: ADMIN BEHEER LOGICA (Onveranderd)
 // ---
 adminBeheerKnop.addEventListener('click', () => {
-    adminBeheerModal.style.display = 'flex';
+    showModal(adminBeheerModal);
 });
 sluitAdminBeheerKnop.addEventListener('click', () => {
-    adminBeheerModal.style.display = 'none';
+    hideModal(adminBeheerModal);
 });
 adminTerugKnop.addEventListener('click', () => {
     schakelBeheer(eigenUserId, "Jezelf");
@@ -1120,20 +1197,21 @@ btnToggleAlles.addEventListener('click', () => {
 });
 
 // ---
-// STAP 10: OVERIGE FUNCTIES (Print, Logout, Scanner) & NIEUWE LISTENERS
+// STAP 10: NIEUWE FUNCTIES & LISTENERS
 // ---
+
+// Print
 printBtn.addEventListener('click', () => window.print());
 
-// De 'logoutBtn' bevindt zich nu in de profiel modal, maar de listener werkt nog steeds
+// Logout
 logoutBtn.addEventListener('click', () => {
     if (confirm("Weet je zeker dat je wilt uitloggen?")) {
-        // Sluit eerst de modal voor een soepele overgang
-        profileModal.style.display = 'none'; 
+        hideModal(profileModal); 
         auth.signOut().catch((error) => showFeedback(`Fout bij uitloggen: ${error.message}`, 'error'));
     }
 });
 
-// Scanner listeners (onveranderd)
+// Scanner
 scanBtn.addEventListener('click', startScanner);
 stopScanBtn.addEventListener('click', sluitScanner);
 manualEanBtn.addEventListener('click', () => {
@@ -1141,20 +1219,110 @@ manualEanBtn.addEventListener('click', () => {
     if (ean && ean.trim() !== "") fetchProductFromOFF(ean.trim());
 });
 
-// --- NIEUW: Profiel Modal Listeners ---
+// Aantal knoppen (UX)
+form.addEventListener('click', handleAantalKlik);
+editModal.addEventListener('click', handleAantalKlik);
+
+// Profiel Modal
 profileBtn.addEventListener('click', () => {
-    profileModal.style.display = 'flex';
+    showModal(profileModal);
 });
-
 sluitProfileModalKnop.addEventListener('click', () => {
-    profileModal.style.display = 'none';
+    hideModal(profileModal);
+});
+profileVriezerBeheerBtn.addEventListener('click', () => {
+    hideModal(profileModal); 
+    showModal(vriezerBeheerModal); 
+    laadVriezersBeheer(); 
 });
 
-// Link de "Vriezer Beheer" knop *in het profiel* naar de vriezer beheer modal
-profileVriezerBeheerBtn.addEventListener('click', () => {
-    profileModal.style.display = 'none'; // Sluit profiel modal
-    vriezerBeheerModal.style.display = 'flex'; // Open vriezer beheer modal
-    laadVriezersBeheer(); // Zorg dat de data laadt
+// --- NIEUW: Export ---
+exportDataBtn.addEventListener('click', () => {
+    if (alleItems.length === 0 && alleVriezers.length === 0) {
+        showFeedback("Er is geen data om te exporteren.", "error");
+        return;
+    }
+    
+    // Verpak alle data in een JSON
+    const backupData = {
+        exportDatum: new Date().toISOString(),
+        vriezers: alleVriezers,
+        lades: alleLades,
+        items: alleItems.map(item => {
+            // Converteer Firestore Timestamps naar ISO strings
+            return {
+                ...item,
+                ingevrorenOp: item.ingevrorenOp ? item.ingevrorenOp.toDate().toISOString() : null
+            };
+        })
+    };
+    
+    const jsonData = JSON.stringify(backupData, null, 2); // 'null, 2' voor mooie opmaak
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vriezer_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showFeedback("Data geëxporteerd!", "success");
+    hideModal(profileModal);
+});
+
+// --- NIEUW: Notificatie Modal ---
+function checkHoudbaarheidNotificaties() {
+    const DAGEN_OUD = 180; // 'Rood'
+    const oudeItems = alleItems
+        .filter(item => {
+            if (!item.ingevrorenOp) return false;
+            const diffDagen = Math.ceil(Math.abs(new Date() - item.ingevrorenOp.toDate()) / (1000 * 60 * 60 * 24));
+            return diffDagen > DAGEN_OUD;
+        })
+        .sort((a, b) => b.ingevrorenOp.toDate() - a.ingevrorenOp.toDate()); // Oudste eerst? Nee, andersom.
+        // .sort((a, b) => a.ingevrorenOp.toDate() - b.ingevrorenOp.toDate()); // Oudste eerst
+
+    // Sorteer op dagen, oudste eerst
+    oudeItems.sort((a, b) => {
+        const dagenA = Math.ceil(Math.abs(new Date() - a.ingevrorenOp.toDate()) / (1000 * 60 * 60 * 24));
+        const dagenB = Math.ceil(Math.abs(new Date() - b.ingevrorenOp.toDate()) / (1000 * 60 * 60 * 24));
+        return dagenB - dagenA;
+    });
+
+
+    if (oudeItems.length > 0) {
+        notificatieLijst.innerHTML = ''; // Leegmaken
+        oudeItems.slice(0, 5).forEach(item => { // Toon max 5
+            const li = document.createElement('li');
+            const dagen = Math.ceil(Math.abs(new Date() - item.ingevrorenOp.toDate()) / (1000 * 60 * 60 * 24));
+            li.textContent = `${item.naam} (${item.ladeNaam}) - ${dagen} dagen oud`;
+            notificatieLijst.appendChild(li);
+        });
+        showModal(notificatieModal);
+    }
+}
+sluitNotificatieKnop.addEventListener('click', () => {
+    hideModal(notificatieModal);
+});
+
+// --- NIEUW: Deel Modal (UI) ---
+profileShareBtn.addEventListener('click', () => {
+    hideModal(profileModal);
+    showModal(shareModal);
+    // Toekomst: laadVriezerDelen();
+});
+sluitShareKnop.addEventListener('click', () => {
+    hideModal(shareModal);
+});
+shareInviteForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    // Dit is de placeholder. De echte logica is zeer complex.
+    showFeedback("Functie binnenkort beschikbaar.", "error");
+    // const email = document.getElementById('share-email').value;
+    // console.log(`Wil uitnodigen: ${email}`);
 });
 
 
