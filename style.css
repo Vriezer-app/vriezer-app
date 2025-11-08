@@ -17,7 +17,7 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Header Bar --- */
+/* --- AANGEPAST: Header Bar --- */
 .header-bar {
     display: flex;
     justify-content: space-between;
@@ -105,7 +105,7 @@ h1 {
 .btn-admin:hover { background-color: #e06c69; }
 .btn-admin span { display: none; } /* Verberg tekst op mobiel */
 
-/* Print knop specifiek */
+/* Print knop (oude stijl, niet meer in header) */
 .btn-print {
     background-color: #777;
 }
@@ -218,7 +218,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     font-weight: normal;
 }
 
-/* --- NIEUW: Aantal Knoppen (UX) --- */
+/* --- Aantal Knoppen (UX) --- */
 .aantal-wrapper {
     display: flex;
     align-items: center;
@@ -228,7 +228,6 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     border-left: none;
     border-right: none;
     border-radius: 0;
-    /* Verberg de standaard pijltjes in de input */
     -moz-appearance: textfield; 
 }
 .aantal-wrapper input[type="number"]::-webkit-outer-spin-button,
@@ -258,7 +257,6 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 .aantal-btn[data-action="plus"] {
     border-radius: 0 5px 5px 0;
 }
-/* Einde Aantal Knoppen */
 
 
 input[type="text"], input[type="number"], input[type="email"], select, input[type="date"] {
@@ -366,7 +364,7 @@ li .item-buttons {
     transition: background-color 0.2s ease;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* Zorgt voor centreren */
 }
 .edit-btn { background-color: #4A90E2; }
 .edit-btn:hover { background-color: #63a4f0; }
@@ -374,7 +372,6 @@ li .item-buttons {
 .delete-btn:hover { background-color: #FF8F8F; }
 .save-btn { background-color: #66DDAA; color: #1a1a1a; }
 .save-btn:hover { background-color: #88FFCC; }
-/* NIEUW: Consume Knop (UX) */
 .consume-btn { background-color: #66DDAA; color: #1a1a1a; }
 .consume-btn:hover { background-color: #88FFCC; }
 
@@ -391,7 +388,6 @@ li .item-buttons {
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
-    /* Zorgt voor soepele fade-in */
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
@@ -409,7 +405,6 @@ li .item-buttons {
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
-    /* Zoom-in effect */
     transform: scale(0.95);
     transition: transform 0.2s ease-in-out;
 }
@@ -651,13 +646,14 @@ li .item-buttons {
 .profile-menu-btn:disabled i {
     color: #ccc;
 }
-/* Icoon kleuren voor nieuwe knoppen */
+/* Icoon kleuren voor knoppen */
 #profile-share-btn i { color: #66DDAA; }
 #export-data-btn i { color: #f0ad4e; }
+#print-btn i { color: #777; } /* AANGEPAST: Print knop icoon kleur */
 .profile-menu-btn[disabled] i[class*="fa-file-import"] { color: #ccc; }
 
 
-/* --- NIEUW: Notificatie Modal --- */
+/* --- Notificatie Modal --- */
 .notificatie-lijst {
     list-style: none;
     padding: 0;
@@ -674,7 +670,7 @@ li .item-buttons {
     color: #66512c;
 }
 
-/* --- NIEUW: Share Modal --- */
+/* --- Share Modal --- */
 .share-huidige-lijst {
     list-style: none;
     padding: 0;
@@ -701,7 +697,7 @@ li .item-buttons {
     width: 35px;
     height: 35px;
     font-size: 14px;
-    margin-left: auto; /* Duw de knop naar rechts */
+    margin-left: auto;
 }
 
 
@@ -772,6 +768,7 @@ li .item-buttons {
     position: relative;
     margin-bottom: 25px; 
 }
+
 .search-container .fa-search {
     position: absolute;
     left: 15px;
@@ -779,6 +776,7 @@ li .item-buttons {
     transform: translateY(-50%);
     color: #999;
 }
+
 #search-bar {
     padding-left: 45px;
     font-size: 1.1em;
@@ -796,7 +794,7 @@ li.item-old {
     border-left: 5px solid #FF6B6B; /* Rood */
 }
 
-/* --- Stijlen voor Scan Knop & Modal --- */
+/* --- AANGEPAST: Stijlen voor Scan Knop & Modal --- */
 .input-with-button {
     display: flex;
     gap: 10px;
@@ -812,6 +810,7 @@ li.item-old {
     width: 50px; 
     height: 50px; 
     font-size: 20px; 
+    justify-content: center; /* DE FIX: Horizontaal centreren */
 }
 
 #barcode-scanner-container {
@@ -869,7 +868,7 @@ li.sortable-ghost {
     cursor: pointer;
     width: 100%;
     border: none;
-    font: inherit; /* Zorgt dat de button-stijl gereset wordt */
+    font: inherit; 
     color: #333;
     text-align: left;
 }
@@ -886,7 +885,6 @@ li.sortable-ghost {
     font-size: 0.9em;
     color: #555;
 }
-/* Wanneer ingeklapt, draai de pijl */
 .lade-group.collapsed .chevron {
     transform: rotate(-90deg);
 }
@@ -894,7 +892,6 @@ li.sortable-ghost {
     padding: 0 15px 15px 15px;
     background-color: #ffffff;
 }
-/* Wanneer ingeklapt, verberg de content */
 .lade-group.collapsed .lade-content {
     display: none;
 }
@@ -904,13 +901,12 @@ li.sortable-ghost {
     margin: 10px 0 0 0;
 }
 
-/* Zorg dat de drag-ghost er goed uit ziet */
 .sortable-ghost {
     background: #f0f8ff;
 }
 /* --- Knop voor Alles Openen/Sluiten --- */
 .btn-full-width-toggle {
-    background-color: #8a8a8a; /* Een neutraal grijs */
+    background-color: #8a8a8a; 
     color: white;
     border: none;
     border-radius: 5px;
@@ -931,7 +927,7 @@ li.sortable-ghost {
     margin-right: 8px; 
 }
 
-/* --- PRINT STIJLEN (Onveranderd) --- */
+/* --- PRINT STIJLEN --- */
 @media print {
     /* Verberg alles wat niet geprint moet worden */
     .header-bar,
