@@ -36,14 +36,13 @@ let ladesListener = null;
 let itemsListener = null; 
 let userListListener = null;
 
-// --- NIEUW: Admin & Data Scheiding ---
+// Admin & Data Scheiding
 let isAdmin = false;
-let beheerdeUserId = null; // De UID van de persoon wiens data we nu bekijken
+let beheerdeUserId = null; 
 let beheerdeUserEmail = null;
-let eigenUserId = null; // De UID van de ingelogde gebruiker zelf
+let eigenUserId = null; 
 
 // --- Snelkoppelingen naar elementen ---
-// (Deze blijven grotendeels hetzelfde, maar nu met de Admin-elementen erbij)
 const form = document.getElementById('add-item-form');
 const vriezerSelect = document.getElementById('item-vriezer'); 
 const schuifSelect = document.getElementById('item-schuif'); 
@@ -57,7 +56,7 @@ const editVriezer = document.getElementById('edit-item-vriezer');
 const editSchuif = document.getElementById('edit-item-schuif');
 const editDatum = document.getElementById('edit-item-datum');
 const btnCancel = document.getElementById('btn-cancel');
-const logoutBtn = document.getElementById('logout-btn');
+const logoutBtn = document.getElementById('logout-btn'); // Zit nu in profiel modal
 const searchBar = document.getElementById('search-bar');
 const printBtn = document.getElementById('print-btn');
 const dashboard = document.getElementById('dashboard'); 
@@ -70,7 +69,7 @@ const manualEanBtn = document.getElementById('manual-ean-btn');
 let html5QrCode;
 const vriezerLijstenContainer = document.getElementById('vriezer-lijsten-container');
 const vriezerBeheerModal = document.getElementById('vriezer-beheer-modal');
-const vriezerBeheerKnop = document.getElementById('vriezer-beheer-knop');
+// const vriezerBeheerKnop = document.getElementById('vriezer-beheer-knop'); // VERWIJDERD
 const sluitBeheerKnop = document.getElementById('btn-sluit-beheer');
 const addVriezerForm = document.getElementById('add-vriezer-form');
 const vriezerBeheerLijst = document.getElementById('vriezer-beheer-lijst');
@@ -80,7 +79,7 @@ const ladesBeheerHr = document.getElementById('lades-beheer-hr');
 const ladeBeheerLijst = document.getElementById('lade-beheer-lijst');
 const btnToggleAlles = document.getElementById('btn-toggle-alles');
 
-// --- NIEUW: Admin Modal Elementen ---
+// Admin Modal Elementen
 const adminBeheerKnop = document.getElementById('admin-beheer-knop');
 const adminBeheerModal = document.getElementById('admin-beheer-modal');
 const sluitAdminBeheerKnop = document.getElementById('btn-sluit-admin-beheer');
@@ -88,9 +87,20 @@ const adminUserLijst = document.getElementById('admin-user-lijst');
 const adminBeheertTitel = document.getElementById('admin-beheert-titel');
 const adminTerugKnop = document.getElementById('admin-terug-knop');
 
+// --- NIEUW: Profiel Modal Elementen ---
+const profileBtn = document.getElementById('profile-btn');
+const profileImg = document.getElementById('profile-img');
+const profileIcon = profileBtn.querySelector('i'); // Het 'fa-user-circle' icoon
+const profileModal = document.getElementById('profile-modal');
+const sluitProfileModalKnop = document.getElementById('btn-sluit-profile');
+const profileModalImg = document.getElementById('profile-modal-img');
+const profileModalIcon = profileModal.querySelector('.profile-header i');
+const profileEmailEl = document.getElementById('profile-email');
+const profileVriezerBeheerBtn = document.getElementById('profile-vriezer-beheer-btn');
+
 
 // ---
-// HELPER FUNCTIES (blijven grotendeels hetzelfde)
+// HELPER FUNCTIES (Onveranderd)
 // ---
 function showFeedback(message, type = 'success') {
     feedbackMessage.textContent = message;
@@ -185,58 +195,92 @@ async function fetchProductFromOFF(ean) {
 
 
 // ---
-// STAP 2: AUTHENTICATIE & INITIALISATIE (STERK AANGEPAST)
+// STAP 2: AUTHENTICATIE & INITIALISATIE (AANGEPAST)
 // ---
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("Ingelogd als:", user.email);
         currentUser = user;
-        eigenUserId = user.uid; // Sla eigen UID op
+        eigenUserId = user.uid; 
         
-        // Zet standaard beheer op de eigen gebruiker
         beheerdeUserId = user.uid;
         beheerdeUserEmail = user.email || "Jezelf";
 
-        // Registreer/update gebruiker in de 'users' collectie
         registreerGebruiker(user);
-        
-        // Check of deze gebruiker een admin is
         checkAdminStatus(user.uid);
         
+        // --- NIEUW: Profiel Knop & Modal Info Instellen ---
+        const userPhoto = user.photoURL;
+        const userEmail = user.email || 'Geen e-mailadres';
+        
+        // 1. Header Profiel Knop
+        if (userPhoto) {
+            profileImg.src = userPhoto;
+            profileImg.style.display = 'block';
+            profileIcon.style.display = 'none';
+        } else {
+            profileImg.style.display = 'none';
+            profileIcon.style.display = 'block';
+        }
+        
+        // 2. Profiel Modal Header
+        if (userPhoto) {
+            profileModalImg.src = userPhoto;
+            profileModalImg.style.display = 'block';
+            profileModalIcon.style.display = 'none';
+        } else {
+            profileModalImg.style.display = 'none';
+            profileModalIcon.style.display = 'block';
+        }
+        profileEmailEl.textContent = userEmail;
+        // --- EINDE NIEUW ---
+
         // Start de data listeners
         startAlleDataListeners();
         
     } else {
+        // --- UITLOGGEN ---
         currentUser = null;
         eigenUserId = null;
         beheerdeUserId = null;
         isAdmin = false;
         
-        stopAlleDataListeners(); // Stop alle listeners bij uitloggen
+        stopAlleDataListeners(); 
         console.log("Niet ingelogd, terug naar index.html");
-        // Zorg dat de UI leeg is
+        
+        // UI leegmaken
         vriezerLijstenContainer.innerHTML = '';
         dashboard.innerHTML = '';
         vriezerSelect.innerHTML = '<option value="" disabled selected>Kies een vriezer...</option>';
         schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
         
-        // Verberg admin knoppen
+        // Knoppen resetten/verbergen
         adminBeheerKnop.style.display = 'none';
         adminBeheerModal.style.display = 'none';
+        
+        // --- NIEUW: Profiel Knop Resetten ---
+        profileImg.src = '';
+        profileImg.style.display = 'none';
+        profileIcon.style.display = 'block';
+        profileEmailEl.textContent = '';
+        profileModalImg.src = '';
+        profileModalImg.style.display = 'none';
+        profileModalIcon.style.display = 'block';
+        // --- EINDE NIEUW ---
         
         window.location.replace('index.html');
     }
 });
 
+// (Functies 'registreerGebruiker', 'checkAdminStatus', 'schakelBeheer', 'updateAdminUI' 
+// zijn onveranderd en blijven hier)
 async function registreerGebruiker(user) {
-    // Sla de gebruiker op (of update) in de 'users' collectie
-    // Dit is nodig zodat admins een lijst hebben om uit te kiezen
     try {
         await usersCollectie.doc(user.uid).set({
             email: user.email || 'Onbekend',
             displayName: user.displayName || user.email,
             laatstGezien: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }); // merge = true update alleen, overschrijft niets
+        }, { merge: true }); 
     } catch (err) {
         console.warn("Kon gebruiker niet registreren in 'users' collectie:", err.message);
     }
@@ -248,8 +292,8 @@ async function checkAdminStatus(uid) {
         if (adminDoc.exists) {
             console.log("ADMIN STATUS: Ja");
             isAdmin = true;
-            adminBeheerKnop.style.display = 'inline-block';
-            startAdminUserListener(); // Start de listener voor de gebruikerslijst
+            adminBeheerKnop.style.display = 'inline-flex'; // 'inline-flex' gebruiken ipv 'inline-block'
+            startAdminUserListener(); 
         } else {
             console.log("ADMIN STATUS: Nee");
             isAdmin = false;
@@ -264,32 +308,25 @@ async function checkAdminStatus(uid) {
 }
 
 function schakelBeheer(naarUserId, naarUserEmail) {
-    if (beheerdeUserId === naarUserId) return; // Geen wijziging
+    if (beheerdeUserId === naarUserId) return; 
 
     console.log(`Schakelen van beheer...
     Van: ${beheerdeUserId}
     Naar: ${naarUserId} (${naarUserEmail})`);
 
-    // Update de globale variabelen
     beheerdeUserId = naarUserId;
     beheerdeUserEmail = naarUserEmail || 'Onbekende Gebruiker';
 
-    // Stop alle huidige data listeners
     stopAlleDataListeners();
 
-    // Reset de UI (lijsten, dropdowns, etc.)
     vriezerLijstenContainer.innerHTML = '';
     dashboard.innerHTML = '';
     vriezerSelect.innerHTML = '<option value="" disabled selected>Kies een vriezer...</option>';
     schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
     
-    // Herstart alle data listeners met de NIEUWE beheerdeUserId
     startAlleDataListeners();
-    
-    // Update de Admin UI (titel in modal, etc.)
     updateAdminUI();
     
-    // Sluit de admin modal
     adminBeheerModal.style.display = 'none';
     showFeedback(`Je beheert nu de vriezers van: ${beheerdeUserEmail}`, 'success');
 }
@@ -297,12 +334,10 @@ function schakelBeheer(naarUserId, naarUserEmail) {
 function updateAdminUI() {
     if (isAdmin) {
         if (beheerdeUserId === eigenUserId) {
-            // We beheren onszelf
             adminBeheertTitel.textContent = 'Je beheert je eigen vriezers.';
             adminBeheertTitel.style.color = '#555';
             adminTerugKnop.style.display = 'none';
         } else {
-            // We beheren iemand anders
             adminBeheertTitel.textContent = `LET OP: Je beheert nu de vriezers van ${beheerdeUserEmail}!`;
             adminBeheertTitel.style.color = '#FF6B6B';
             adminTerugKnop.style.display = 'block';
@@ -311,17 +346,14 @@ function updateAdminUI() {
 }
 
 // ---
-// STAP 3: DATA LISTENERS (AANGEPAST VOOR ADMIN)
+// STAP 3: DATA LISTENERS (Onveranderd)
 // ---
-
-// Deze functie start alle listeners voor de *huidige* beheerdeUserId
 function startAlleDataListeners() {
-    if (!beheerdeUserId) return; // Kan niet starten zonder ID
-
+    if (!beheerdeUserId) return; 
     console.log(`Start listeners voor: ${beheerdeUserId}`);
     
     // 1. Vriezers Listener
-    if (vriezersListener) vriezersListener(); // Stop vorige listener
+    if (vriezersListener) vriezersListener(); 
     vriezersListener = vriezersCollectieBasis
         .where('userId', '==', beheerdeUserId)
         .orderBy('naam')
@@ -329,31 +361,30 @@ function startAlleDataListeners() {
             alleVriezers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             console.log("Vriezers geladen:", alleVriezers.length);
             vulToevoegVriezerDropdown();
-            renderDynamischeLijsten(); // Her-render
+            renderDynamischeLijsten(); 
         }, (err) => console.error("Fout bij vriezers listener:", err.message));
 
     // 2. Lades Listener
-    if (ladesListener) ladesListener(); // Stop vorige listener
+    if (ladesListener) ladesListener(); 
     ladesListener = ladesCollectieBasis
         .where('userId', '==', beheerdeUserId)
         .orderBy('naam')
         .onSnapshot((snapshot) => {
             alleLades = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             console.log("Lades geladen:", alleLades.length);
-            // Update lade-dropdowns (als vriezer geselecteerd is)
             updateLadeDropdown(vriezerSelect.value, schuifSelect, false); 
-            renderDynamischeLijsten(); // Her-render
+            renderDynamischeLijsten(); 
         }, (err) => console.error("Fout bij lades listener:", err.message));
 
     // 3. Items Listener
-    if (itemsListener) itemsListener(); // Stop vorige listener
+    if (itemsListener) itemsListener(); 
     itemsListener = itemsCollectieBasis
         .where("userId", "==", beheerdeUserId)
         .onSnapshot((snapshot) => {
             alleItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             console.log("Items geladen:", alleItems.length);
-            renderDynamischeLijsten(); // Her-render
-            updateDashboard(); // Update de dashboard-teller
+            renderDynamischeLijsten(); 
+            updateDashboard(); 
         }, (error) => {
             console.error("Fout bij ophalen items: ", error);
             showFeedback(error.message, "error");
@@ -374,21 +405,16 @@ function stopAlleDataListeners() {
         itemsListener();
         itemsListener = null;
     }
-    // Let op: userListListener laten we draaien, die is niet afhankelijk
-    // van de beheerdeUserId, alleen van de admin-status.
 }
 
 function startAdminUserListener() {
-    // Deze listener laadt de lijst van *alle* gebruikers voor de admin modal
-    if (userListListener) userListListener(); // Stop vorige
+    if (userListListener) userListListener(); 
     
     userListListener = usersCollectie.orderBy("email")
         .onSnapshot((snapshot) => {
-            adminUserLijst.innerHTML = ''; // Leegmaken
+            adminUserLijst.innerHTML = ''; 
             snapshot.docs.forEach(doc => {
                 const user = { id: doc.id, ...doc.data() };
-                
-                // Sla de eigen gebruiker over in de lijst
                 if (user.id === eigenUserId) return; 
 
                 const li = document.createElement('li');
@@ -417,10 +443,10 @@ function stopAdminUserListener() {
 }
 
 // ---
-// STAP 4: UI RENDERING (Dropdowns & Lijsten)
+// STAP 4: UI RENDERING (Dropdowns & Lijsten) (Onveranderd)
+// (functies 'vulToevoegVriezerDropdown', 'updateLadeDropdown', 'renderDynamischeLijsten', 
+// 'updateDashboard', 'initDragAndDrop' zijn onveranderd)
 // ---
-
-// Vult de "Vriezer" dropdown in het 'Toevoegen' formulier
 function vulToevoegVriezerDropdown() {
     const geselecteerdeId = vriezerSelect.value;
     vriezerSelect.innerHTML = '<option value="" disabled>Kies een vriezer...</option>';
@@ -431,24 +457,18 @@ function vulToevoegVriezerDropdown() {
         vriezerSelect.appendChild(option);
     });
     
-    // Probeer de eerder geselecteerde waarde te herstellen
     if (geselecteerdeId && alleVriezers.some(v => v.id === geselecteerdeId)) {
         vriezerSelect.value = geselecteerdeId;
     } else {
-        vriezerSelect.value = ""; // Forceer "Kies..."
+        vriezerSelect.value = ""; 
     }
-    // Roep updateLadeDropdown aan, zelfs als er niets hersteld is
-    // (voor het geval de geselecteerde vriezer verwijderd is)
     updateLadeDropdown(vriezerSelect.value, schuifSelect, false);
 }
 
-// Event listener voor de 'Toevoegen' vriezer dropdown
 vriezerSelect.addEventListener('change', () => {
     updateLadeDropdown(vriezerSelect.value, schuifSelect, true);
 });
 
-// Vult een 'Lade' dropdown (kan 'item-schuif' of 'edit-item-schuif' zijn)
-// op basis van een vriezerId.
 function updateLadeDropdown(vriezerId, ladeSelectElement, resetSelectie) {
     const geselecteerdeLadeId = resetSelectie ? "" : ladeSelectElement.value;
     
@@ -469,91 +489,25 @@ function updateLadeDropdown(vriezerId, ladeSelectElement, resetSelectie) {
         ladeSelectElement.appendChild(option);
     });
     
-    // Herstel de selectie als dat mogelijk is
     if (geselecteerdeLadeId && gefilterdeLades.some(l => l.id === geselecteerdeLadeId)) {
         ladeSelectElement.value = geselecteerdeLadeId;
     } else {
-        ladeSelectElement.value = ""; // Forceer "Kies..."
+        ladeSelectElement.value = ""; 
     }
 }
 
-
-// ---
-// STAP 5: Items CRUD (Create, Read, Update, Delete)
-// ---
-
-// --- CREATE (Toevoegen formulier) ---
-form.addEventListener('submit', (e) => {
-    e.preventDefault(); 
-    const geselecteerdeVriezerId = vriezerSelect.value;
-    const geselecteerdeLadeId = schuifSelect.value;
-    
-    if (!beheerdeUserId) {
-        showFeedback("Fout: Geen gebruiker geselecteerd.", "error");
-        return;
-    }
-    if (!geselecteerdeVriezerId || !geselecteerdeLadeId) {
-        showFeedback("Selecteer a.u.b. een vriezer én een lade.", "error");
-        return;
-    }
-    
-    const geselecteerdeLadeNaam = schuifSelect.options[schuifSelect.selectedIndex].text;
-    const itemNaam = document.getElementById('item-naam').value;
-
-    itemsCollectieBasis.add({ // Gebruik altijd de 'Basis' collectie voor schrijven
-        naam: itemNaam,
-        aantal: parseFloat(document.getElementById('item-aantal').value),
-        eenheid: document.getElementById('item-eenheid').value,
-        ingevrorenOp: firebase.firestore.FieldValue.serverTimestamp(),
-        userId: beheerdeUserId, // <-- BELANGRIJK: sla op voor de beheerde gebruiker
-        vriezerId: geselecteerdeVriezerId,
-        ladeId: geselecteerdeLadeId,
-        ladeNaam: geselecteerdeLadeNaam // (Dit is redundant, maar ok)
-    })
-    .then(() => {
-        showFeedback(`'${itemNaam}' toegevoegd!`, 'success');
-        const rememberCheck = document.getElementById('remember-drawer-check');
-        if (rememberCheck.checked) {
-            document.getElementById('item-naam').value = '';
-            document.getElementById('item-aantal').value = 1;
-            document.getElementById('item-eenheid').value = "stuks";
-            document.getElementById('item-naam').focus();
-        } else {
-            form.reset();
-            document.getElementById('item-eenheid').value = "stuks";
-            vriezerSelect.value = "";
-            schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
-        }
-    })
-    .catch((err) => {
-        console.error("Fout bij toevoegen: ", err);
-        showFeedback(`Fout bij toevoegen: ${err.message}`, 'error');
-    });
-});
-
-// --- READ (wordt afgehandeld door renderDynamischeLijsten) ---
-
-/**
- * AANGEPAST: Deze functie 'onthoudt' nu welke lades open waren
- * voordat de lijst opnieuw wordt opgebouwd.
- */
+// AANGEPAST in vorige stap (onthoudt open lades)
 function renderDynamischeLijsten() {
     
-    // --- NIEUW: Bewaar de open/gesloten status ---
     const openLadeIds = new Set();
-    // Vind alle lade-groepen die NIET de class 'collapsed' hebben
     document.querySelectorAll('.lade-group:not(.collapsed)').forEach(group => {
         openLadeIds.add(group.dataset.ladeId);
     });
     
-    // Check of dit de allereerste keer is dat we renderen (dan is alles leeg)
-    // We controleren dit *voordat* we de innerHTML wissen.
     const isFirstRender = (vriezerLijstenContainer.children.length === 0);
-    // --- EINDE NIEUW ---
     
     vriezerLijstenContainer.innerHTML = ''; 
     
-    // Sorteer vriezers (reeds geladen in 'alleVriezers')
     alleVriezers.sort((a, b) => a.naam.localeCompare(b.naam));
 
     alleVriezers.forEach(vriezer => {
@@ -565,7 +519,6 @@ function renderDynamischeLijsten() {
             .filter(lade => lade.vriezerId === vriezer.id)
             .sort((a, b) => a.naam.localeCompare(b.naam));
 
-        // --- Lade Filter Dropdown (onveranderd) ---
         if (vriezerLades.length > 0) {
             const filterContainer = document.createElement('div');
             filterContainer.className = 'lade-filter-container';
@@ -597,43 +550,31 @@ function renderDynamischeLijsten() {
             kolomDiv.appendChild(filterContainer);
         }
         
-        // Filter items die bij deze vriezer horen
         const vriezerItems = alleItems.filter(item => item.vriezerId === vriezer.id);
         
-        // --- Accordion Lades Opbouwen ---
         vriezerLades.forEach(lade => {
-            // 1. Maak de groep-wrapper
             const ladeGroup = document.createElement('div');
             
-            // --- AANGEPAST: Slimme 'collapse' logica ---
-            ladeGroup.className = 'lade-group'; // Begin neutraal
+            ladeGroup.className = 'lade-group'; 
             ladeGroup.dataset.ladeId = lade.id; 
 
             if (isFirstRender) {
-                // Eerste laadbeurt: alles is standaard ingeklapt
                 ladeGroup.classList.add('collapsed');
             } else {
-                // Dit is een 're-render' (na drag/edit/delete).
-                // Als de lade NIET in onze 'open' lijst stond, klap hem in.
                 if (!openLadeIds.has(lade.id)) {
                     ladeGroup.classList.add('collapsed');
                 }
-                // Als hij wel open was, doen we niets, en blijft hij open.
             }
-            // --- EINDE AANPASSING ---
             
-            // 2. Maak de klikbare header (onveranderd)
             const ladeHeader = document.createElement('button');
             ladeHeader.className = 'lade-header';
             ladeHeader.dataset.ladeId = lade.id;
             ladeHeader.dataset.ladeNaam = lade.naam;
             ladeHeader.innerHTML = `<h3>${lade.naam}</h3> <i class="fas fa-chevron-down chevron"></i>`;
 
-            // 3. Maak de content-wrapper (onveranderd)
             const ladeContent = document.createElement('div');
             ladeContent.className = 'lade-content';
 
-            // 4. Maak de UL specifiek voor DEZE lade (onveranderd)
             const ladeUl = document.createElement('ul');
             ladeUl.dataset.vriezerId = vriezer.id; 
             
@@ -641,14 +582,12 @@ function renderDynamischeLijsten() {
                 .filter(item => item.ladeId === lade.id)
                 .sort((a, b) => a.naam.localeCompare(b.naam));
                 
-            // 5. Vul de UL met items (onveranderd)
             ladeItems.forEach(item => {
                 const li = document.createElement('li');
                 li.dataset.id = item.id;
                 li.dataset.ladeId = item.ladeId; 
                 li.dataset.vriezerId = item.vriezerId;
                 
-                // Kleurcodering (onveranderd)
                 if (item.ingevrorenOp) {
                     const diffDagen = Math.ceil(Math.abs(new Date() - item.ingevrorenOp.toDate()) / (1000 * 60 * 60 * 24));
                     if (diffDagen > 180) { li.classList.add('item-old'); }
@@ -669,22 +608,18 @@ function renderDynamischeLijsten() {
                 ladeUl.appendChild(li);
             });
             
-            // 6. Bouw de structuur samen (onveranderd)
             ladeContent.appendChild(ladeUl);
             ladeGroup.appendChild(ladeHeader);
             ladeGroup.appendChild(ladeContent);
             
-            // 7. Voeg de hele groep toe aan de kolom (onveranderd)
             kolomDiv.appendChild(ladeGroup);
         });
         
         vriezerLijstenContainer.appendChild(kolomDiv);
     });
     
-    // Initialiseer Drag-and-Drop en filters opnieuw
     initDragAndDrop();
     updateItemVisibility(); 
-    // Dashboard wordt apart geüpdatet door de itemsListener
 }
 
 
@@ -722,7 +657,6 @@ function initDragAndDrop() {
 
         if (oldLadeId === newLadeId) return; 
         
-        // Update Firestore
         itemsCollectieBasis.doc(itemId).update({
             vriezerId: newVriezerId,
             ladeId: newLadeId,
@@ -744,10 +678,63 @@ function initDragAndDrop() {
     });
 }
 
-// --- Event Handlers voor Accordion, Edit en Delete ---
+
+// ---
+// STAP 5: Items CRUD (Onveranderd)
+// (functies 'form.addEventListener', 'vriezerLijstenContainer.addEventListener', 
+// 'editVriezer.addEventListener', 'editForm.addEventListener', 'sluitItemModal', 'btnCancel.addEventListener')
+// zijn onveranderd.
+// ---
+form.addEventListener('submit', (e) => {
+    e.preventDefault(); 
+    const geselecteerdeVriezerId = vriezerSelect.value;
+    const geselecteerdeLadeId = schuifSelect.value;
+    
+    if (!beheerdeUserId) {
+        showFeedback("Fout: Geen gebruiker geselecteerd.", "error");
+        return;
+    }
+    if (!geselecteerdeVriezerId || !geselecteerdeLadeId) {
+        showFeedback("Selecteer a.u.b. een vriezer én een lade.", "error");
+        return;
+    }
+    
+    const geselecteerdeLadeNaam = schuifSelect.options[schuifSelect.selectedIndex].text;
+    const itemNaam = document.getElementById('item-naam').value;
+
+    itemsCollectieBasis.add({
+        naam: itemNaam,
+        aantal: parseFloat(document.getElementById('item-aantal').value),
+        eenheid: document.getElementById('item-eenheid').value,
+        ingevrorenOp: firebase.firestore.FieldValue.serverTimestamp(),
+        userId: beheerdeUserId, 
+        vriezerId: geselecteerdeVriezerId,
+        ladeId: geselecteerdeLadeId,
+        ladeNaam: geselecteerdeLadeNaam 
+    })
+    .then(() => {
+        showFeedback(`'${itemNaam}' toegevoegd!`, 'success');
+        const rememberCheck = document.getElementById('remember-drawer-check');
+        if (rememberCheck.checked) {
+            document.getElementById('item-naam').value = '';
+            document.getElementById('item-aantal').value = 1;
+            document.getElementById('item-eenheid').value = "stuks";
+            document.getElementById('item-naam').focus();
+        } else {
+            form.reset();
+            document.getElementById('item-eenheid').value = "stuks";
+            vriezerSelect.value = "";
+            schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
+        }
+    })
+    .catch((err) => {
+        console.error("Fout bij toevoegen: ", err);
+        showFeedback(`Fout bij toevoegen: ${err.message}`, 'error');
+    });
+});
+
 vriezerLijstenContainer.addEventListener('click', (e) => {
     
-    // Check voor lade-header klik (onveranderd)
     const ladeHeader = e.target.closest('.lade-header');
     if (ladeHeader) {
         const ladeGroup = ladeHeader.parentElement;
@@ -755,10 +742,9 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
         return; 
     }
 
-    // --- DELETE (Knop in lijst) ---
     const deleteButton = e.target.closest('.delete-btn');
     const li = e.target.closest('li');
-    if (!li) return; // Klik was niet op een item
+    if (!li) return; 
 
     if (deleteButton) {
         const id = li.dataset.id;
@@ -769,20 +755,17 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
         }
     }
     
-    // --- UPDATE (Knop in lijst - opent modal) ---
     const editButton = e.target.closest('.edit-btn');
     if (editButton) {
         const id = li.dataset.id;
         const item = alleItems.find(i => i.id === id);
         if (!item) return;
         
-        // Vul de modal
         editId.value = id;
         editNaam.value = item.naam;
         editAantal.value = item.aantal;
         editEenheid.value = item.eenheid || 'stuks';
         
-        // Vul vriezer dropdown in modal
         editVriezer.innerHTML = '';
         alleVriezers.forEach(vriezer => {
             const option = document.createElement('option');
@@ -792,11 +775,9 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
             editVriezer.appendChild(option);
         });
         
-        // Vul lade dropdown in modal (gebaseerd op geselecteerde vriezer)
         updateLadeDropdown(item.vriezerId, editSchuif, false);
-        editSchuif.value = item.ladeId; // Zorg dat de juiste lade geselecteerd is
+        editSchuif.value = item.ladeId; 
         
-        // Vul datum in
         const jsDate = item.ingevrorenOp ? item.ingevrorenOp.toDate() : new Date();
         const year = jsDate.getFullYear();
         const month = (jsDate.getMonth() + 1).toString().padStart(2, '0');
@@ -807,12 +788,10 @@ vriezerLijstenContainer.addEventListener('click', (e) => {
     }
 });
 
-// "Vriezer" dropdown *in de edit modal*
 editVriezer.addEventListener('change', () => {
     updateLadeDropdown(editVriezer.value, editSchuif, true); 
 });
 
-// --- UPDATE (Opslaan knop in modal) ---
 editForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = editId.value;
@@ -820,7 +799,6 @@ editForm.addEventListener('submit', (e) => {
     const geselecteerdeLadeId = editSchuif.value;
     const geselecteerdeLadeNaam = editSchuif.options[editSchuif.selectedIndex].text;
     
-    // Datum omzetten
     const nieuweDatum = new Date(editDatum.value + "T00:00:00");
     
     itemsCollectieBasis.doc(id).update({
@@ -843,15 +821,25 @@ btnCancel.addEventListener('click', sluitItemModal);
 
 
 // ---
-// STAP 6: VRIEZER BEHEER LOGICA (Modal)
+// STAP 6: VRIEZER BEHEER LOGICA (AANGEPAST)
 // ---
-vriezerBeheerKnop.addEventListener('click', () => {
-    vriezerBeheerModal.style.display = 'flex';
-    laadVriezersBeheer(); // Start de vriezer-beheer listener
-});
+
+// --- DE OUDE LISTENER IS VERWIJDERD ---
+// vriezerBeheerKnop.addEventListener('click', ...);
+
+// De knop om de modal te *openen* zit nu in de Profiel Modal listeners (zie STAP 10)
+
+// De rest van de Vriezer Beheer logica (functies 'sluitBeheerKnop.addEventListener', 
+// 'addVriezerForm.addEventListener', 'laadVriezersBeheer', 'addLadeForm.addEventListener',
+// 'laadLadesBeheer', 'vriezerBeheerLijst.addEventListener', 'ladeBeheerLijst.addEventListener',
+// 'handleHernoem', 'handleVerwijderVriezer', 'handleVerwijderLade') is onveranderd.
+
+let vriezerBeheerListener = null; 
+let ladeBeheerListener = null; 
+
 sluitBeheerKnop.addEventListener('click', () => {
     vriezerBeheerModal.style.display = 'none';
-    if (vriezerBeheerListener) { // Stop de specifieke beheer-listeners
+    if (vriezerBeheerListener) { 
         vriezerBeheerListener();
         vriezerBeheerListener = null;
     }
@@ -859,7 +847,6 @@ sluitBeheerKnop.addEventListener('click', () => {
         ladeBeheerListener(); 
         ladeBeheerListener = null;
     }
-    // Reset de modal UI
     ladeBeheerLijst.innerHTML = '';
     ladesBeheerTitel.textContent = 'Selecteer een vriezer...';
     addLadeForm.style.display = 'none';
@@ -868,7 +855,6 @@ sluitBeheerKnop.addEventListener('click', () => {
     geselecteerdeVriezerNaam = null;
 });
 
-// --- Vriezer Beheer ---
 addVriezerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const naam = document.getElementById('vriezer-naam').value;
@@ -876,25 +862,19 @@ addVriezerForm.addEventListener('submit', (e) => {
     
     vriezersCollectieBasis.add({ 
         naam: naam, 
-        userId: beheerdeUserId // Koppel aan de beheerde gebruiker
+        userId: beheerdeUserId 
     })
     .then(() => {
         showFeedback("Vriezer toegevoegd!", "success");
         addVriezerForm.reset();
-        // De 'onSnapshot' listener (gestart in laadVriezersBeheer)
-        // en de 'vriezersListener' (globaal) pikken dit automatisch op.
     })
     .catch(err => showFeedback(err.message, "error"));
 });
 
-let vriezerBeheerListener = null; // Aparte listener voor de modal
-let ladeBeheerListener = null; // Aparte listener voor de modal
-
 function laadVriezersBeheer() {
     if (!beheerdeUserId) return;
-    if (vriezerBeheerListener) vriezerBeheerListener(); // Stop vorige
+    if (vriezerBeheerListener) vriezerBeheerListener(); 
     
-    // Deze listener is alleen voor DEZE modal
     vriezerBeheerListener = vriezersCollectieBasis.where("userId", "==", beheerdeUserId).orderBy("naam")
         .onSnapshot(snapshot => {
             vriezerBeheerLijst.innerHTML = '';
@@ -917,7 +897,6 @@ function laadVriezersBeheer() {
         });
 }
 
-// --- Lade Beheer ---
 addLadeForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const naam = document.getElementById('lade-naam').value;
@@ -926,21 +905,19 @@ addLadeForm.addEventListener('submit', (e) => {
     ladesCollectieBasis.add({
         naam: naam,
         vriezerId: geselecteerdeVriezerId, 
-        userId: beheerdeUserId // Koppel aan de beheerde gebruiker
+        userId: beheerdeUserId 
     })
     .then(() => {
         showFeedback("Lade toegevoegd!", "success");
         addLadeForm.reset();
-        // De 'onSnapshot' listeners pikken dit automatisch op.
     })
     .catch(err => showFeedback(err.message, "error"));
 });
 
 function laadLadesBeheer(vriezerId) {
-    if (ladeBeheerListener) ladeBeheerListener(); // Stop vorige
+    if (ladeBeheerListener) ladeBeheerListener(); 
     
     ladeBeheerLijst.innerHTML = '<i>Lades laden...</i>';
-    // Deze listener is alleen voor DEZE modal
     ladeBeheerListener = ladesCollectieBasis.where("vriezerId", "==", vriezerId).orderBy("naam")
         .onSnapshot(snapshot => {
             ladeBeheerLijst.innerHTML = '';
@@ -963,7 +940,6 @@ function laadLadesBeheer(vriezerId) {
         });
 }
 
-// --- Event Handlers voor Vriezer & Lade Beheer ---
 vriezerBeheerLijst.addEventListener('click', (e) => {
     const li = e.target.closest('li');
     if (!li) return;
@@ -975,7 +951,6 @@ vriezerBeheerLijst.addEventListener('click', (e) => {
     if (deleteBtn) handleVerwijderVriezer(vriezerId, vriezerNaam);
     else if (editBtn) handleHernoem(li, vriezersCollectieBasis);
     else {
-        // Selecteer vriezer
         geselecteerdeVriezerId = vriezerId;
         geselecteerdeVriezerNaam = vriezerNaam;
         ladesBeheerTitel.textContent = `Lades voor: ${vriezerNaam}`;
@@ -983,7 +958,7 @@ vriezerBeheerLijst.addEventListener('click', (e) => {
         ladesBeheerHr.style.display = 'block';
         document.querySelectorAll('#vriezer-beheer-lijst li').forEach(el => el.classList.remove('selected'));
         li.classList.add('selected');
-        laadLadesBeheer(vriezerId); // Start de lade-listener
+        laadLadesBeheer(vriezerId); 
     }
 });
 
@@ -1005,18 +980,15 @@ function handleHernoem(liElement, collectie) {
     const saveBtn = liElement.querySelector('.edit-btn');
     
     if (liElement.classList.contains('edit-mode')) {
-        // --- Opslaan ---
         const nieuweNaam = input.value;
         collectie.doc(id).update({ naam: nieuweNaam })
             .then(() => {
                 liElement.classList.remove('edit-mode');
                 saveBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
                 showFeedback("Naam bijgewerkt!", "success");
-                // De onSnapshot listeners doen de rest
             })
             .catch(err => showFeedback(err.message, "error"));
     } else {
-        // --- Bewerken ---
         liElement.classList.add('edit-mode');
         input.focus();
         saveBtn.innerHTML = '<i class="fas fa-save"></i>';
@@ -1024,7 +996,6 @@ function handleHernoem(liElement, collectie) {
 }
 
 async function handleVerwijderVriezer(id, naam) {
-    // Check eerst of er nog lades in zitten
     const ladesCheck = await ladesCollectieBasis.where("vriezerId", "==", id).limit(1).get();
     if (!ladesCheck.empty) {
         showFeedback("Kan vriezer niet verwijderen: maak eerst alle lades leeg.", "error");
@@ -1034,7 +1005,6 @@ async function handleVerwijderVriezer(id, naam) {
         vriezersCollectieBasis.doc(id).delete()
             .then(() => {
                 showFeedback(`Vriezer "${naam}" verwijderd.`, "success");
-                // Reset lade-beheer UI als de verwijderde vriezer geselecteerd was
                 if (id === geselecteerdeVriezerId) {
                     if (ladeBeheerListener) ladeBeheerListener();
                     ladeBeheerLijst.innerHTML = '';
@@ -1049,7 +1019,6 @@ async function handleVerwijderVriezer(id, naam) {
 }
 
 async function handleVerwijderLade(id, naam) {
-    // Check eerst of er nog items in zitten
     const itemsCheck = await itemsCollectieBasis.where("ladeId", "==", id).limit(1).get();
     if (!itemsCheck.empty) {
         showFeedback("Kan lade niet verwijderen: verplaats eerst alle items.", "error");
@@ -1059,35 +1028,29 @@ async function handleVerwijderLade(id, naam) {
         ladesCollectieBasis.doc(id).delete()
             .then(() => {
                 showFeedback(`Lade "${naam}" verwijderd.`, "success");
-                // De onSnapshot listeners doen de rest
             })
             .catch(err => showFeedback(err.message, "error"));
     }
 }
 
 // ---
-// STAP 7: ADMIN BEHEER LOGICA (Modal)
+// STAP 7: ADMIN BEHEER LOGICA (Onveranderd)
 // ---
 adminBeheerKnop.addEventListener('click', () => {
     adminBeheerModal.style.display = 'flex';
-    // De listener (startAdminUserListener) is al gestart als de knop zichtbaar is
 });
-
 sluitAdminBeheerKnop.addEventListener('click', () => {
     adminBeheerModal.style.display = 'none';
 });
-
 adminTerugKnop.addEventListener('click', () => {
-    // Schakel terug naar de eigen gebruiker
     schakelBeheer(eigenUserId, "Jezelf");
 });
 
 
 // ---
-// STAP 8: ZOEKBALK & FILTERS
+// STAP 8: ZOEKBALK & FILTERS (Onveranderd)
 // ---
 searchBar.addEventListener('input', updateItemVisibility);
-
 function updateItemVisibility() {
     const searchTerm = searchBar.value.toLowerCase();
     const isSearching = searchTerm.length > 0;
@@ -1096,14 +1059,11 @@ function updateItemVisibility() {
         
         const ladeFilter = kolom.querySelector('.lade-filter-select');
         const geselecteerdeLadeId = ladeFilter ? ladeFilter.value : 'all';
-
         const ladeHeeftZichtbareItems = {}; 
 
-        // 1. Loop 1: Bepaal zichtbaarheid ITEMS (LI)
         kolom.querySelectorAll('li').forEach(item => {
             const itemLadeId = item.dataset.ladeId;
             const matchesLade = (geselecteerdeLadeId === 'all' || geselecteerdeLadeId === itemLadeId);
-            
             const itemText = item.querySelector('.item-text strong').textContent.toLowerCase();
             const matchesSearch = itemText.includes(searchTerm);
 
@@ -1115,31 +1075,24 @@ function updateItemVisibility() {
             }
         });
 
-        // 2. Loop 2: Bepaal zichtbaarheid LADE GROEPEN
         kolom.querySelectorAll('.lade-group').forEach(group => {
             const groupLadeId = group.dataset.ladeId;
             const heeftItems = ladeHeeftZichtbareItems[groupLadeId] === true;
-
             let toonGroup = false;
 
             if (geselecteerdeLadeId === 'all') {
-                // "Alles" modus
                 if (heeftItems) {
                     toonGroup = true;
                 } else if (!isSearching) {
-                    // Als we niet zoeken, toon ook lege lades
                     toonGroup = true; 
                 }
             } else {
-                // "Specifieke Lade" modus
                 if (geselecteerdeLadeId === groupLadeId) {
                     toonGroup = true;
                 }
             }
-
             group.style.display = toonGroup ? 'block' : 'none';
 
-            // Als we zoeken en de groep wordt getoond, klap hem open
             if (isSearching && toonGroup && heeftItems) { 
                 group.classList.remove('collapsed');
             }
@@ -1149,42 +1102,59 @@ function updateItemVisibility() {
 
 
 // ---
-// STAP 9: ALLES OPENEN / SLUITEN
+// STAP 9: ALLES OPENEN / SLUITEN (Onveranderd)
 // ---
 btnToggleAlles.addEventListener('click', () => {
     const alleLades = vriezerLijstenContainer.querySelectorAll('.lade-group');
     if (alleLades.length === 0) return; 
 
-    // Kijk of er minstens ÉÉN lade gesloten (collapsed) is
     const minstensEénGesloten = vriezerLijstenContainer.querySelector('.lade-group.collapsed');
 
     if (minstensEénGesloten) {
-        // Er is minstens één lade dicht, dus: OPEN ALLES
         alleLades.forEach(lade => lade.classList.remove('collapsed'));
         btnToggleAlles.innerHTML = '<i class="fas fa-minus-square"></i> Alles Sluiten';
     } else {
-        // Alles is al open, dus: SLUIT ALLES
         alleLades.forEach(lade => lade.classList.add('collapsed'));
         btnToggleAlles.innerHTML = '<i class="fas fa-plus-square"></i> Alles Openen';
     }
 });
 
 // ---
-// STAP 10: OVERIGE FUNCTIES (Print, Logout, Scanner)
+// STAP 10: OVERIGE FUNCTIES (Print, Logout, Scanner) & NIEUWE LISTENERS
 // ---
 printBtn.addEventListener('click', () => window.print());
 
+// De 'logoutBtn' bevindt zich nu in de profiel modal, maar de listener werkt nog steeds
 logoutBtn.addEventListener('click', () => {
     if (confirm("Weet je zeker dat je wilt uitloggen?")) {
+        // Sluit eerst de modal voor een soepele overgang
+        profileModal.style.display = 'none'; 
         auth.signOut().catch((error) => showFeedback(`Fout bij uitloggen: ${error.message}`, 'error'));
     }
 });
 
+// Scanner listeners (onveranderd)
 scanBtn.addEventListener('click', startScanner);
 stopScanBtn.addEventListener('click', sluitScanner);
 manualEanBtn.addEventListener('click', () => {
     const ean = prompt("Voer het EAN-nummer (barcode) handmatig in:", "");
     if (ean && ean.trim() !== "") fetchProductFromOFF(ean.trim());
+});
+
+// --- NIEUW: Profiel Modal Listeners ---
+profileBtn.addEventListener('click', () => {
+    profileModal.style.display = 'flex';
+});
+
+sluitProfileModalKnop.addEventListener('click', () => {
+    profileModal.style.display = 'none';
+});
+
+// Link de "Vriezer Beheer" knop *in het profiel* naar de vriezer beheer modal
+profileVriezerBeheerBtn.addEventListener('click', () => {
+    profileModal.style.display = 'none'; // Sluit profiel modal
+    vriezerBeheerModal.style.display = 'flex'; // Open vriezer beheer modal
+    laadVriezersBeheer(); // Zorg dat de data laadt
 });
 
 
