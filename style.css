@@ -117,7 +117,7 @@ h1 {
     display: block; /* Standaard zichtbaar */
 }
 
-/* --- NIEUW: Notificatie belletje --- */
+/* Notificatie belletje */
 .btn-invites {
     background-color: #f0ad4e; /* Oranje */
     position: relative; /* Voor de badge */
@@ -140,7 +140,6 @@ h1 {
     justify-content: center;
     border: 2px solid white;
 }
-/* --- EINDE NIEUW --- */
 
 
 h2 {
@@ -152,7 +151,7 @@ h2 {
 
 hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 
-/* --- Visuele Feedback Berichten --- */
+/* Visuele Feedback Berichten */
 .feedback {
     padding: 15px;
     margin-bottom: 20px;
@@ -169,7 +168,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 .feedback.success { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
 .feedback.error { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
 
-/* --- Dashboard --- */
+/* Dashboard */
 .dashboard-container {
     display: flex;
     flex-wrap: wrap;
@@ -183,16 +182,16 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 .dashboard-container strong { font-size: 0.9em; color: #000; }
 
 
-/* --- De Formulieren (Mobile-first) --- */
+/* De Formulieren (Mobile-first) */
 #add-item-form {
     display: grid;
     grid-template-columns: 1fr;
     gap: 15px;
 }
-#add-vriezer-form, #add-lade-form {
+#add-vriezer-form, #add-lade-form, #share-invite-form {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 10px;
 }
 #add-lade-form button { background-color: #4A90E2; }
 #add-vriezer-form button { background-color: #66DDAA; }
@@ -228,7 +227,7 @@ button[type="submit"] {
 }
 button[type="submit"]:hover { background-color: #88FFCC; }
 
-/* --- +/- Knoppen (UX) --- */
+/* +/- Knoppen (UX) */
 .aantal-wrapper {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -239,7 +238,6 @@ button[type="submit"]:hover { background-color: #88FFCC; }
     text-align: center;
     padding-left: 10px;
     padding-right: 10px;
-    /* Verberg de standaard pijltjes */
     -moz-appearance: textfield;
 }
 .aantal-wrapper input[type="number"]::-webkit-outer-spin-button,
@@ -269,7 +267,7 @@ button[type="submit"]:hover { background-color: #88FFCC; }
     border-color: #f5c2c7;
 }
 
-/* --- Lade Filter per Vriezer --- */
+/* Lade Filter per Vriezer */
 .lade-filter-container {
     display: flex;
     align-items: center;
@@ -290,12 +288,11 @@ button[type="submit"]:hover { background-color: #88FFCC; }
 }
 
 
-/* --- Voorraadlijst Container --- */
+/* Voorraadlijst Container */
 .vriezer-container { 
     display: flex; 
     flex-wrap: wrap; 
     gap: 25px; 
-    /* Zorg dat h2's (Mijn Vriezers, Gedeelde Vriezers) de volle breedte pakken */
     flex-direction: column;
 }
 .vriezer-kolom { 
@@ -506,7 +503,7 @@ li .item-buttons {
 .admin-user-lijst li small { color: #555; }
 
 
-/* --- PROFIEL MODAL --- */
+/* --- AANGEPAST: PROFIEL MODAL (Nieuwe Grid) --- */
 .profile-header {
     text-align: center;
     border-bottom: 1px solid #e0e0e0;
@@ -533,49 +530,73 @@ li .item-buttons {
     margin-top: 10px;
     font-size: 1.1em;
 }
-.profile-menu-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+
+/* De oude lijst-stijlen zijn weg */
+/* .profile-menu-list, .profile-menu-btn { ... } */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 kolommen */
+    gap: 15px; /* Ruimte tussen de knoppen */
 }
-.profile-menu-list li {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-.profile-menu-btn {
+
+.profile-grid-btn {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
+    gap: 8px;
+    
+    aspect-ratio: 1 / 1; /* Maak de knop vierkant */
     width: 100%;
-    background: transparent;
-    border: none;
-    font-size: 1.1em;
-    padding: 15px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: left;
-    color: #333;
+    
+    background-color: #f4f7f6;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    
+    padding: 10px;
+    box-sizing: border-box; /* Zorg dat padding de maat niet breekt */
+    
     font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.8em; /* Kleinere tekst */
     font-weight: 500;
-}
-.profile-menu-btn:hover { background-color: #f4f7f6; }
-.profile-menu-btn:disabled { color: #aaa; cursor: not-allowed; }
-.profile-menu-btn i {
-    width: 25px;
+    color: #333;
     text-align: center;
-    color: #4A90E2;
+    
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
-.profile-menu-btn:disabled i { color: #aaa; }
+
+.profile-grid-btn:hover {
+    background-color: #ffffff;
+    border-color: #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.profile-grid-btn i {
+    font-size: 1.8em; /* Groter icoon */
+    color: #4A90E2; /* Blauw icoon */
+}
+
+.profile-grid-btn.btn-print i {
+    color: #777; /* Grijze print icoon */
+}
+
+.profile-grid-btn:disabled {
+    background-color: #f9f9f9;
+    color: #aaa;
+    cursor: not-allowed;
+    box-shadow: none;
+    border-color: #e0e0e0;
+}
+
+.profile-grid-btn:disabled i {
+    color: #ccc;
+}
+/* --- EINDE AANPASSING PROFIEL --- */
 
 
 /* --- SHARE MODAL --- */
-#share-invite-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-}
 #share-invite-form label { display: block; font-weight: bold; color: #555; }
 
 .share-huidige-lijst {
@@ -588,14 +609,14 @@ li .item-buttons {
     border: 1px solid #e9e9e9;
     padding: 10px 15px;
     margin-bottom: 8px;
-    display: grid; /* Gebruik grid voor uitlijning */
-    grid-template-columns: 1fr auto auto; /* Naam, Status, Knop */
+    display: grid; 
+    grid-template-columns: 1fr auto auto; 
     align-items: center; 
     gap: 15px;
 }
 .share-huidige-lijst li span { font-weight: bold; }
 .share-huidige-lijst li small { font-style: italic; }
-.share-huidige-lijst li .delete-btn { margin-left: 0; } /* Reset marge */
+.share-huidige-lijst li .delete-btn { margin-left: 0; }
 
 
 /* --- NOTIFICATIE MODAL (Houdbaarheid & Invites) --- */
@@ -612,7 +633,7 @@ li .item-buttons {
     font-weight: bold;
 }
 
-/* --- NIEUW: Stijlen voor Invites lijst --- */
+/* Stijlen voor Invites lijst */
 .invites-lijst li {
     display: flex;
     flex-wrap: wrap;
@@ -650,7 +671,6 @@ li .item-buttons {
     color: white;
 }
 .invite-decline-btn:hover { background-color: #FF8F8F; }
-/* --- EINDE NIEUW --- */
 
 
 /* --- AANGEPAST: MEDIA QUERY VOOR GROTERE SCHERMEN --- */
@@ -690,6 +710,12 @@ li .item-buttons {
         grid-column: 1 / 3;
         margin-bottom: -5px;
     }
+    
+    /* Maak profiel grid breder op desktop (minder hoog) */
+    .profile-grid {
+        /* Blijf op 3 kolommen, maar geef de modal meer breedte */
+        /* De modal-content max-width regelt dit */
+    }
 }
 /* EINDE VAN DE MEDIA QUERY (min-width: 768px) */
 
@@ -722,7 +748,6 @@ li.item-old { border-left: 5px solid #FF6B6B; }
     width: 50px; 
     height: 50px; 
     font-size: 20px;
-    /* justify-content: center; was al toegevoegd in btn-beheer */
 }
 #barcode-scanner-container {
     background-color: #222;
