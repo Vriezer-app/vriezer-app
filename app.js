@@ -381,7 +381,8 @@ async function checkAdminStatus(uid) {
         isAdmin = false;
         switchAccountKnop.style.display = 'none';
     }
-    updateAdminUI(); // Deze heet nu updateSwitchAccountUI
+    // **** DE FIX IS HIER ****
+    updateSwitchAccountUI(); // Hernoemd
 }
 
 // AANGEPAST: Hernoemd en aangepast voor beide rollen
@@ -800,7 +801,11 @@ function renderDynamischeLijsten() {
     });
     
     // Alleen drag-and-drop toestaan als we ons EIGEN account beheren
-    if (beheerdeUserId === eigenUserId) {
+    // OF als we een account beheren met 'editor' rechten
+    const kanBewerken = (beheerdeUserId === eigenUserId) || 
+                       (alleAcceptedShares.find(s => s.ownerId === beheerdeUserId && s.role === 'editor'));
+                       
+    if (kanBewerken) {
         initDragAndDrop();
     }
     updateItemVisibility(); 
@@ -869,8 +874,12 @@ function initDragAndDrop() {
 form.addEventListener('submit', (e) => {
     e.preventDefault(); 
     
-    if (beheerdeUserId !== eigenUserId) {
-        showFeedback("Je kunt geen items toevoegen aan een gedeeld account.", "error");
+    // Check of we rechten hebben om toe te voegen
+    const kanBewerken = (beheerdeUserId === eigenUserId) || 
+                       (alleAcceptedShares.find(s => s.ownerId === beheerdeUserId && s.role === 'editor'));
+
+    if (!kanBewerken) {
+        showFeedback("Je kunt geen items toevoegen aan dit account.", "error");
         return;
     }
     
@@ -890,7 +899,7 @@ form.addEventListener('submit', (e) => {
         aantal: parseFloat(document.getElementById('item-aantal').value),
         eenheid: document.getElementById('item-eenheid').value,
         ingevrorenOp: firebase.firestore.FieldValue.serverTimestamp(),
-        userId: beheerdeUserId, 
+        userId: beheerdeUserId, // Belangrijk: item wordt toegevoegd aan het beheerde account
         vriezerId: geselecteerdeVriezerId,
         ladeId: geselecteerdeLadeId,
         ladeNaam: geselecteerdeLadeNaam 
