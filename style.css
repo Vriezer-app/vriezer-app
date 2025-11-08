@@ -17,81 +17,110 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* --- AANGEPAST: Header Bar --- */
 .header-bar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: center; /* Zorgt dat knoppen en titel verticaal centreren */
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* Titel en knoppen onder elkaar */
-    gap: 15px; /* Ruimte tussen titel-blok en knoppen-blok */
+    flex-wrap: wrap; /* Blijft wrap op extreem smalle schermen */
+    gap: 10px;
 }
-
-/* --- AANGEPAST: Wrapper voor titel en admin-icoon --- */
 .header-title-wrapper {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: 100%; /* Neem volledige breedte op mobiel */
+    gap: 10px;
+    flex-grow: 1; /* Neemt de meeste ruimte */
+}
+h1 { 
+    color: #66DDAA; 
+    margin: 0; 
+    padding: 0; 
+    border: none;
+    font-size: 1.8rem; /* Iets groter */
 }
 
-/* --- AANGEPAST: Stijl voor de 3 knoppen (Mobiel) --- */
 .header-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; /* 3 knoppen naast elkaar */
+    display: flex;
     gap: 8px;
-    width: 100%; /* Volledige breedte */
+    flex-shrink: 0; /* Voorkom dat deze krimpen */
 }
 
-.header-buttons button {
-    width: 100%; /* Knoppen vullen de grid cel */
-    padding: 10px 5px; /* Iets compactere padding */
-    font-size: 13px; /* Iets kleiner lettertype */
-    white-space: nowrap; /* Voorkom dat tekst ombreekt */
+/* --- NIEUW: Stijl voor Profiel Knop --- */
+.profile-btn {
+    background-color: #eee;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden; /* Zorgt dat de img mooi rond blijft */
+    flex-shrink: 0;
+    position: relative; /* Voor de icon/img stacking */
+}
+.profile-btn:hover {
+    border-color: #4A90E2;
+}
+.profile-btn i {
+    font-size: 38px;
+    color: #bbb;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.profile-btn #profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Zorgt dat de foto de cirkel vult */
+    position: relative;
+    z-index: 2;
 }
 
 
-h1 { color: #66DDAA; margin: 0; padding: 0; border: none; }
-
+/* --- AANGEPAST: Stijlen voor Beheer Knoppen --- */
 .btn-beheer {
     background-color: #4A90E2; 
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 15px;
+    padding: 10px 12px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 .btn-beheer:hover { background-color: #63a4f0; }
 
-/* STIJL VOOR ADMIN KNOP */
+/* Admin knop specifiek */
 .btn-admin {
+    background-color: #d9534f;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+.btn-admin:hover { background-color: #e06c69; }
+.btn-admin span { display: none; } /* Verberg tekst op mobiel */
+
+/* Print knop specifiek */
+.btn-print {
+    background-color: #777;
+}
+.btn-print:hover { background-color: #888; }
+.btn-print span { display: none; } /* Verberg tekst op mobiel */
+
+/* Logout knop (nu in modal, maar stijl blijft) */
+.btn-logout {
     background-color: #FF6B6B;
 }
-.btn-admin:hover {
+.btn-logout:hover {
     background-color: #FF8F8F;
 }
-
-/* --- AANGEPAST: Admin knop specifiek (Mobiel) --- */
-#admin-beheer-knop {
-    /* Maak er een icoon-knop van */
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    font-size: 18px; /* Grootte van icoon */
-    flex-shrink: 0; /* Voorkom krimpen */
-}
-.admin-knop-tekst {
-    /* Verberg tekst op mobiel */
-    display: none;
-}
-#admin-beheer-knop i {
-    margin-right: 0; /* Geen marge nodig als tekst weg is */
-}
-
 
 h2 {
     color: #66DDAA;
@@ -131,11 +160,11 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     border-color: #f5c2c7;
 }
 
-/* --- NIEUW: Dynamisch Dashboard --- */
+/* --- Dynamisch Dashboard --- */
 .dashboard-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 15px 20px;
     padding: 10px;
     background-color: #f0f0f0;
     border-radius: 5px;
@@ -151,7 +180,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 }
 
 
-/* --- AANGEPAST: De Formulieren (Mobile-first) --- */
+/* --- Formulieren (Toevoegen, Vriezer/Lade beheer) --- */
 #add-item-form {
     display: grid;
     grid-template-columns: 1fr;
@@ -183,7 +212,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     font-weight: normal;
 }
 
-input[type="text"], input[type="number"], select {
+input[type="text"], input[type="number"], select, input[type="date"] {
     width: 100%;
     box-sizing: border-box; 
     background-color: #fdfdfd;
@@ -211,7 +240,7 @@ button[type="submit"] {
 }
 button[type="submit"]:hover { background-color: #88FFCC; }
 
-/* --- NIEUW: Lade Filter per Vriezer --- */
+/* --- Lade Filter per Vriezer --- */
 .lade-filter-container {
     display: flex;
     align-items: center;
@@ -223,11 +252,11 @@ button[type="submit"]:hover { background-color: #88FFCC; }
     font-weight: bold;
     font-size: 0.9em;
     color: #555;
-    flex-shrink: 0; /* Zorgt dat de label niet krimpt */
+    flex-shrink: 0; 
 }
 .lade-filter-select {
-    flex-grow: 1; /* Neemt de rest van de ruimte */
-    padding: 8px; /* Iets compacter dan de hoofd-inputs */
+    flex-grow: 1; 
+    padding: 8px; 
     font-size: 15px;
     background-color: #fdfdfd;
     color: #333;
@@ -237,30 +266,17 @@ button[type="submit"]:hover { background-color: #88FFCC; }
 }
 
 
-/* --- De Voorraadlijst Container (Dynamisch) --- */
+/* --- Voorraadlijst Container --- */
 .vriezer-container { display: flex; flex-wrap: wrap; gap: 25px; }
 .vriezer-kolom { 
     flex: 1; 
     min-width: 300px; 
 }
-/* De hard-gecodeerde <ul> ID's zijn weg, de stijl is nu algemeen */
 .vriezer-kolom ul {
     list-style-type: none; 
     padding: 0; 
     margin: 0; 
 }
-
-.schuif-titel {
-    color: #444;
-    background-color: #f0f0f0;
-    padding: 8px 15px;
-    border-radius: 5px;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    font-size: 1em;
-    font-weight: bold;
-}
-.vriezer-kolom h3:first-of-type { margin-top: 0; }
 
 /* Lijst items (inventaris) - Mobiele weergave */
 li {
@@ -361,7 +377,7 @@ li .item-buttons {
 .btn-cancel:hover { background-color: #bbb; }
 
 
-/* --- VRIEZER BEHEER MODAL (Stap 1) --- */
+/* --- VRIEZER BEHEER MODAL --- */
 .beheer-container { 
     display: flex; 
     flex-wrap: wrap; 
@@ -445,35 +461,129 @@ li .item-buttons {
     display: block;
 }
 
-/* --- NIEUW: STIJLEN VOOR ADMIN MODAL --- */
-.admin-user-list {
+/* --- ADMIN BEHEER MODAL --- */
+.admin-huidig-beheer {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+.admin-huidig-beheer h3 {
+    border: none;
+    margin: 0 0 10px 0;
+    padding: 0;
+    font-size: 1.1em;
+}
+.admin-user-lijst {
     list-style: none;
     padding: 0;
-    margin: 0;
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 5px;
 }
-.admin-user-list li {
-    padding: 12px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 0;
-    border-radius: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.admin-user-list li:last-child {
-    border-bottom: none;
-}
-.admin-user-list li:hover {
+.admin-user-lijst li {
     background-color: #f9f9f9;
+    padding: 12px 15px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
-.admin-user-list li small {
+.admin-user-lijst li:hover {
+    background-color: #e0f7fa;
+}
+.admin-user-lijst li span {
+    display: block;
+    font-weight: bold;
+    color: #333;
+}
+.admin-user-lijst li small {
     color: #777;
-    font-size: 0.8em;
+    font-size: 0.9em;
+}
+
+
+/* --- NIEUW: PROFIEL MODAL --- */
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+.profile-header i {
+    font-size: 60px;
+    color: #ccc;
+    display: block;
+}
+.profile-header #profile-modal-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #eee;
+    display: none; /* Standaard verborgen */
+}
+.profile-header span {
+    font-size: 1.1em;
+    color: #333;
+    font-weight: bold;
+    word-break: break-all;
+}
+
+.profile-menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.profile-menu-list li {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    display: block; /* Zorgt dat 'li' de volle breedte pakt */
+}
+
+.profile-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.profile-menu-btn:hover:not(:disabled) {
+    background-color: #f0f0f0;
+    border-color: #ddd;
+}
+.profile-menu-btn i {
+    font-size: 18px;
+    color: #4A90E2;
+    width: 20px; /* Vaste breedte voor uitlijning */
+    text-align: center;
+}
+/* Stijl voor disabled knoppen (placeholders) */
+.profile-menu-btn:disabled {
+    background-color: #fdfdfd;
+    color: #aaa;
+    cursor: not-allowed;
+}
+.profile-menu-btn:disabled i {
+    color: #ccc;
 }
 
 
@@ -483,52 +593,21 @@ li .item-buttons {
     body { padding: 20px; }
     .container { padding: 25px; }
 
-    /* --- AANGEPAST: HEADER STIJLEN VOOR DESKTOP --- */
-    .header-bar {
-        flex-wrap: nowrap; /* Zorgt dat H1 en knoppen naast elkaar blijven */
-        gap: 10px;
+    /* Toon tekst in header knoppen */
+    .btn-admin span, .btn-print span {
+        display: inline-block;
     }
     
-    .header-title-wrapper {
-        width: auto;
-        flex-grow: 1; /* Titel neemt ruimte, duwt knoppen naar rechts */
+    /* Maak header knoppen iets groter op desktop */
+    .btn-beheer {
+        padding: 10px 15px;
+        font-size: 15px;
+    }
+    .btn-admin {
+        padding: 10px 15px;
+        font-size: 15px;
     }
 
-    /* Admin knop terug naar normaal */
-    #admin-beheer-knop {
-        width: auto;
-        height: auto;
-        font-size: 15px; /* Terug naar normale grootte */
-        padding: 10px 15px; /* Terug naar normale padding */
-        margin-left: 10px; /* Ruimte tussen titel en knop */
-    }
-    .admin-knop-tekst {
-        display: inline; /* Toon de tekst weer */
-    }
-    #admin-beheer-knop i {
-        margin-right: 5px; /* Herstel marge */
-    }
-
-    /* De 3 knoppen terug naar normaal */
-    .header-buttons {
-        display: block; /* Verwijder grid */
-        width: auto; /* Krimp naar inhoud */
-    }
-
-    .header-buttons button {
-        width: auto; /* Knoppen krijgen auto-breedte */
-        font-size: 15px; /* Terug naar normale grootte */
-        padding: 10px 15px; /* Terug naar normale padding */
-        white-space: normal; /* Terug naar normaal */
-    }
-
-    /* Breng de marges terug die we uit HTML haalden */
-    .header-buttons button:not(:first-child) {
-        margin-left: 10px;
-    }
-    /* --- EINDE AANPASSING --- */
-    
-    
     #add-item-form {
         grid-template-columns: 1fr 1fr;
     }
@@ -546,19 +625,18 @@ li .item-buttons {
     #add-item-form div[style*="grid-column"] {
         grid-column: 1 / 3 !important; 
     }
-
+    
+    /* Vriezer kolom layout */
     .vriezer-kolom ul li {
         flex-direction: row; 
         align-items: center; 
         padding: 15px;
         gap: 0;
     }
-
     .vriezer-kolom ul li .item-text {
         margin-right: 15px;
         margin-bottom: 0;
     }
-    
     .vriezer-kolom ul li .item-buttons {
         width: auto;
         justify-content: flex-end;
@@ -569,13 +647,6 @@ li .item-buttons {
 
 
 /* --- Stijlen die je al had (Logout & Zoekbalk) --- */
-.btn-logout {
-    background-color: #FF6B6B;
-}
-.btn-logout:hover {
-    background-color: #FF8F8F;
-}
-
 .search-container {
     position: relative;
     margin-bottom: 25px; 
@@ -629,7 +700,6 @@ li.item-old {
     border-radius: 8px;
     overflow: hidden;
 }
-
 #barcode-scanner-container video {
     width: 100% !important;
     height: auto !important;
@@ -656,17 +726,13 @@ li.sortable-chosen {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     cursor: grabbing; 
 }
-
 li.sortable-ghost {
     opacity: 0.4;
     border-style: dashed;
     background-color: #f0f0f0;
 }
-.schuif-titel {
-    cursor: not-allowed;
-}
-/* --- ACCORDION VOOR LADES --- */
 
+/* --- ACCORDION VOOR LADES --- */
 .lade-group {
     margin-bottom: 12px;
     border-radius: 8px;
@@ -688,39 +754,31 @@ li.sortable-ghost {
     color: #333;
     text-align: left;
 }
-
 .lade-header:hover {
     background-color: #f1f1f1;
 }
-
 .lade-header h3 {
     margin: 0;
     font-size: 1.1rem;
-    /* Zorg dat de <h3> zelf niet klikbaar is, de button regelt het */
     pointer-events: none; 
 }
-
 .lade-header .chevron {
     transition: transform 0.2s ease;
     font-size: 0.9em;
     color: #555;
 }
-
 /* Wanneer ingeklapt, draai de pijl */
 .lade-group.collapsed .chevron {
     transform: rotate(-90deg);
 }
-
 .lade-content {
     padding: 0 15px 15px 15px;
     background-color: #ffffff;
 }
-
 /* Wanneer ingeklapt, verberg de content */
 .lade-group.collapsed .lade-content {
     display: none;
 }
-
 .lade-content ul {
     padding-left: 0;
     list-style: none;
@@ -743,102 +801,90 @@ li.sortable-ghost {
     cursor: pointer;
     transition: background-color 0.2s ease;
     width: 100%;
-    box-sizing: border-box; /* Zorgt dat padding de breedte niet breekt */
-    margin-bottom: 20px; /* Ruimte onder de knop */
+    box-sizing: border-box; 
+    margin-bottom: 20px; 
     text-align: center;
 }
 .btn-full-width-toggle:hover {
     background-color: #9e9e9e;
 }
 .btn-full-width-toggle i {
-    margin-right: 8px; /* Iets meer ruimte voor het icoon */
+    margin-right: 8px; 
 }
-/* --- AANGEPAST: VOLLEDIGE PRINT STIJLEN --- */
+
+/* --- PRINT STIJLEN (Onveranderd) --- */
 @media print {
-            /* Verberg alles wat niet geprint moet worden */
-            .header-bar,
-            #add-item-form,
-            .search-container,
-            #btn-toggle-alles,
-            #feedback-message,
-            #dashboard,
-            hr,
-            .modal-overlay,
-            .item-buttons,
-            .lade-filter-container,
-            #scan-btn,
-            #manual-ean-btn,
-            #admin-beheer-knop /* Verberg admin knop ook */ {
-                display: none !important;
-            }
+    /* Verberg alles wat niet geprint moet worden */
+    .header-bar,
+    #add-item-form,
+    .search-container,
+    #btn-toggle-alles,
+    #feedback-message,
+    #dashboard,
+    hr,
+    .modal-overlay,
+    .item-buttons,
+    .lade-filter-container,
+    #scan-btn,
+    #manual-ean-btn,
+    .profile-btn {
+        display: none !important;
+    }
 
-            /* Zorg dat de body de volledige breedte gebruikt */
-            body, .container {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                box-shadow: none;
-                border: none;
-                background-color: #ffffff; /* Zorg voor witte achtergrond */
-                font-size: 9pt; 
-            }
+    body, .container {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        background-color: #ffffff; 
+        font-size: 9pt; 
+    }
 
-            /* Toon de vriezer-container */
-            .vriezer-container {
-                display: block !important;
-                /* Kolommen onder elkaar op papier */
-                flex-direction: column;
-            }
-            
-            .vriezer-kolom {
-                width: 100% !important;
-                 /* Voorkom dat een kolom halverwege een pagina breekt */
-                page-break-inside: avoid;
-            }
+    .vriezer-container {
+        display: block !important;
+        flex-direction: column;
+    }
+    
+    .vriezer-kolom {
+        width: 100% !important;
+        page-break-inside: avoid;
+    }
 
-            /* Forceer alle lades om open te zijn */
-            .lade-group {
-                 /* Voorkom dat een lade halverwege een pagina breekt */
-                page-break-inside: avoid;
-            }
-            
-            .lade-group.collapsed .lade-content,
-            .lade-content {
-                /* Forceer de inhoud (de <ul>) om zichtbaar te zijn */
-                display: block !important;
-                max-height: none !important; /* Overschrijf eventuele JS/CSS hoogte animaties */
-            }
-            
-            /* Verberg de 'chevron' (pijltje) in de lade-header */
-            .lade-header .chevron {
-                display: none !important;
-            }
-            
-            /* Zorg dat alle items (li) getoond worden */
-            .vriezer-kolom li {
-                display: flex !important;
-                /* Voorkom dat een item halverwege een pagina breekt */
-                page-break-inside: avoid;
-            }
-            
-            /* Stijl de item-tekst voor print */
-            .item-text {
-                flex-grow: 1;
-                color: #000000; /* Zorg voor zwarte tekst */
-            }
-            
-            /* Haal de achtergrondkleur en rand van 'oude' items weg */
-            .item-old, .item-medium, .item-fresh {
-                background-color: transparent !important;
-                border-left: none !important;
-                color: #000000;
-            }
+    /* Forceer alle lades om open te zijn */
+    .lade-group {
+        page-break-inside: avoid;
+    }
+    
+    .lade-group.collapsed .lade-content,
+    .lade-content {
+        display: block !important;
+        max-height: none !important;
+    }
+    
+    .lade-header .chevron {
+        display: none !important;
+    }
+    
+    .vriezer-kolom li {
+        display: flex !important;
+        page-break-inside: avoid;
+    }
+    
+    .item-text {
+        flex-grow: 1;
+        color: #000000; 
+    }
+    
+    .item-old, .item-medium, .item-fresh {
+        background-color: transparent !important;
+        border-left: none !important;
+        color: #000000;
+    }
 
-            /* Zorg dat de titels ook duidelijk zijn */
-            h1, h2, h3, small {
-                color: #000000 !important;
-            }
-
+    h1, h2, h3, small {
+        color: #000000 !important;
+    }
 }
 
 
