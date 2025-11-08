@@ -29,25 +29,21 @@
     <div class="container">
         <!-- --- AANGEPAST: Header Bar --- -->
         <div class="header-bar">
-            <!-- Titel & Admin Knop (Admin knop is verborgen tenzij admin) -->
-            <div class="header-title-wrapper">
-                <h1>Vriezer Voorraad</h1>
-                <button id="admin-beheer-knop" class="btn-beheer btn-admin" style="display: none;">
+            <!-- Titel staat nu los -->
+            <h1>Vriezer Voorraad</h1>
+            
+            <!-- Nieuwe wrapper voor alle iconen rechts -->
+            <div class="header-icons-wrapper">
+                <button id="admin-beheer-knop" class="btn-beheer btn-admin" style="display: none;" title="Admin Beheer">
                     <i class="fas fa-user-shield"></i>
                     <span>Admin Beheer</span>
                 </button>
+                
+                <button id="profile-btn" class="profile-btn" title="Profiel & Instellingen">
+                    <i class="fas fa-user-circle"></i> 
+                    <img id="profile-img" src="" alt="Profiel" style="display: none;">
+                </button>
             </div>
-            
-            <!-- Overgebleven Knoppen (LEEG) -->
-            <div class="header-buttons">
-                <!-- Print knop is verplaatst naar Profiel Modal -->
-            </div>
-            
-            <!-- Profiel Knop -->
-            <button id="profile-btn" class="profile-btn" title="Profiel & Instellingen">
-                <i class="fas fa-user-circle"></i> 
-                <img id="profile-img" src="" alt="Profiel" style="display: none;">
-            </button>
         </div>
         <!-- --- EINDE AANGEPAST --- -->
 
@@ -122,7 +118,7 @@
     </div>
     
     <!-- ---
-    MODALS
+    MODALS (Allemaal onveranderd, behalve Profiel Modal)
     --- -->
 
     <!-- Edit Item Modal (Onveranderd) -->
@@ -240,7 +236,7 @@
         </div> 
     </div>
 
-    <!-- Profiel Modal (AANGEPAST) -->
+    <!-- Profiel Modal (Onveranderd) -->
     <div id="profile-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -254,7 +250,7 @@
                 <span id="profile-email">Laden...</span>
             </div>
 
-            <!-- Menu Opties (Print knop toegevoegd) -->
+            <!-- Menu Opties (Onveranderd) -->
             <ul class="profile-menu-list">
                 <li>
                     <button id="profile-vriezer-beheer-btn" class="profile-menu-btn">
@@ -268,7 +264,6 @@
                         <span>Mijn Vriezers Delen</span>
                     </button>
                 </li>
-                <!-- NIEUW: Print Knop Verplaatst -->
                 <li>
                     <button id="print-btn" class="profile-menu-btn">
                         <i class="fas fa-print"></i>
