@@ -27,14 +27,10 @@
 <body>
 
     <div class="container">
-        <!-- --- AANGEPAST: Header Bar --- -->
+        <!-- Header Bar (onveranderd) -->
         <div class="header-bar">
-            <!-- Titel staat nu los -->
             <h1>Vriezer</h1>
-            
-            <!-- Nieuwe wrapper voor alle iconen rechts -->
             <div class="header-icons-wrapper">
-                <!-- Deze knop heet nu 'Wissel Account' en is voor Admins EN Gedeelde Users -->
                 <button id="switch-account-knop" class="btn-beheer btn-admin" style="display: none;" title="Wissel Account">
                     <i class="fas fa-users-cog"></i>
                     <span>Wissel Account</span>
@@ -46,7 +42,6 @@
                 </button>
             </div>
         </div>
-        <!-- --- EINDE AANGEPAST --- -->
 
 
         <div id="feedback-message" class="feedback"></div>
@@ -54,6 +49,7 @@
         <div id="dashboard" class="dashboard-container">
             </div>
 
+        <!-- *** AANGEPAST: add-item-form *** -->
         <form id="add-item-form">
             
             <div class="input-with-button" style="grid-column: 1 / 3;">
@@ -95,10 +91,29 @@
                 <option value="" disabled selected>Kies eerst een vriezer...</option> 
             </select>
             
-            <!-- NIEUW DATUMVELD TOEGEVOEGD -->
-            <div>
-                <label for="item-datum" class="form-label">Ingevroren op:</label>
-                <input type="date" id="item-datum" required>
+            <!-- NIEUWE Groepering voor Categorie en Datum -->
+            <div class="form-grid-pair" style="grid-column: 1 / 3;">
+                <!-- NIEUW CATEGORIE VELD -->
+                <div>
+                    <label for="item-categorie" class="form-label">Categorie:</label>
+                    <select id="item-categorie" required>
+                        <option value="Geen">Geen categorie</option>
+                        <option value="Groenten">Groenten</option>
+                        <option value="Vlees">Vlees</option>
+                        <option value="Vis">Vis</option>
+                        <option value="Restjes">Restjes</option>
+                        <option value="Brood">Brood</option>
+                        <option value="Fruit">Fruit</option>
+                        <option value="IJs">IJs</option>
+                        <option value="Ander">Ander</option>
+                    </select>
+                </div>
+                
+                <!-- AANGEPAST: Datumveld heeft nu een wrapper -->
+                <div class="form-field-group">
+                    <label for="item-datum" class="form-label">Ingevroren op:</label>
+                    <input type="date" id="item-datum" required>
+                </div>
             </div>
             
             <div style="grid-column: 1 / 3; display: flex; align-items: center; gap: 10px;">
@@ -108,6 +123,8 @@
 
             <button type="submit">Toevoegen</button>
         </form>
+        <!-- *** EINDE AANPASSING add-item-form *** -->
+        
         <hr>
         
         <div class="search-container">
@@ -128,7 +145,7 @@
     MODALS
     --- -->
 
-    <!-- Edit Item Modal (Onveranderd) -->
+    <!-- *** AANGEPAST: Edit Item Modal *** -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content">
             <h2>Item Bewerken</h2>
@@ -162,8 +179,24 @@
                 <select id="edit-item-vriezer" required></select>
                 <label for="edit-item-schuif">Schuif/Lade:</label>
                 <select id="edit-item-schuif" required></select>
+                
+                <!-- NIEUW CATEGORIE VELD -->
+                <label for="edit-item-categorie">Categorie:</label>
+                <select id="edit-item-categorie" required>
+                    <option value="Geen">Geen categorie</option>
+                    <option value="Groenten">Groenten</option>
+                    <option value="Vlees">Vlees</option>
+                    <option value="Vis">Vis</option>
+                    <option value="Restjes">Restjes</option>
+                    <option value="Brood">Brood</option>
+                    <option value="Fruit">Fruit</option>
+                    <option value="IJs">IJs</option>
+                    <option value="Ander">Ander</option>
+                </select>
+                
                 <label for="edit-item-datum">Ingevroren op:</label>
                 <input type="date" id="edit-item-datum" required>
+                
                 <div class="modal-buttons">
                     <button type="submit" class="btn-save">Opslaan</button>
                     <button type="button" id="btn-cancel" class="btn-cancel">Annuleren</button>
@@ -171,6 +204,8 @@
             </form>
         </div>
     </div>
+    <!-- *** EINDE AANPASSING Edit Item Modal *** -->
+
 
     <!-- Vriezer Beheer Modal (Onveranderd) -->
     <div id="vriezer-beheer-modal" class="modal-overlay">
@@ -214,7 +249,7 @@
         </div>
     </div>
     
-    <!-- AANGEPAST: Wissel Account Modal (voorheen Admin Modal) -->
+    <!-- Wissel Account Modal (Onveranderd) -->
     <div id="switch-account-modal" class="modal-overlay">
         <div class="modal-content modal-groot"> 
             <div class="modal-header">
@@ -232,21 +267,17 @@
             <hr>
             
             <div class="beheer-container">
-                <!-- Sectie voor Gedeelde Accounts (voor gewone users) -->
                 <div class="beheer-kolom" id="user-switch-section" style="display: none;">
                     <h3 class="user-only">Gedeeld met mij</h3>
                     <p>Selecteer een account om hun vriezers te bekijken/beheren.</p>
                     <ul id="user-shared-lijst" class="shared-list">
-                        <!-- Dynamisch gevuld -->
                     </ul>
                 </div>
                 
-                <!-- Sectie voor Alle Accounts (Admin only) -->
                 <div class="beheer-kolom" id="admin-switch-section" style="display: none;">
                     <h3 class="admin-only">Alle Gebruikers (Admin)</h3>
                     <p>Selecteer een gebruiker om hun vriezers te beheren.</p>
                     <ul id="admin-user-lijst" class="shared-list">
-                        <!-- Dynamisch gevuld -->
                     </ul>
                 </div>
             </div>
@@ -267,7 +298,7 @@
                 <span id="profile-email">Laden...</span>
             </div>
 
-            <!-- Menu Opties (AANGEPAST) -->
+            <!-- Menu Opties (Boodschappenlijst geactiveerd) -->
             <ul class="profile-menu-list">
                 <li>
                     <button id="profile-vriezer-beheer-btn" class="profile-menu-btn">
@@ -288,7 +319,6 @@
                     </button>
                 </li>
                 <li>
-                    <!-- Knop geactiveerd -->
                     <button id="profile-shopping-list-btn" class="profile-menu-btn">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Boodschappenlijst</span>
@@ -331,7 +361,7 @@
         </div>
     </div>
     
-    <!-- Deel Modal (UI) (Onveranderd) -->
+    <!-- Deel Modal (Onveranderd) -->
     <div id="share-modal" class="modal-overlay">
         <div class="modal-content modal-groot">
             <div class="modal-header">
@@ -381,7 +411,7 @@
         </div>
     </div>
 
-    <!-- *** NIEUW: BOODSCHAPPENLIJST MODAL *** -->
+    <!-- Boodschappenlijst Modal (Onveranderd) -->
     <div id="shopping-list-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
