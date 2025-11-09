@@ -17,15 +17,15 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* --- AANGEPAST: Header Bar --- */
+/* --- Header Bar --- */
 .header-bar {
     display: flex;
-    justify-content: space-between; /* H1 links, iconen rechts */
+    justify-content: space-between;
     align-items: center; 
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
     margin-bottom: 20px;
-    flex-wrap: nowrap; /* Zorg dat het op één lijn blijft */
+    flex-wrap: nowrap;
     gap: 10px;
 }
 h1 { 
@@ -34,7 +34,7 @@ h1 {
     padding: 0; 
     border: none;
     font-size: 1.8rem; 
-    flex-grow: 1; /* H1 neemt de beschikbare ruimte */
+    flex-grow: 1;
     min-width: 0;
     white-space: nowrap;
     overflow: hidden;
@@ -94,13 +94,13 @@ h1 {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    justify-content: center; /* Centreren van iconen */
+    justify-content: center;
 }
 .btn-beheer:hover { background-color: #63a4f0; }
 
-/* AANGEPAST: Admin knop (nu Wissel Account) */
+/* Wissel Account knop */
 .btn-admin {
-    background-color: #f0ad4e; /* Oranje gemaakt ipv rood */
+    background-color: #f0ad4e;
     padding: 0; 
     width: 44px; 
     height: 44px;
@@ -110,7 +110,7 @@ h1 {
 .btn-admin:hover { background-color: #f3bd73; }
 .btn-admin span { display: none; } 
 
-/* Print knop (verplaatst naar profiel) */
+/* Print knop */
 .btn-print {
     background-color: #777;
 }
@@ -182,7 +182,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 }
 
 
-/* --- Formulieren (Toevoegen, Vriezer/Lade beheer) --- */
+/* --- Formulieren --- */
 #add-item-form {
     display: grid;
     grid-template-columns: 1fr;
@@ -221,6 +221,21 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     margin: 0;
     font-weight: normal;
 }
+
+/* --- *** NIEUW: Formulier Groepering *** --- */
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Ruimte tussen label en input */
+}
+/* Stijling voor Categorie/Datum rij op mobiel */
+.form-grid-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+/* --- Einde Nieuw --- */
+
 
 /* --- Aantal Knoppen (UX) --- */
 .aantal-wrapper {
@@ -291,13 +306,19 @@ button[type="submit"] {
 }
 button[type="submit"]:hover { background-color: #88FFCC; }
 
-/* --- Lade Filter per Vriezer --- */
+/* --- *** AANGEPAST: Lade Filter per Vriezer *** --- */
 .lade-filter-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr; /* Mobiel: onder elkaar */
     align-items: center;
     gap: 10px;
     margin-top: 5px; 
     margin-bottom: 15px; 
+}
+.lade-filter-container .filter-group {
+    display: flex;
+    flex-direction: column; /* Label boven select */
+    gap: 4px;
 }
 .lade-filter-container label {
     font-weight: bold;
@@ -306,7 +327,7 @@ button[type="submit"]:hover { background-color: #88FFCC; }
     flex-shrink: 0; 
 }
 .lade-filter-select {
-    flex-grow: 1; 
+    width: 100%; /* Volle breedte op mobiel */
     padding: 8px; 
     font-size: 15px;
     background-color: #fdfdfd;
@@ -348,6 +369,19 @@ li .item-text {
     min-width: 150px;
     cursor: grab;
 }
+/* --- *** NIEUW: Categorie styling in lijst *** --- */
+li .item-text .item-categorie {
+    display: block;
+    color: #4A90E2; /* Blauw */
+    font-size: 0.9em;
+    font-weight: bold;
+}
+li .item-text .item-datum {
+    display: block;
+    color: #555;
+    font-size: 0.9em;
+}
+
 li strong { font-size: 1.1em; color: #333; }
 li .item-buttons { 
     display: flex; 
@@ -355,7 +389,6 @@ li .item-buttons {
     flex-shrink: 0;
 }
 
-/* AANGEPAST: .consume-btn verwijderd */
 .edit-btn, .delete-btn, .save-btn {
     color: white;
     border: none;
@@ -368,7 +401,7 @@ li .item-buttons {
     transition: background-color 0.2s ease;
     display: inline-flex;
     align-items: center;
-    justify-content: center; /* Zorgt voor centreren */
+    justify-content: center;
 }
 .edit-btn { background-color: #4A90E2; }
 .edit-btn:hover { background-color: #63a4f0; }
@@ -420,13 +453,14 @@ li .item-buttons {
 .modal-content h2, .modal-content h3 { margin-top: 0; color: #66DDAA; }
 .modal-content h3 { color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; margin-top: 20px; }
 
-/* AANGEPAST: Styling voor formulierlabels */
+/* Styling voor formulierlabels (Aangepast) */
 #add-item-form .form-label, 
 #edit-item-form label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
     color: #555;
+    font-size: 0.9em; /* Iets kleiner gemaakt */
 }
 #edit-item-form label {
     margin-top: 15px;
@@ -531,7 +565,7 @@ li .item-buttons {
     display: block;
 }
 
-/* --- AANGEPAST: Wissel Account Modal (voorheen Admin) --- */
+/* --- Wissel Account Modal --- */
 .admin-huidig-beheer {
     padding: 10px;
     background-color: #f5f5f5;
@@ -545,7 +579,7 @@ li .item-buttons {
     font-size: 1.1em;
 }
 
-/* NIEUW: Generieke lijst voor 'Wissel Account' en 'Deel' modals */
+/* Generieke lijst voor 'Wissel Account' en 'Deel' modals */
 .shared-list {
     list-style: none;
     padding: 0;
@@ -568,7 +602,6 @@ li .item-buttons {
 .shared-list li:hover {
     background-color: #e0f7fa;
 }
-/* Alleen de 'wissel' lijsten zijn klikbaar */
 #admin-user-lijst li, #user-shared-lijst li {
     cursor: pointer;
 }
@@ -588,7 +621,6 @@ li .item-buttons {
     margin-left: auto;
     flex-shrink: 0;
 }
-/* Specifieke delete knop voor 'share-huidige-lijst' */
 #share-huidige-lijst .delete-btn {
     width: 35px;
     height: 35px;
@@ -681,7 +713,6 @@ li .item-buttons {
 #profile-share-btn i { color: #66DDAA; }
 #export-data-btn i { color: #f0ad4e; }
 #print-btn i { color: #777; }
-/* AANGEPAST: Icoon kleur voor boodschappenlijst nu actief */
 #profile-shopping-list-btn i { color: #5bc0de; } 
 .profile-menu-btn[disabled] i[class*="fa-file-import"] { color: #ccc; }
 
@@ -703,11 +734,7 @@ li .item-buttons {
     color: #66512c;
 }
 
-/* --- AANGEPAST: Share Modal --- */
-/* Gebruikt nu .shared-list styling */
-
-
-/* --- NIEUW: Accept Share Modal --- */
+/* --- Accept Share Modal --- */
 .accept-share-list {
     list-style: none;
     padding: 0;
@@ -762,7 +789,7 @@ li .item-buttons {
     cursor: pointer;
 }
 
-/* --- *** NIEUW: BOODSCHAPPENLIJST STYLING *** --- */
+/* --- BOODSCHAPPENLIJST STYLING --- */
 .shopping-list {
     list-style: none;
     padding: 0;
@@ -823,24 +850,22 @@ li .item-buttons {
 }
 
 
-/* --- AANGEPAST: MEDIA QUERY VOOR GROTERE SCHERMEN --- */
+/* --- MEDIA QUERY VOOR GROTERE SCHERMEN --- */
 @media (min-width: 768px) {
     
     body { padding: 20px; }
     .container { padding: 25px; }
 
-    /* Toon tekst in 'Wissel Account' knop */
+    /* 'Wissel Account' knop */
     .btn-admin span {
         display: inline-block;
     }
-    
-    /* Maak 'Wissel Account' knop weer rechthoekig op desktop */
     .btn-admin {
         padding: 10px 15px;
         font-size: 15px;
-        width: auto; /* Reset breedte */
-        height: auto; /* Reset hoogte */
-        border-radius: 5px; /* Reset radius */
+        width: auto;
+        height: auto;
+        border-radius: 5px;
     }
 
     #add-item-form {
@@ -862,6 +887,25 @@ li .item-buttons {
     }
     #add-item-form div[style*="grid-column"] {
         grid-column: 1 / 3 !important; 
+    }
+    
+    /* --- *** NIEUW: Categorie/Datum op desktop *** --- */
+    .form-grid-pair {
+        grid-template-columns: 1fr 1fr; /* Naast elkaar op desktop */
+    }
+    
+    /* --- *** AANGEPAST: Filters op desktop *** --- */
+    .lade-filter-container {
+        grid-template-columns: 1fr 1fr; /* Naast elkaar op desktop */
+    }
+    .lade-filter-container .filter-group {
+        flex-direction: row; /* Label naast select */
+        align-items: center;
+        gap: 10px;
+    }
+    .lade-filter-select {
+        width: auto; /* Automatische breedte */
+        flex-grow: 1;
     }
     
     /* Vriezer kolom layout */
@@ -915,7 +959,7 @@ li.item-old {
     border-left: 5px solid #FF6B6B; /* Rood */
 }
 
-/* --- AANGEPAST: Stijlen voor Scan Knop & Modal --- */
+/* --- Stijlen voor Scan Knop & Modal --- */
 .input-with-button {
     display: flex;
     gap: 10px;
@@ -931,7 +975,7 @@ li.item-old {
     width: 50px; 
     height: 50px; 
     font-size: 20px; 
-    justify-content: center; /* DE FIX: Horizontaal centreren */
+    justify-content: center;
 }
 
 #barcode-scanner-container {
@@ -1109,6 +1153,14 @@ li.sortable-ghost {
     .item-text {
         flex-grow: 1;
         color: #000000; 
+    }
+    /* NIEUW: Categorie tonen in print */
+    .item-text .item-categorie {
+        color: #333 !important;
+        font-weight: bold;
+    }
+    .item-text .item-datum {
+        color: #000 !important;
     }
     
     .item-old, .item-medium, .item-fresh {
