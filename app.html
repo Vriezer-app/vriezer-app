@@ -253,7 +253,7 @@
         </div> 
     </div>
 
-    <!-- Profiel Modal (Onveranderd) -->
+    <!-- Profiel Modal (AANGEPAST) -->
     <div id="profile-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -267,7 +267,7 @@
                 <span id="profile-email">Laden...</span>
             </div>
 
-            <!-- Menu Opties (Onveranderd) -->
+            <!-- Menu Opties (AANGEPAST) -->
             <ul class="profile-menu-list">
                 <li>
                     <button id="profile-vriezer-beheer-btn" class="profile-menu-btn">
@@ -288,7 +288,8 @@
                     </button>
                 </li>
                 <li>
-                    <button class="profile-menu-btn" disabled title="Binnenkort beschikbaar">
+                    <!-- Knop geactiveerd -->
+                    <button id="profile-shopping-list-btn" class="profile-menu-btn">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Boodschappenlijst</span>
                     </button>
@@ -330,7 +331,7 @@
         </div>
     </div>
     
-    <!-- AANGEPAST: Deel Modal (UI) -->
+    <!-- Deel Modal (UI) (Onveranderd) -->
     <div id="share-modal" class="modal-overlay">
         <div class="modal-content modal-groot">
             <div class="modal-header">
@@ -346,7 +347,6 @@
                         <label for="share-email">E-mailadres:</label>
                         <input type="email" id="share-email" placeholder="naam@voorbeeld.com" required>
                         <label for="share-role">Rol:</label>
-                        <!-- 'disabled' verwijderd -->
                         <select id="share-role">
                             <option value="editor">Kan bewerken</option>
                             <option value="viewer">Kan bekijken (Binnenkort)</option>
@@ -367,7 +367,7 @@
         </div>
     </div>
     
-    <!-- NIEUW: Uitnodiging Accepteren Modal -->
+    <!-- Uitnodiging Accepteren Modal (Onveranderd) -->
     <div id="accept-share-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -381,6 +381,36 @@
         </div>
     </div>
 
+    <!-- *** NIEUW: BOODSCHAPPENLIJST MODAL *** -->
+    <div id="shopping-list-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Boodschappenlijst</h2>
+                <button type="button" id="btn-sluit-shopping-list" class="btn-cancel">Sluiten</button>
+            </div>
+            
+            <h3>Item Toevoegen</h3>
+            <form id="add-shopping-item-form" class="input-with-button" style="margin-bottom: 20px;">
+                <input type="text" id="shopping-item-naam" placeholder="Nieuw item..." required>
+                <button type="submit" class="btn-beheer" style="width: 50px; height: 50px; padding: 0;">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+            
+            <hr>
+            
+            <div class="modal-header" style="margin-bottom: 10px;">
+                <h3 style="margin: 0; border: none;">Mijn Lijst</h3>
+                <button type="button" id="btn-clear-checked-shopping-items" class="btn-beheer" style="background-color: #d9534f; font-size: 13px;">
+                    <i class="fas fa-check-double"></i> Vinkjes Wissen
+                </button>
+            </div>
+            
+            <ul id="shopping-list" class="shopping-list">
+                <!-- Dynamisch gevuld -->
+            </ul>
+        </div>
+    </div>
 
     
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -391,3 +421,5 @@
 
 </body>
 </html>
+
+
