@@ -681,6 +681,8 @@ li .item-buttons {
 #profile-share-btn i { color: #66DDAA; }
 #export-data-btn i { color: #f0ad4e; }
 #print-btn i { color: #777; }
+/* AANGEPAST: Icoon kleur voor boodschappenlijst nu actief */
+#profile-shopping-list-btn i { color: #5bc0de; } 
 .profile-menu-btn[disabled] i[class*="fa-file-import"] { color: #ccc; }
 
 
@@ -758,6 +760,66 @@ li .item-buttons {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
+}
+
+/* --- *** NIEUW: BOODSCHAPPENLIJST STYLING *** --- */
+.shopping-list {
+    list-style: none;
+    padding: 0;
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px;
+}
+.shopping-list li {
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    margin: 0 0 8px 0;
+    background-color: #fdfdfd;
+    border: 1px solid #f0f0f0;
+    gap: 12px;
+}
+.shopping-list li .shopping-item-checkbox {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+.shopping-list li .shopping-item-name {
+    flex-grow: 1;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+    transition: color 0.2s, text-decoration 0.2s;
+}
+.shopping-list li.checked .shopping-item-name {
+    text-decoration: line-through;
+    color: #999;
+    font-weight: normal;
+}
+.shopping-list li .item-buttons {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+/* "Gekocht" knop */
+.btn-purchased {
+    background-color: #66DDAA;
+    color: #1a1a1a;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    padding: 0;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-purchased:hover {
+    background-color: #88FFCC;
 }
 
 
@@ -1059,3 +1121,5 @@ li.sortable-ghost {
         color: #000000 !important;
     }
 }
+
+
