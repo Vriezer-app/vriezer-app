@@ -1515,12 +1515,12 @@ function laadVriezersBeheer() {
         });
 }
 // --- FIX: Vriezer Beheer Knop ---
-if (profileVriezerBeheerBtn) {
-    profileVriezerBeheerBtn.addEventListener('click', () => {
-        hideModal(profileModal);        // 1. Sluit het profiel menu
-        showModal(vriezerBeheerModal);  // 2. Open het beheer scherm
-        laadVriezersBeheer();           // 3. Laad de lijst met vriezers
-    });
+profileVriezerBeheerBtn.addEventListener('click', () => {
+    hideModal(profileModal);
+    showModal(vriezerBeheerModal);
+    laadVriezersBeheer();
+});
+// ----------------------
 // Export
 exportDataBtn.addEventListener('click', () => {
     if (alleItems.length === 0 && alleVriezers.length === 0) {
