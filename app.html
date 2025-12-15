@@ -71,18 +71,6 @@
             </div>
             
             <select id="item-eenheid" required>
-                <option value="stuks">Stuks (x)</option>
-                <option value="zak">Zak</option>
-                <option value="boterpot">Boterpot</option>
-                <option value="ijsdoos">Ijsdoos</option>
-                <option value="Ikea doos 600ml">Ikea doos 600ml</option>
-                <option value="iglodoos 450ml">Iglo doos 450ml</option>
-                <option value="iglodoos 1l laag">Iglo doos 1l laag</option>
-                <option value="iglodoos 1l hoog">Iglo doos 1l hoog</option>
-                <option value="gram">Gram (g)</option>
-                <option value="kilo">Kilo (kg)</option>
-                <option value="bakje">Bakje(s)</option>
-                <option value="portie">Portie(s)</option>
             </select>
             
             <select id="item-vriezer" required>
@@ -165,18 +153,6 @@
 
                 <label for="edit-item-eenheid">Eenheid:</label>
                 <select id="edit-item-eenheid" required>
-                    <option value="stuks">Stuks (x)</option>
-                    <option value="zak">Zak</option>
-                    <option value="boterpot">Boterpot</option>
-                    <option value="ijsdoos">Ijsdoos</option>
-                    <option value="Ikea doos 600ml">Ikea doos 600ml</option>
-                    <option value="iglodoos 450ml">Iglo doos 450ml</option>
-                    <option value="iglodoos 1l laag">Iglo doos 1l laag</option>
-                    <option value="iglodoos 1l hoog">Iglo doos 1l hoog</option>
-                    <option value="gram">Gram (g)</option>
-                    <option value="kilo">Kilo (kg)</option>
-                    <option value="bakje">Bakje(s)</option>
-                    <option value="portie">Portie(s)</option>
                 </select>
                 <label for="edit-item-vriezer">Vriezer:</label>
                 <select id="edit-item-vriezer" required></select>
@@ -214,28 +190,43 @@
     <div id="vriezer-beheer-modal" class="modal-overlay">
         <div class="modal-content modal-groot"> 
             <div class="modal-header">
-                <h2>Vriezer & Lade Beheer</h2>
+                <h2>Beheer Vriezers, Lades & Eenheden</h2>
                 <button type="button" id="btn-sluit-beheer" class="btn-cancel">Sluiten</button>
             </div>
+            
             <div class="beheer-container">
+                
                 <div class="beheer-kolom">
-                    <h3>Mijn Vriezers</h3>
+                    <h3>Vriezers</h3>
                     <form id="add-vriezer-form">
-                        <input type="text" id="vriezer-naam" placeholder="Naam nieuwe vriezer" required>
-                        <button type="submit">Vriezer Toevoegen</button>
+                        <input type="text" id="vriezer-naam" placeholder="Naam vriezer" required>
+                        <button type="submit">Toevoegen</button>
                     </form>
                     <hr>
                     <ul id="vriezer-beheer-lijst"></ul>
                 </div>
+
                 <div class="beheer-kolom">
-                    <h3 id="lades-beheer-titel">Selecteer een vriezer...</h3>
+                    <h3 id="lades-beheer-titel">Kies eerst een vriezer...</h3>
                     <form id="add-lade-form" style="display: none;">
-                        <input type="text" id="lade-naam" placeholder="Naam nieuwe lade" required>
-                        <button type="submit">Lade Toevoegen</button>
+                        <input type="text" id="lade-naam" placeholder="Naam lade" required>
+                        <button type="submit">Toevoegen</button>
                     </form>
                     <hr id="lades-beheer-hr" style="display: none;">
                     <ul id="lade-beheer-lijst"></ul>
                 </div>
+
+                <div class="beheer-kolom">
+                    <h3>Mijn Eenheden</h3>
+                    <form id="add-eenheid-form">
+                        <input type="text" id="eenheid-naam" placeholder="bv. Tupperware" required>
+                        <button type="submit" style="background-color: #f0ad4e;">Toevoegen</button>
+                    </form>
+                    <hr>
+                    <ul id="eenheid-beheer-lijst" class="shared-list">
+                        </ul>
+                </div>
+
             </div>
         </div> 
     </div>
