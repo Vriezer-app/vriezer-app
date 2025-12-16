@@ -122,9 +122,17 @@
             <input type="text" id="search-bar" placeholder="Zoek een product...">
         </div>
         
-        <button id="btn-toggle-alles" class="btn-full-width-toggle">
-            <i class="fas fa-plus-square"></i> Alles Openen
-        </button>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <button id="btn-toggle-alles" class="btn-full-width-toggle" style="margin-bottom: 0; flex: 1;">
+        <i class="fas fa-plus-square"></i> Alles Openen
+    </button>
+    <button id="btn-select-mode" class="btn-full-width-toggle" style="margin-bottom: 0; flex: 1; background-color: #6c757d;">
+        <i class="fas fa-check-square"></i> Selectie
+    </button>
+</div>
+<button id="fab-move-selected" class="btn-beheer" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 99; padding: 15px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-radius: 30px;">
+    <i class="fas fa-dolly"></i> Verplaats (<span id="fab-count">0</span>)
+</button>
         
         <div class="vriezer-container" id="vriezer-lijsten-container">
             <!-- Dynamisch gevuld -->
@@ -325,6 +333,12 @@
                     </button>
                 </li>
                 <li>
+                    <button id="profile-history-btn" class="profile-menu-btn">
+                        <i class="fas fa-history"></i>
+                        <span>Logboek / Geschiedenis</span>
+                    </button>
+                </li>
+                <li>
                     <button id="export-data-btn" class="profile-menu-btn">
                         <i class="fas fa-file-export"></i>
                         <span>Exporteer Data</span>
@@ -478,7 +492,83 @@
             </ul>
     </div>
 </div>
-    
+ <div id="history-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Logboek</h2>
+                <button type="button" id="btn-sluit-history" class="btn-cancel">Sluiten</button>
+            </div>
+            <ul id="history-list" class="shared-list">
+                <li><i>Laden...</i></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="quick-move-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Selectie Verplaatsen</h2>
+                <button type="button" id="btn-sluit-quick-move" class="btn-cancel">Annuleren</button>
+            </div>
+            <p>Verplaats <span id="quick-move-count">0</span> items naar:</p>
+            <form id="quick-move-form">
+                <select id="quick-move-vriezer" required></select>
+                <select id="quick-move-schuif" required></select>
+                <button type="submit" class="btn-save" style="width: 100%; margin-top: 15px;">Verplaatsen</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="smart-shop-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Inruimen: <span id="smart-shop-item-naam"></span></h2>
+                <button type="button" id="btn-sluit-smart-shop" class="btn-cancel">Annuleren</button>
+            </div>
+            <form id="smart-shop-form">
+                <input type="hidden" id="smart-shop-original-id">
+                <input type="hidden" id="smart-shop-naam-hidden">
+                
+                <div class="aantal-wrapper" style="margin-bottom: 15px;">
+                    <button type="button" class="aantal-btn" data-action="minus">-</button>
+                    <input type="number" id="smart-shop-aantal" value="1" step="0.25" min="0.25" required>
+                    <button type="button" class="aantal-btn" data-action="plus">+</button>
+                </div>
+                
+                <select id="smart-shop-eenheid" required style="margin-bottom: 15px;"></select>
+                <select id="smart-shop-categorie" required style="margin-bottom: 15px;">
+                    <option value="Geen">Geen categorie</option>
+                    <option value="Groenten">Groenten</option>
+                    <option value="Vlees">Vlees</option>
+                    <option value="Vis">Vis</option>
+                    <option value="Restjes">Restjes</option>
+                    <option value="Brood">Brood</option>
+                    <option value="Fruit">Fruit</option>
+                    <option value="IJs">Ijs</option>
+                    <option value="Saus">Saus</option>
+                    <option value="Ander">Ander</option>
+                </select>
+
+                <label>Locatie:</label>
+                <select id="smart-shop-vriezer" required></select>
+                <select id="smart-shop-schuif" required></select>
+
+                <button type="submit" class="btn-save" style="width: 100%; margin-top: 15px;">Inruimen & Afvinken</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="qr-print-modal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <div class="modal-header">
+                <h2>QR Code voor Lade</h2>
+                <button type="button" id="btn-sluit-qr" class="btn-cancel">Sluiten</button>
+            </div>
+            <img id="qr-image-display" src="" alt="QR Code" style="max-width: 100%; height: auto; margin-bottom: 15px;">
+            <p id="qr-desc-display" style="font-weight: bold;"></p>
+            <button onclick="window.print()" class="btn-beheer btn-print"><i class="fas fa-print"></i> Print Pagina</button>
+        </div>
+    </div>   
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
