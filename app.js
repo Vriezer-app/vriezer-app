@@ -21,7 +21,7 @@ const adminsCollectie = db.collection('admins');
 const sharesCollectie = db.collection('shares');
 const shoppingListCollectie = db.collection('shoppingList');
 const weekMenuCollectie = db.collection('weekmenu');
-const historyCollectie = db.collection('history'); // NIEUW
+const historyCollectie = db.collection('history'); 
 
 // --- GLOBALE VARIABELEN ---
 let alleVriezers = [];
@@ -32,7 +32,7 @@ let geselecteerdeVriezerId = null;
 let userUnits = []; 
 const defaultUnits = ["stuks", "zak", "boterpot", "ijsdoos", "gram", "kilo", "bakje", "portie"];
 
-// EMOJI MAPPING (NIEUW)
+// EMOJI MAPPING
 const categoryEmojis = {
     "Vlees": "🥩", "Vis": "🐟", "Groenten": "🥦", "Fruit": "🍓",
     "IJs": "🍦", "Brood": "🍞", "Restjes": "🍲", "Saus": "🥫",
@@ -136,6 +136,22 @@ async function registreerGebruiker(user) {
     }, { merge: true });
 }
 
+async function checkAdminStatus(uid) {
+    // In een echte app check je de db, hier doen we even een simpele check of placeholder
+    try {
+        const adminDoc = await adminsCollectie.doc(uid).get();
+        isAdmin = adminDoc.exists;
+        if(isAdmin) {
+             document.getElementById('switch-account-knop').style.display = 'inline-flex';
+             document.getElementById('admin-switch-section').style.display = 'block';
+             startAdminUserListener();
+        } else {
+            // Check gewone shares
+             startAcceptedSharesListener();
+        }
+    } catch(e) { console.log(e); }
+}
+
 // --- DATA LISTENERS ---
 function startAlleDataListeners() {
     stopAlleDataListeners();
@@ -183,6 +199,35 @@ function stopAlleDataListeners() {
     if (weekMenuListener) weekMenuListener();
     // history listener is on demand
 }
+
+function startAcceptedSharesListener() {
+    acceptedSharesListener = sharesCollectie.where("sharedWithId", "==", eigenUserId).where("status", "==", "accepted")
+    .onSnapshot(snap => {
+        const list = document.getElementById('user-shared-lijst');
+        list.innerHTML = '';
+        if(!snap.empty) {
+            document.getElementById('switch-account-knop').style.display = 'inline-flex';
+            document.getElementById('user-switch-section').style.display = 'block';
+            snap.forEach(doc => {
+                const d = doc.data();
+                list.innerHTML += `<li onclick="schakelBeheer('${d.ownerId}', '${d.ownerEmail}')"><span>${d.ownerEmail}</span></li>`;
+            });
+        }
+    });
+}
+// Placeholder functions voor shares
+function startPendingSharesListener() {} 
+function startAdminUserListener() {}
+function schakelBeheer(uid, email) {
+    beheerdeUserId = uid;
+    document.getElementById('switch-account-titel').textContent = `Beheer van: ${email}`;
+    document.getElementById('switch-terug-knop').style.display = 'block';
+    hideModal(document.getElementById('switch-account-modal'));
+    startAlleDataListeners();
+    showFeedback(`Nu ${email} aan het beheren.`);
+}
+document.getElementById('switch-terug-knop').onclick = () => schakelBeheer(eigenUserId, "Jezelf");
+
 
 // --- UI RENDERING & LOGICA ---
 
@@ -239,7 +284,7 @@ function renderDynamischeLijsten() {
         kolom.className = 'vriezer-kolom';
         kolom.innerHTML = `<h2>${vriezer.naam}</h2>`;
         
-        // Filters (Hier weggelaten voor beknoptheid, maar functionaliteit blijft via updateItemVisibility)
+        // Filters
         const filterBox = document.createElement('div');
         filterBox.className = 'lade-filter-container';
         filterBox.innerHTML = `
@@ -311,6 +356,24 @@ function renderDynamischeLijsten() {
     
     // Check bulk checkboxes
     document.querySelectorAll('.bulk-check').forEach(c => c.addEventListener('change', updateBulkCount));
+}
+
+function initDragAndDrop() {
+    document.querySelectorAll('.lade-content ul').forEach(ul => {
+        new Sortable(ul, {
+            group: 'shared', animation: 150, handle: '.item-text',
+            onEnd: function(evt) {
+                const itemEl = evt.item;
+                const newLadeId = itemEl.closest('.lade-group').dataset.ladeId;
+                const newVriezerId = itemEl.closest('.lade-content').querySelector('ul').dataset.vriezerId;
+                const ladeNaam = alleLades.find(l => l.id === newLadeId)?.naam;
+                
+                itemsCollectieBasis.doc(itemEl.dataset.id).update({
+                    ladeId: newLadeId, vriezerId: newVriezerId, ladeNaam: ladeNaam
+                });
+            }
+        });
+    });
 }
 
 function updateDashboard() {
@@ -521,6 +584,28 @@ document.getElementById('add-shopping-item-form').addEventListener('submit', (e)
     });
     document.getElementById('shopping-item-naam').value = '';
 });
+
+// --- WEEKMENU (simpel) ---
+function startWeekMenuListener() {
+    weekMenuListener = weekMenuCollectie.where("userId", "==", eigenUserId).orderBy("datum").onSnapshot(snap => {
+         const ul = document.getElementById('weekmenu-list'); ul.innerHTML='';
+         snap.forEach(d => {
+             const data = d.data();
+             ul.innerHTML += `<li><span>${data.datum}: ${data.gerecht}</span> <button class="delete-btn" onclick="deleteWeekMenuItem('${d.id}')"><i class="fas fa-trash"></i></button></li>`;
+         });
+    });
+}
+document.getElementById('add-weekmenu-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    weekMenuCollectie.add({
+        datum: document.getElementById('weekmenu-datum').value,
+        gerecht: document.getElementById('weekmenu-gerecht').value,
+        userId: eigenUserId
+    });
+    document.getElementById('weekmenu-gerecht').value='';
+});
+window.deleteWeekMenuItem = (id) => weekMenuCollectie.doc(id).delete();
+
 
 // --- GESCHIEDENIS (NIEUW) ---
 document.getElementById('profile-history-btn').addEventListener('click', () => {
