@@ -3,31 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vriezer</title>
+    <title>Mijn Vriezer</title>
     
+    <!-- Externe libraries -->
     <link rel="stylesheet" href="style.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Favicons (onveranderd) -->
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
-
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body>
 
     <div class="container">
-        <!-- Header Bar (onveranderd) -->
+        <!-- Header Bar -->
         <div class="header-bar">
             <h1>Vriezer</h1>
             <div class="header-icons-wrapper">
@@ -43,15 +37,35 @@
             </div>
         </div>
 
-
         <div id="feedback-message" class="feedback"></div>
 
+        <!-- Dashboard -->
         <div id="dashboard" class="dashboard-container">
+            <!-- Stats komen hier -->
+        </div>
+        
+        <!-- Action Bar voor Snel Verplaatsen (NIEUW) -->
+        <div id="bulk-move-controls" style="display: none; margin-bottom: 20px; background: #e0f7fa; padding: 10px; border-radius: 8px; border: 1px solid #4A90E2;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <strong><i class="fas fa-dolly"></i> Verplaatsmodus Actief</strong>
+                <button id="btn-cancel-move-mode" class="btn-cancel" style="padding: 5px 10px; font-size: 0.8em;">Stoppen</button>
             </div>
+            <p id="bulk-selected-count" style="margin:0 0 10px 0; font-size:0.9em;">0 items geselecteerd</p>
+            <div class="form-grid-pair">
+                <select id="bulk-target-vriezer">
+                    <option value="">Naar vriezer...</option>
+                </select>
+                <select id="bulk-target-schuif">
+                    <option value="">Naar lade...</option>
+                </select>
+            </div>
+            <button id="btn-confirm-bulk-move" class="btn-beheer" style="width:100%; margin-top:10px; background-color: #4A90E2;" disabled>
+                Verplaatsen Uitvoeren
+            </button>
+        </div>
 
-        <!-- *** AANGEPAST: add-item-form *** -->
+        <!-- Toevoegen Formulier -->
         <form id="add-item-form">
-            
             <div class="input-with-button" style="grid-column: 1 / 3;">
                 <input type="text" id="item-naam" placeholder="Productnaam" required list="product-suggesties">
                 <button type="button" id="scan-btn" class="btn-beheer" title="Scan barcode">
@@ -65,13 +79,12 @@
             <datalist id="product-suggesties"></datalist>
 
             <div class="aantal-wrapper">
-                <button type="button" class="aantal-btn" data-action="minus" aria-label="Verminder aantal">-</button>
+                <button type="button" class="aantal-btn" data-action="minus">-</button>
                 <input type="number" id="item-aantal" placeholder="Aantal" value="1" step="0.25" min="0.25" required>
-                <button type="button" class="aantal-btn" data-action="plus" aria-label="Verhoog aantal">+</button>
+                <button type="button" class="aantal-btn" data-action="plus">+</button>
             </div>
             
-            <select id="item-eenheid" required>
-            </select>
+            <select id="item-eenheid" required></select>
             
             <select id="item-vriezer" required>
                 <option value="" disabled selected>Kies een vriezer...</option> 
@@ -80,26 +93,24 @@
                 <option value="" disabled selected>Kies eerst een vriezer...</option> 
             </select>
             
-            <!-- NIEUWE Groepering voor Categorie en Datum -->
+            <!-- Categorie & Datum -->
             <div class="form-grid-pair" style="grid-column: 1 / 3;">
-                <!-- NIEUW CATEGORIE VELD -->
                 <div>
                     <label for="item-categorie" class="form-label">Categorie:</label>
                     <select id="item-categorie" required>
                         <option value="Geen">Geen categorie</option>
-                        <option value="Groenten">Groenten</option>
-                        <option value="Vlees">Vlees</option>
-                        <option value="Vis">Vis</option>
-                        <option value="Restjes">Restjes</option>
-                        <option value="Brood">Brood</option>
-                        <option value="Fruit">Fruit</option>
-                        <option value="IJs">Ijs</option>
-                        <option value="Saus">Saus</option>
-                        <option value="Ander">Ander</option>
+                        <option value="Groenten">🥦 Groenten</option>
+                        <option value="Vlees">🥩 Vlees</option>
+                        <option value="Vis">🐟 Vis</option>
+                        <option value="Restjes">🍲 Restjes</option>
+                        <option value="Brood">🍞 Brood</option>
+                        <option value="Fruit">🍓 Fruit</option>
+                        <option value="IJs">🍦 IJs</option>
+                        <option value="Saus">🥫 Saus</option>
+                        <option value="Ander">📦 Ander</option>
                     </select>
                 </div>
                 
-                <!-- AANGEPAST: Datumveld heeft nu een wrapper -->
                 <div class="form-field-group">
                     <label for="item-datum" class="form-label">Ingevroren op:</label>
                     <input type="date" id="item-datum" required>
@@ -113,7 +124,6 @@
 
             <button type="submit">Toevoegen</button>
         </form>
-        <!-- *** EINDE AANPASSING add-item-form *** -->
         
         <hr>
         
@@ -122,28 +132,24 @@
             <input type="text" id="search-bar" placeholder="Zoek een product...">
         </div>
         
+        <!-- Knoppenbalk (NIEUW) -->
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-    <button id="btn-toggle-alles" class="btn-full-width-toggle" style="margin-bottom: 0; flex: 1;">
-        <i class="fas fa-plus-square"></i> Alles Openen
-    </button>
-    <button id="btn-select-mode" class="btn-full-width-toggle" style="margin-bottom: 0; flex: 1; background-color: #6c757d;">
-        <i class="fas fa-check-square"></i> Selectie
-    </button>
-</div>
-<button id="fab-move-selected" class="btn-beheer" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 99; padding: 15px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-radius: 30px;">
-    <i class="fas fa-dolly"></i> Verplaats (<span id="fab-count">0</span>)
-</button>
+            <button id="btn-toggle-alles" class="btn-full-width-toggle" style="flex: 1; margin-bottom: 0;">
+                <i class="fas fa-plus-square"></i> Alles Openen
+            </button>
+            <button id="btn-start-move-mode" class="btn-full-width-toggle" style="flex: 1; margin-bottom: 0; background-color: #4A90E2;">
+                <i class="fas fa-dolly"></i> Verplaatsen
+            </button>
+        </div>
         
         <div class="vriezer-container" id="vriezer-lijsten-container">
             <!-- Dynamisch gevuld -->
         </div>
     </div>
     
-    <!-- ---
-    MODALS
-    --- -->
+    <!-- --- MODALS --- -->
 
-    <!-- *** AANGEPAST: Edit Item Modal *** -->
+    <!-- Edit Item Modal -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content">
             <h2>Item Bewerken</h2>
@@ -154,31 +160,30 @@
                 
                 <label for="edit-item-aantal">Aantal:</label>
                 <div class="aantal-wrapper">
-                    <button type="button" class="aantal-btn" data-action="minus" aria-label="Verminder aantal">-</button>
+                    <button type="button" class="aantal-btn" data-action="minus">-</button>
                     <input type="number" id="edit-item-aantal" step="0.25" min="0.25" required>
-                    <button type="button" class="aantal-btn" data-action="plus" aria-label="Verhoog aantal">+</button>
+                    <button type="button" class="aantal-btn" data-action="plus">+</button>
                 </div>
 
                 <label for="edit-item-eenheid">Eenheid:</label>
-                <select id="edit-item-eenheid" required>
-                </select>
+                <select id="edit-item-eenheid" required></select>
                 <label for="edit-item-vriezer">Vriezer:</label>
                 <select id="edit-item-vriezer" required></select>
                 <label for="edit-item-schuif">Schuif/Lade:</label>
                 <select id="edit-item-schuif" required></select>
                 
-                <!-- NIEUW CATEGORIE VELD -->
                 <label for="edit-item-categorie">Categorie:</label>
                 <select id="edit-item-categorie" required>
                     <option value="Geen">Geen categorie</option>
-                    <option value="Groenten">Groenten</option>
-                    <option value="Vlees">Vlees</option>
-                    <option value="Vis">Vis</option>
-                    <option value="Restjes">Restjes</option>
-                    <option value="Brood">Brood</option>
-                    <option value="Fruit">Fruit</option>
-                    <option value="IJs">IJs</option>
-                    <option value="Ander">Ander</option>
+                    <option value="Groenten">🥦 Groenten</option>
+                    <option value="Vlees">🥩 Vlees</option>
+                    <option value="Vis">🐟 Vis</option>
+                    <option value="Restjes">🍲 Restjes</option>
+                    <option value="Brood">🍞 Brood</option>
+                    <option value="Fruit">🍓 Fruit</option>
+                    <option value="IJs">🍦 IJs</option>
+                    <option value="Saus">🥫 Saus</option>
+                    <option value="Ander">📦 Ander</option>
                 </select>
                 
                 <label for="edit-item-datum">Ingevroren op:</label>
@@ -191,19 +196,16 @@
             </form>
         </div>
     </div>
-    <!-- *** EINDE AANPASSING Edit Item Modal *** -->
 
-
-    <!-- Vriezer Beheer Modal (Onveranderd) -->
+    <!-- Vriezer Beheer Modal -->
     <div id="vriezer-beheer-modal" class="modal-overlay">
         <div class="modal-content modal-groot"> 
             <div class="modal-header">
-                <h2>Beheer Vriezers, Lades & Eenheden</h2>
+                <h2>Beheer Vriezers, Lades & QR</h2>
                 <button type="button" id="btn-sluit-beheer" class="btn-cancel">Sluiten</button>
             </div>
             
             <div class="beheer-container">
-                
                 <div class="beheer-kolom">
                     <h3>Vriezers</h3>
                     <form id="add-vriezer-form">
@@ -225,33 +227,90 @@
                 </div>
 
                 <div class="beheer-kolom">
-                    <h3>Mijn Eenheden</h3>
+                    <h3>Eenheden</h3>
                     <form id="add-eenheid-form">
                         <input type="text" id="eenheid-naam" placeholder="bv. Tupperware" required>
                         <button type="submit" style="background-color: #f0ad4e;">Toevoegen</button>
                     </form>
                     <hr>
-                    <ul id="eenheid-beheer-lijst" class="shared-list">
-                        </ul>
+                    <ul id="eenheid-beheer-lijst" class="shared-list"></ul>
                 </div>
-
             </div>
         </div> 
     </div>
 
-    <!-- Scan Modal (Onveranderd) -->
+    <!-- QR Code Toon Modal (NIEUW) -->
+    <div id="qr-show-modal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <h2>Lade QR Code</h2>
+            <p id="qr-modal-title" style="margin-bottom:20px; font-weight:bold;"></p>
+            <div id="qr-code-display" style="margin: 0 auto 20px auto; display: inline-block; border: 10px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1);"></div>
+            <p>Print deze code en plak hem op de lade.</p>
+            <div class="modal-buttons" style="justify-content: center;">
+                <button onclick="window.print()" class="btn-beheer" style="background-color: #777;"><i class="fas fa-print"></i> Print Pagina</button>
+                <button type="button" id="btn-sluit-qr" class="btn-cancel">Sluiten</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan Modal -->
     <div id="scan-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Scan Barcode</h2>
+                <h2>Scan Barcode / QR</h2>
                 <button type="button" id="btn-stop-scan" class="btn-cancel">Annuleren</button>
             </div>
             <div id="barcode-scanner-container" style="width: 100%; max-width: 450px; margin: 20px auto;"></div>
-            <p style="text-align: center; color: #777;">Richt de camera op een barcode.</p>
+            <p style="text-align: center; color: #777;">Richt de camera op een barcode of lade-QR.</p>
         </div>
     </div>
     
-    <!-- Wissel Account Modal (Onveranderd) -->
+    <!-- "Gekocht" Verwerking Modal (NIEUW) -->
+    <div id="purchased-process-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fas fa-check-circle" style="color: #66DDAA;"></i> Waar heb je het gelegd?</h2>
+            <p id="purchased-item-name" style="font-weight: bold; font-size: 1.2em; text-align: center; margin-bottom: 20px;"></p>
+            
+            <form id="process-purchased-form">
+                <input type="hidden" id="purchased-item-id">
+                <input type="hidden" id="purchased-item-original-name">
+                
+                <label>Locatie:</label>
+                <select id="purchased-vriezer" required></select>
+                <select id="purchased-schuif" required style="margin-top: 10px;"></select>
+                
+                <label style="margin-top:15px;">Details:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="purchased-aantal" value="1" style="width: 80px;" required>
+                    <select id="purchased-eenheid" required></select>
+                </div>
+                
+                <label style="margin-top:10px;">Ingevroren op:</label>
+                <input type="date" id="purchased-datum" required>
+                
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">Opslaan in Vriezer</button>
+                    <button type="button" id="btn-cancel-process" class="btn-cancel">Annuleren</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Geschiedenis Modal (NIEUW) -->
+    <div id="history-modal" class="modal-overlay">
+        <div class="modal-content modal-groot">
+            <div class="modal-header">
+                <h2>Geschiedenis (Laatste 30 dagen)</h2>
+                <button type="button" id="btn-sluit-history" class="btn-cancel">Sluiten</button>
+            </div>
+            <p>Recent verwijderde items of "opgegeten" items.</p>
+            <ul id="history-list" class="shared-list">
+                <!-- Dynamisch gevuld -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Wissel Account Modal -->
     <div id="switch-account-modal" class="modal-overlay">
         <div class="modal-content modal-groot"> 
             <div class="modal-header">
@@ -265,28 +324,21 @@
                     <i class="fas fa-arrow-left"></i> Terug naar mijn account
                 </button>
             </div>
-            
             <hr>
-            
             <div class="beheer-container">
                 <div class="beheer-kolom" id="user-switch-section" style="display: none;">
                     <h3 class="user-only">Gedeeld met mij</h3>
-                    <p>Selecteer een account om hun vriezers te bekijken/beheren.</p>
-                    <ul id="user-shared-lijst" class="shared-list">
-                    </ul>
+                    <ul id="user-shared-lijst" class="shared-list"></ul>
                 </div>
-                
                 <div class="beheer-kolom" id="admin-switch-section" style="display: none;">
                     <h3 class="admin-only">Alle Gebruikers (Admin)</h3>
-                    <p>Selecteer een gebruiker om hun vriezers te beheren.</p>
-                    <ul id="admin-user-lijst" class="shared-list">
-                    </ul>
+                    <ul id="admin-user-lijst" class="shared-list"></ul>
                 </div>
             </div>
         </div> 
     </div>
 
-    <!-- Profiel Modal (AANGEPAST) -->
+    <!-- Profiel Modal -->
     <div id="profile-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -300,93 +352,47 @@
                 <span id="profile-email">Laden...</span>
             </div>
 
-            <!-- Menu Opties (Boodschappenlijst geactiveerd) -->
             <ul class="profile-menu-list">
-                <li>
-                    <button id="profile-vriezer-beheer-btn" class="profile-menu-btn">
-                        <i class="fas fa-snowflake"></i>
-                        <span>Mijn Vriezers Beheren</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="profile-share-btn" class="profile-menu-btn">
-                        <i class="fas fa-users"></i>
-                        <span>Mijn Vriezers Delen</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="print-btn" class="profile-menu-btn">
-                        <i class="fas fa-print"></i>
-                        <span>Print Voorraadlijst</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="profile-shopping-list-btn" class="profile-menu-btn">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Boodschappenlijst</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="profile-weekmenu-btn" class="profile-menu-btn">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Weekmenu</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="profile-history-btn" class="profile-menu-btn">
-                        <i class="fas fa-history"></i>
-                        <span>Logboek / Geschiedenis</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="export-data-btn" class="profile-menu-btn">
-                        <i class="fas fa-file-export"></i>
-                        <span>Exporteer Data</span>
-                    </button>
-                </li>
-                <li>
-                    <button class="profile-menu-btn" disabled title="Binnenkort beschikbaar">
-                        <i class="fas fa-file-import"></i>
-                        <span>Importeer Data</span>
-                    </button>
-                </li>
+                <li><button id="profile-vriezer-beheer-btn" class="profile-menu-btn"><i class="fas fa-snowflake"></i><span>Mijn Vriezers & QR</span></button></li>
+                <li><button id="profile-share-btn" class="profile-menu-btn"><i class="fas fa-users"></i><span>Mijn Vriezers Delen</span></button></li>
+                <li><button id="print-btn" class="profile-menu-btn"><i class="fas fa-print"></i><span>Print Voorraadlijst</span></button></li>
+                <li><button id="profile-shopping-list-btn" class="profile-menu-btn"><i class="fas fa-shopping-cart"></i><span>Boodschappenlijst</span></button></li>
+                <li><button id="profile-weekmenu-btn" class="profile-menu-btn"><i class="fas fa-calendar-alt"></i><span>Weekmenu</span></button></li>
+                <!-- NIEUW: Geschiedenis knop -->
+                <li><button id="profile-history-btn" class="profile-menu-btn"><i class="fas fa-history"></i><span>Geschiedenis / Logboek</span></button></li>
+                
+                <li><button id="export-data-btn" class="profile-menu-btn"><i class="fas fa-file-export"></i><span>Exporteer Data</span></button></li>
             </ul>
 
             <hr>
-            
             <button id="logout-btn" class="btn-beheer btn-logout" style="width: 100%;">
                 <i class="fas fa-sign-out-alt"></i> Uitloggen
             </button>
-            
         </div>
     </div>
     
-    <!-- Notificatie Modal (Onveranderd) -->
+    <!-- Notificatie Modal -->
     <div id="notificatie-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Houdbaarheid Waarschuwing</h2>
                 <button type="button" id="btn-sluit-notificatie" class="btn-cancel">Sluiten</button>
             </div>
-            <p>De volgende items zijn al erg lang ingevroren. Overweeg om deze binnenkort te gebruiken!</p>
-            <ul id="notificatie-lijst" class="notificatie-lijst">
-                <!-- Dynamisch gevuld -->
-            </ul>
+            <p>De volgende items zijn al erg lang ingevroren:</p>
+            <ul id="notificatie-lijst" class="notificatie-lijst"></ul>
         </div>
     </div>
     
-    <!-- Deel Modal (Onveranderd) -->
+    <!-- Deel Modal -->
     <div id="share-modal" class="modal-overlay">
         <div class="modal-content modal-groot">
             <div class="modal-header">
                 <h2>Mijn Vriezers Delen</h2>
                 <button type="button" id="btn-sluit-share" class="btn-cancel">Sluiten</button>
             </div>
-            
             <div class="beheer-container">
                 <div class="beheer-kolom">
                     <h3>Nieuwe Gebruiker Uitnodigen</h3>
-                    <p>Deel al je vriezers met iemand anders (ze hebben een account nodig).</p>
                     <form id="share-invite-form">
                         <label for="share-email">E-mailadres:</label>
                         <input type="email" id="share-email" placeholder="naam@voorbeeld.com" required>
@@ -402,30 +408,24 @@
                 </div>
                 <div class="beheer-kolom">
                     <h3>Huidige Gedeelde Toegang</h3>
-                    <p>Je deelt je vriezers momenteel met:</p>
-                    <ul id="share-huidige-lijst" class="shared-list">
-                         <li><i>Laden...</i></li>
-                    </ul>
+                    <ul id="share-huidige-lijst" class="shared-list"></ul>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Uitnodiging Accepteren Modal (Onveranderd) -->
+    <!-- Accept Share Modal -->
     <div id="accept-share-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Openstaande Uitnodigingen</h2>
                 <button type="button" id="btn-sluit-accept-share" class="btn-cancel">Later</button>
             </div>
-            <p>Je bent uitgenodigd om vriezers te beheren. Accepteer of weiger de uitnodigingen.</p>
-            <ul id="accept-share-lijst" class="accept-share-list">
-                <!-- Dynamisch gevuld -->
-            </ul>
+            <ul id="accept-share-lijst" class="accept-share-list"></ul>
         </div>
     </div>
 
-    <!-- Boodschappenlijst Modal (Onveranderd) -->
+    <!-- Boodschappenlijst Modal -->
     <div id="shopping-list-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -450,130 +450,47 @@
                 </button>
             </div>
             
-            <ul id="shopping-list" class="shopping-list">
-                <!-- Dynamisch gevuld -->
-            </ul>
+            <ul id="shopping-list" class="shopping-list"></ul>
         </div>
     </div>
-<!-- Weekmenu Modal -->
+
+    <!-- Weekmenu Modal -->
     <div id="weekmenu-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Mijn Weekmenu</h2>
-            <button type="button" id="btn-sluit-weekmenu" class="btn-cancel">Sluiten</button>
-        </div>
-        
-        <h3>Gerecht Inplannen</h3>
-        <form id="add-weekmenu-form" style="margin-bottom: 20px;">
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <label for="weekmenu-datum" style="font-size: 0.9em; font-weight: bold;">Datum:</label>
-                <input type="date" id="weekmenu-datum" required style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                
-                <input type="text" id="weekmenu-gerecht" placeholder="Wat eten we?" required style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                
-                <input type="url" id="weekmenu-link" placeholder="Link naar recept (https://...)" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                
-                <button type="submit" class="btn-beheer" style="width: 100%; margin-top: 5px;">
-                    <i class="fas fa-plus"></i> Inplannen
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Mijn Weekmenu</h2>
+                <button type="button" id="btn-sluit-weekmenu" class="btn-cancel">Sluiten</button>
+            </div>
+            
+            <h3>Gerecht Inplannen</h3>
+            <form id="add-weekmenu-form" style="margin-bottom: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label for="weekmenu-datum" style="font-size: 0.9em; font-weight: bold;">Datum:</label>
+                    <input type="date" id="weekmenu-datum" required style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    
+                    <input type="text" id="weekmenu-gerecht" placeholder="Wat eten we?" required style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    
+                    <input type="url" id="weekmenu-link" placeholder="Link naar recept (https://...)" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    
+                    <button type="submit" class="btn-beheer" style="width: 100%; margin-top: 5px;">
+                        <i class="fas fa-plus"></i> Inplannen
+                    </button>
+                </div>
+            </form>
+            
+            <hr>
+            
+            <div class="modal-header" style="margin-bottom: 10px;">
+                <h3 style="margin: 0; border: none;">Op de planning</h3>
+                <button type="button" id="btn-clear-old-weekmenu" class="btn-beheer" style="background-color: #d9534f; font-size: 13px;">
+                    <i class="fas fa-history"></i> Oude wissen
                 </button>
             </div>
-        </form>
-        
-        <hr>
-        
-        <div class="modal-header" style="margin-bottom: 10px;">
-            <h3 style="margin: 0; border: none;">Op de planning</h3>
-            <button type="button" id="btn-clear-old-weekmenu" class="btn-beheer" style="background-color: #d9534f; font-size: 13px;">
-                <i class="fas fa-history"></i> Oude wissen
-            </button>
-        </div>
-        
-        <ul id="weekmenu-list" class="shopping-list">
-            </ul>
-    </div>
-</div>
- <div id="history-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Logboek</h2>
-                <button type="button" id="btn-sluit-history" class="btn-cancel">Sluiten</button>
-            </div>
-            <ul id="history-list" class="shared-list">
-                <li><i>Laden...</i></li>
-            </ul>
+            
+            <ul id="weekmenu-list" class="shopping-list"></ul>
         </div>
     </div>
 
-    <div id="quick-move-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Selectie Verplaatsen</h2>
-                <button type="button" id="btn-sluit-quick-move" class="btn-cancel">Annuleren</button>
-            </div>
-            <p>Verplaats <span id="quick-move-count">0</span> items naar:</p>
-            <form id="quick-move-form">
-                <select id="quick-move-vriezer" required></select>
-                <select id="quick-move-schuif" required></select>
-                <button type="submit" class="btn-save" style="width: 100%; margin-top: 15px;">Verplaatsen</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="smart-shop-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Inruimen: <span id="smart-shop-item-naam"></span></h2>
-                <button type="button" id="btn-sluit-smart-shop" class="btn-cancel">Annuleren</button>
-            </div>
-            <form id="smart-shop-form">
-                <input type="hidden" id="smart-shop-original-id">
-                <input type="hidden" id="smart-shop-naam-hidden">
-                
-                <div class="aantal-wrapper" style="margin-bottom: 15px;">
-                    <button type="button" class="aantal-btn" data-action="minus">-</button>
-                    <input type="number" id="smart-shop-aantal" value="1" step="0.25" min="0.25" required>
-                    <button type="button" class="aantal-btn" data-action="plus">+</button>
-                </div>
-                
-                <select id="smart-shop-eenheid" required style="margin-bottom: 15px;"></select>
-                <select id="smart-shop-categorie" required style="margin-bottom: 15px;">
-                    <option value="Geen">Geen categorie</option>
-                    <option value="Groenten">Groenten</option>
-                    <option value="Vlees">Vlees</option>
-                    <option value="Vis">Vis</option>
-                    <option value="Restjes">Restjes</option>
-                    <option value="Brood">Brood</option>
-                    <option value="Fruit">Fruit</option>
-                    <option value="IJs">Ijs</option>
-                    <option value="Saus">Saus</option>
-                    <option value="Ander">Ander</option>
-                </select>
-
-                <label>Locatie:</label>
-                <select id="smart-shop-vriezer" required></select>
-                <select id="smart-shop-schuif" required></select>
-
-                <button type="submit" class="btn-save" style="width: 100%; margin-top: 15px;">Inruimen & Afvinken</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="qr-print-modal" class="modal-overlay">
-        <div class="modal-content" style="text-align: center;">
-            <div class="modal-header">
-                <h2>QR Code voor Lade</h2>
-                <button type="button" id="btn-sluit-qr" class="btn-cancel">Sluiten</button>
-            </div>
-            <img id="qr-image-display" src="" alt="QR Code" style="max-width: 100%; height: auto; margin-bottom: 15px;">
-            <p id="qr-desc-display" style="font-weight: bold;"></p>
-            <button onclick="window.print()" class="btn-beheer btn-print"><i class="fas fa-print"></i> Print Pagina</button>
-        </div>
-    </div>   
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="app.js"></script>
-
 </body>
 </html>
