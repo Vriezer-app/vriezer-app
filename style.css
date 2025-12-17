@@ -235,16 +235,25 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     font-weight: normal;
 }
 
-/* --- Formulier Groepering --- */
+/* --- Formulier Groepering (Categorie & Datum) --- */
 .form-field-group {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    width: 100%; /* Zorg dat de groep de volle breedte van de kolom pakt */
+    /* Zorg voor verticale uitlijning */
+    justify-content: flex-start;
+    /* FIX: Zeker zijn dat de inhoud niet buiten de groep valt */
+    min-width: 0; 
 }
 .form-grid-pair {
     display: grid;
     grid-template-columns: 1fr;
     gap: 15px;
+    width: 100%;
+    align-items: start; /* Zorg dat ze aan de bovenkant uitlijnen */
+    /* FIX: Zorg dat de grid zelf niet uitbreekt */
+    max-width: 100%;
 }
 
 
@@ -303,6 +312,7 @@ input[type="text"], input[type="number"], input[type="email"], select, input[typ
     /* FIX: Zorgt dat inputs niet uit hun container breken */
     max-width: 100%; 
     min-width: 0; /* Laat flex items krimpen */
+    height: 50px; /* FIX: Forceer gelijke hoogte voor alle inputs/selects */
 }
 /* FIX: Dropdowns mogen niet breder zijn dan het scherm */
 select {
@@ -404,7 +414,7 @@ li .item-text {
     word-break: break-word; /* Voorkom dat lange woorden layout breken */
 }
 li .item-text .item-categorie {
-    display: inline-block;
+    display: block;
     color: #4A90E2; 
     font-size: 0.9em;
     font-weight: bold;
