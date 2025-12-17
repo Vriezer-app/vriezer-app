@@ -248,7 +248,6 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 }
 .form-grid-pair {
     display: grid;
-    /* FIX: Op mobiel altijd onder elkaar */
     grid-template-columns: 1fr;
     gap: 15px;
     width: 100%;
@@ -314,7 +313,16 @@ input[type="text"], input[type="number"], input[type="email"], select, input[typ
     max-width: 100%; 
     min-width: 0; /* Laat flex items krimpen */
     height: 50px; /* FIX: Forceer gelijke hoogte voor alle inputs/selects */
+    -webkit-appearance: none; /* FIX voor iOS inputs */
 }
+/* SPECIFIEK VOOR DATUM VELD OP MOBIEL */
+input[type="date"] {
+    width: 100%; /* Forceer 100% breedte */
+    max-width: 100%;
+    box-sizing: border-box; /* Inclusief padding en border */
+    display: block; /* Zorg dat het een blok element is */
+}
+
 /* FIX: Dropdowns mogen niet breder zijn dan het scherm */
 select {
     max-width: 100%;
