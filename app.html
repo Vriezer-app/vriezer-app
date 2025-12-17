@@ -57,10 +57,10 @@
         <form id="add-item-form">
             
             <div class="input-with-button" style="grid-column: 1 / 3;">
-                <!-- AANGEPAST: Losstaand vierkant vakje (50x50px), identiek aan knoppen -->
-                <input type="text" id="item-emoji" placeholder="🏷️" style="width: 50px; height: 50px; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;" title="Emoji">
+                <!-- AANGEPAST: flex-grow: 0 toegevoegd zodat hij NIET uitrekt -->
+                <input type="text" id="item-emoji" placeholder="🏷️" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;" title="Emoji">
                 
-                <!-- AANGEPAST: Naamveld weer normaal, maar geforceerde hoogte 50px om te lijnen -->
+                <!-- AANGEPAST: Naamveld heeft height: 50px -->
                 <input type="text" id="item-naam" placeholder="Productnaam" required list="product-suggesties" style="height: 50px;">
                 
                 <button type="button" id="scan-btn" class="btn-beheer" title="Scan barcode">
@@ -171,10 +171,10 @@
                 <input type="hidden" id="edit-item-id">
                 
                 <label for="edit-item-naam">Naam & Emoji:</label>
-                <!-- AANGEPAST: Gap hersteld naar 10px voor losse blokken -->
+                <!-- Gap hersteld naar 10px voor losse blokken -->
                 <div style="display: flex; gap: 10px;">
-                    <!-- Emoji: 50x50, los blok -->
-                    <input type="text" id="edit-item-emoji" style="width: 50px; height: 50px; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;" placeholder="🏷️">
+                    <!-- AANGEPAST: Emoji: 50x50, los blok met flex-grow: 0 -->
+                    <input type="text" id="edit-item-emoji" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;" placeholder="🏷️">
                     <!-- Naam: 50px hoog om te lijnen -->
                     <input type="text" id="edit-item-naam" required style="flex-grow: 1; height: 50px;">
                 </div>
@@ -261,8 +261,8 @@
                          <option value="Friet">Friet</option>
                          <option value="Ander">Ander</option>
                     </select>
-                    <!-- AANGEPAST: Los blok 50x50 -->
-                    <input type="text" id="move-purchased-emoji" placeholder="🏷️" style="width: 50px; height: 50px; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;">
+                    <!-- AANGEPAST: Los blok 50x50 met flex-grow: 0 -->
+                    <input type="text" id="move-purchased-emoji" placeholder="🏷️" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;">
                 </div>
 
                 <div class="modal-buttons">
