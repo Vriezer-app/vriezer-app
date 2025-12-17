@@ -74,7 +74,7 @@ const vriezerSelect = document.getElementById('item-vriezer');
 const schuifSelect = document.getElementById('item-schuif'); 
 const itemDatum = document.getElementById('item-datum');
 const itemCategorie = document.getElementById('item-categorie');
-const itemEmoji = document.getElementById('item-emoji'); // NIEUW
+const itemEmoji = document.getElementById('item-emoji');
 const editModal = document.getElementById('edit-modal');
 const editForm = document.getElementById('edit-item-form');
 const editId = document.getElementById('edit-item-id');
@@ -85,7 +85,7 @@ const editVriezer = document.getElementById('edit-item-vriezer');
 const editSchuif = document.getElementById('edit-item-schuif');
 const editDatum = document.getElementById('edit-item-datum');
 const editCategorie = document.getElementById('edit-item-categorie');
-const editEmoji = document.getElementById('edit-item-emoji'); // NIEUW
+const editEmoji = document.getElementById('edit-item-emoji');
 const btnCancel = document.getElementById('btn-cancel');
 const logoutBtn = document.getElementById('logout-btn');
 const searchBar = document.getElementById('search-bar');
@@ -205,7 +205,7 @@ const movePurchasedLade = document.getElementById('move-purchased-lade');
 const movePurchasedAantal = document.getElementById('move-purchased-aantal');
 const movePurchasedEenheid = document.getElementById('move-purchased-eenheid');
 const movePurchasedCategorie = document.getElementById('move-purchased-categorie');
-const movePurchasedEmoji = document.getElementById('move-purchased-emoji'); // NIEUW
+const movePurchasedEmoji = document.getElementById('move-purchased-emoji');
 
 
 // ---
@@ -265,12 +265,11 @@ function getEmojiForCategory(categorie) {
     return emojis[categorie] || "❄️";
 }
 
-// NIEUW: Functie om emoji veld te updaten bij categorie change
+// Functie om emoji veld te updaten bij categorie change
 function updateEmojiField(selectElement, inputElement) {
     const cat = selectElement.value;
     const emoji = getEmojiForCategory(cat);
     // Vul alleen in als het veld leeg is of als de gebruiker dit waarschijnlijk verwacht
-    // Voor nu: altijd overschrijven als 'hulp', gebruiker kan aanpassen
     inputElement.value = emoji;
 }
 
@@ -873,6 +872,7 @@ function renderDynamischeLijsten() {
     });
     
     if (window.pendingLadeFilter) {
+        console.log("Pending filter actief in render:", window.pendingLadeFilter);
         openLadeIds.add(window.pendingLadeFilter);
     }
     
@@ -916,8 +916,12 @@ function renderDynamischeLijsten() {
         if (window.pendingLadeFilter) {
              const checkLade = vriezerLades.find(l => l.id === window.pendingLadeFilter);
              if (checkLade) {
+                 console.log("Lade filter toegepast op dropdown:", window.pendingLadeFilter);
                  ladeFilterSelect.value = window.pendingLadeFilter;
-                 setTimeout(() => kolomDiv.scrollIntoView({ behavior: 'smooth' }), 500);
+                 // Scroll pas na rendering met kleine vertraging
+                 setTimeout(() => {
+                     kolomDiv.scrollIntoView({ behavior: 'smooth' });
+                 }, 300);
              }
         }
 
@@ -972,6 +976,9 @@ function renderDynamischeLijsten() {
             } else {
                 if (!openLadeIds.has(lade.id)) {
                     ladeGroup.classList.add('collapsed');
+                } else {
+                    console.log("Lade opengehouden:", lade.naam);
+                    ladeGroup.classList.remove('collapsed'); // Zeker weten open
                 }
             }
             
@@ -1045,18 +1052,22 @@ function renderDynamischeLijsten() {
         vriezerLijstenContainer.appendChild(kolomDiv);
     });
     
-    // AANGEPAST: Reset de pending filter niet direct, maar laat de zichtbaarheidsupdate zijn werk doen
-    // en reset hem pas als de filter daadwerkelijk is toegepast in de updateItemVisibility of als de gebruiker zelf iets doet
-    // Voor nu: reset hem hier, want updateItemVisibility leest de dropdown uit, en die hebben we net gezet
-    window.pendingLadeFilter = null;
-
-    const kanBewerken = (beheerdeUserId === eigenUserId) || 
-                       (alleAcceptedShares.find(s => s.ownerId === beheerdeUserId && s.role === 'editor'));
-                       
-    if (kanBewerken) {
-        initDragAndDrop();
+    // AANGEPAST: Reset pas na een timeout zodat de filter daadwerkelijk werkt
+    if (window.pendingLadeFilter) {
+        setTimeout(() => {
+            console.log("Update visibility voor pending filter");
+            updateItemVisibility(); // Forceer update
+            window.pendingLadeFilter = null; // Reset daarna pas
+        }, 100);
+    } else {
+        const kanBewerken = (beheerdeUserId === eigenUserId) || 
+                           (alleAcceptedShares.find(s => s.ownerId === beheerdeUserId && s.role === 'editor'));
+                           
+        if (kanBewerken) {
+            initDragAndDrop();
+        }
+        updateItemVisibility(); 
     }
-    updateItemVisibility(); 
     
     if (isMoveMode) {
         document.body.classList.add('move-mode');
