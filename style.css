@@ -6,6 +6,7 @@ body {
     margin: 0;
     padding: 10px;
     line-height: 1.6;
+    padding-bottom: 80px; /* Extra ruimte voor de bulk-actiebalk */
 }
 
 .container {
@@ -222,7 +223,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     font-weight: normal;
 }
 
-/* --- *** NIEUW: Formulier Groepering *** --- */
+/* --- *** Formulier Groepering *** --- */
 .form-field-group {
     display: flex;
     flex-direction: column;
@@ -371,15 +372,22 @@ li .item-text {
 }
 /* --- *** NIEUW: Categorie styling in lijst *** --- */
 li .item-text .item-categorie {
-    display: block;
+    display: inline-block;
     color: #4A90E2; /* Blauw */
     font-size: 0.9em;
     font-weight: bold;
+    margin-right: 8px;
 }
 li .item-text .item-datum {
     display: block;
     color: #555;
     font-size: 0.9em;
+}
+/* Auto Emoji Icoon */
+.emoji-icon {
+    font-size: 1.2em;
+    margin-right: 6px;
+    vertical-align: middle;
 }
 
 li strong { font-size: 1.1em; color: #333; }
@@ -389,7 +397,7 @@ li .item-buttons {
     flex-shrink: 0;
 }
 
-.edit-btn, .delete-btn, .save-btn {
+.edit-btn, .delete-btn, .save-btn, .qr-btn {
     color: white;
     border: none;
     border-radius: 5px;
@@ -409,6 +417,8 @@ li .item-buttons {
 .delete-btn:hover { background-color: #FF8F8F; }
 .save-btn { background-color: #66DDAA; color: #1a1a1a; }
 .save-btn:hover { background-color: #88FFCC; }
+.qr-btn { background-color: #333; margin-left: 5px; } /* Zwart voor QR knop */
+.qr-btn:hover { background-color: #555; }
 
 
 /* --- STIJLEN VOOR ALLE MODALS --- */
@@ -453,14 +463,14 @@ li .item-buttons {
 .modal-content h2, .modal-content h3 { margin-top: 0; color: #66DDAA; }
 .modal-content h3 { color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; margin-top: 20px; }
 
-/* Styling voor formulierlabels (Aangepast) */
+/* Styling voor formulierlabels */
 #add-item-form .form-label, 
 #edit-item-form label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
     color: #555;
-    font-size: 0.9em; /* Iets kleiner gemaakt */
+    font-size: 0.9em;
 }
 #edit-item-form label {
     margin-top: 15px;
@@ -850,10 +860,105 @@ li .item-buttons {
 }
 
 
+/* --- NIEUW: STIJLEN VOOR BULK ACTIES & MOVE MODE --- */
+.bulk-checkbox {
+    display: none; /* Standaard verborgen */
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+/* Wanneer 'move-mode' class op body staat, toon checkbox */
+body.move-mode .bulk-checkbox {
+    display: block;
+}
+
+/* De balk onderaan */
+.bulk-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-top: 2px solid #66DDAA;
+    padding: 15px 20px;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 999;
+    transform: translateY(100%); /* Verborgen */
+    transition: transform 0.3s ease-in-out;
+}
+.bulk-action-bar.visible {
+    transform: translateY(0);
+}
+.bulk-info {
+    font-weight: bold;
+    color: #333;
+}
+.bulk-controls {
+    display: flex;
+    gap: 10px;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+.bulk-select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    max-width: 200px;
+}
+.btn-bulk-move {
+    background-color: #4A90E2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Knop om modus te activeren */
+.btn-toggle-mode {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.btn-toggle-mode.active {
+    background-color: #e0f7fa;
+    border-color: #4A90E2;
+    color: #0056b3;
+}
+
+/* --- QR Code Popup Beeld --- */
+.qr-code-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+
 /* --- MEDIA QUERY VOOR GROTERE SCHERMEN --- */
 @media (min-width: 768px) {
     
-    body { padding: 20px; }
+    body { padding: 20px; padding-bottom: 80px; }
     .container { padding: 25px; }
 
     /* 'Wissel Account' knop */
@@ -889,12 +994,12 @@ li .item-buttons {
         grid-column: 1 / 3 !important; 
     }
     
-    /* --- *** NIEUW: Categorie/Datum op desktop *** --- */
+    /* --- *** Categorie/Datum op desktop *** --- */
     .form-grid-pair {
         grid-template-columns: 1fr 1fr; /* Naast elkaar op desktop */
     }
     
-    /* --- *** AANGEPAST: Filters op desktop *** --- */
+    /* --- *** Filters op desktop *** --- */
     .lade-filter-container {
         grid-template-columns: 1fr 1fr; /* Naast elkaar op desktop */
     }
@@ -1107,7 +1212,10 @@ li.sortable-ghost {
     .lade-filter-container,
     #scan-btn,
     #manual-ean-btn,
-    .profile-btn {
+    .profile-btn,
+    .bulk-action-bar, /* Verberg bulk bar */
+    .btn-toggle-mode,
+    .bulk-checkbox {
         display: none !important;
     }
 
