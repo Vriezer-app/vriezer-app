@@ -81,11 +81,9 @@
             <select id="item-vriezer" required>
                 <option value="" disabled selected>Kies een vriezer...</option> 
             </select>
-            <select id="item-schuif" required>
-                <option value="" disabled selected>Kies eerst een vriezer...</option> 
-            </select>
-            
+            <!-- NIEUWE Groepering voor Categorie en Datum -->
             <div class="form-grid-pair" style="grid-column: 1 / 3;">
+                <!-- NIEUW CATEGORIE VELD -->
                 <div>
                     <label for="item-categorie" class="form-label">Categorie:</label>
                     <select id="item-categorie" required>
@@ -98,10 +96,12 @@
                         <option value="Fruit">Fruit</option>
                         <option value="IJs">IJs</option>
                         <option value="Saus">Saus</option>
+                        <option value="Friet">Friet</option>
                         <option value="Ander">Ander</option>
                     </select>
                 </div>
                 
+                <!-- AANGEPAST: Datumveld heeft nu een wrapper -->
                 <div class="form-field-group">
                     <label for="item-datum" class="form-label">Ingevroren op:</label>
                     <input type="date" id="item-datum" required>
@@ -156,7 +156,7 @@
     MODALS
     --- -->
 
-    <!-- Edit Item Modal -->
+    <!-- *** AANGEPAST: Edit Item Modal *** -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content">
             <h2>Item Bewerken</h2>
@@ -181,6 +181,7 @@
                 <label for="edit-item-schuif">Schuif/Lade:</label>
                 <select id="edit-item-schuif" required></select>
                 
+                <!-- NIEUW CATEGORIE VELD -->
                 <label for="edit-item-categorie">Categorie:</label>
                 <select id="edit-item-categorie" required>
                     <option value="Geen">Geen categorie</option>
@@ -191,6 +192,8 @@
                     <option value="Brood">Brood</option>
                     <option value="Fruit">Fruit</option>
                     <option value="IJs">IJs</option>
+                    <option value="Saus">Saus</option>
+                    <option value="Friet">Friet</option>
                     <option value="Ander">Ander</option>
                 </select>
                 
@@ -240,6 +243,8 @@
                      <option value="Brood">Brood</option>
                      <option value="Fruit">Fruit</option>
                      <option value="IJs">IJs</option>
+                     <option value="Saus">Saus</option>
+                     <option value="Friet">Friet</option>
                      <option value="Ander">Ander</option>
                 </select>
 
