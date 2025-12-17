@@ -57,8 +57,8 @@
         <form id="add-item-form">
             
             <div class="input-with-button" style="grid-column: 1 / 3;">
-                <!-- NIEUW: Emoji veld toegevoegd aan de input-groep -->
-                <input type="text" id="item-emoji" placeholder="🏷️" style="width: 50px; flex-shrink: 0; text-align: center; padding: 0;" title="Emoji">
+                <!-- AANGEPAST: Emoji veld kleiner gemaakt (35px) -->
+                <input type="text" id="item-emoji" placeholder="🏷️" style="width: 35px; flex-shrink: 0; text-align: center; padding: 0;" title="Emoji">
                 
                 <input type="text" id="item-naam" placeholder="Productnaam" required list="product-suggesties">
                 <button type="button" id="scan-btn" class="btn-beheer" title="Scan barcode">
@@ -169,7 +169,8 @@
                 <label for="edit-item-naam">Naam & Emoji:</label>
                 <!-- Flex container voor emoji en naam op één regel -->
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" id="edit-item-emoji" style="width: 50px; text-align: center; padding: 0;" placeholder="🏷️">
+                    <!-- AANGEPAST: Emoji veld kleiner gemaakt (35px) -->
+                    <input type="text" id="edit-item-emoji" style="width: 35px; text-align: center; padding: 0;" placeholder="🏷️">
                     <input type="text" id="edit-item-naam" required style="flex-grow: 1;">
                 </div>
                 
@@ -256,7 +257,8 @@
                          <option value="Friet">Friet</option>
                          <option value="Ander">Ander</option>
                     </select>
-                    <input type="text" id="move-purchased-emoji" placeholder="🏷️" style="width: 50px; text-align: center; padding: 0;">
+                    <!-- AANGEPAST: Emoji veld kleiner gemaakt (35px) -->
+                    <input type="text" id="move-purchased-emoji" placeholder="🏷️" style="width: 35px; text-align: center; padding: 0;">
                 </div>
 
                 <div class="modal-buttons">
