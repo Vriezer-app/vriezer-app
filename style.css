@@ -1,7 +1,12 @@
 /* --- Globale instellingen (Mobile-first) --- */
-/* BELANGRIJK: Dit zorgt dat padding de breedte niet groter maakt dan 100% */
+/* BELANGRIJK: box-sizing zorgt dat padding niet bij de breedte wordt opgeteld */
 *, *:before, *:after {
     box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden; /* Voorkom horizontaal scrollen op paginaniveau */
+    width: 100%;
 }
 
 body {
@@ -11,16 +16,20 @@ body {
     margin: 0;
     padding: 10px;
     line-height: 1.6;
-    padding-bottom: 100px; /* Extra ruimte zodat content niet achter de bulk-balk verdwijnt */
+    padding-bottom: 100px;
 }
 
 .container {
-    max-width: 1200px; /* HERSTELD: Terug naar de oorspronkelijke breedte */
+    max-width: 1200px;
     margin: 0 auto;
     padding: 15px;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    /* Zorg dat de container zelf nooit breder is dan de viewport */
+    max-width: 100vw; 
+    overflow: hidden; /* Knip alles af wat er toch buiten zou vallen */
 }
 
 /* --- Header Bar --- */
@@ -39,9 +48,9 @@ h1 {
     margin: 0; 
     padding: 0; 
     border: none;
-    font-size: 1.8rem; 
+    font-size: 1.5rem; /* Iets kleiner op mobiel om ruimte te besparen */
     flex-grow: 1;
-    min-width: 0;
+    min-width: 0; /* Laat tekst krimpen/afkappen indien nodig */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -49,7 +58,7 @@ h1 {
 .header-icons-wrapper {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-shrink: 0; 
 }
 
@@ -59,8 +68,8 @@ h1 {
     background-color: #eee;
     border: 2px solid #ddd;
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    width: 40px; /* Iets compacter op mobiel */
+    height: 40px;
     padding: 0;
     cursor: pointer;
     overflow: hidden; 
@@ -71,7 +80,7 @@ h1 {
     border-color: #4A90E2;
 }
 .profile-btn i {
-    font-size: 38px;
+    font-size: 34px;
     color: #bbb;
     position: absolute;
     top: 50%;
@@ -92,15 +101,15 @@ h1 {
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 10px 12px;
+    padding: 10px;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
     justify-content: center;
+    gap: 6px;
 }
 .btn-beheer:hover { background-color: #63a4f0; }
 
@@ -108,8 +117,8 @@ h1 {
 .btn-admin {
     background-color: #f0ad4e;
     padding: 0; 
-    width: 44px; 
-    height: 44px;
+    width: 40px; 
+    height: 40px;
     border-radius: 50%; 
     font-size: 18px; 
 }
@@ -172,7 +181,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 .dashboard-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px 20px;
+    gap: 10px 15px;
     padding: 10px;
     background-color: #f0f0f0;
     border-radius: 5px;
@@ -227,25 +236,24 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     font-weight: normal;
 }
 
-/* --- *** Formulier Groepering *** --- */
+/* --- Formulier Groepering --- */
 .form-field-group {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Ruimte tussen label en input */
+    gap: 5px;
 }
-/* Stijling voor Categorie/Datum rij op mobiel */
 .form-grid-pair {
     display: grid;
     grid-template-columns: 1fr;
     gap: 15px;
 }
-/* --- Einde Nieuw --- */
 
 
 /* --- Aantal Knoppen (UX) --- */
 .aantal-wrapper {
     display: flex;
     align-items: center;
+    width: 100%; /* Zeker zijn dat hij past */
 }
 .aantal-wrapper input[type="number"] {
     text-align: center;
@@ -253,6 +261,7 @@ hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
     border-right: none;
     border-radius: 0;
     -moz-appearance: textfield; 
+    min-width: 0;
 }
 .aantal-wrapper input[type="number"]::-webkit-outer-spin-button,
 .aantal-wrapper input[type="number"]::-webkit-inner-spin-button {
@@ -292,7 +301,17 @@ input[type="text"], input[type="number"], input[type="email"], select, input[typ
     padding: 12px;
     font-size: 16px;
     font-family: 'Inter', system-ui, sans-serif;
+    /* FIX: Zorgt dat inputs niet uit hun container breken */
+    max-width: 100%; 
 }
+/* FIX: Dropdowns mogen niet breder zijn dan het scherm */
+select {
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 select:required:invalid { color: #999; }
 option[value=""] { color: #999; }
 option { color: #333; }
@@ -310,10 +329,10 @@ button[type="submit"] {
 }
 button[type="submit"]:hover { background-color: #88FFCC; }
 
-/* --- *** AANGEPAST: Lade Filter per Vriezer *** --- */
+/* --- Lade Filter per Vriezer --- */
 .lade-filter-container {
     display: grid;
-    grid-template-columns: 1fr; /* Mobiel: onder elkaar */
+    grid-template-columns: 1fr;
     align-items: center;
     gap: 10px;
     margin-top: 5px; 
@@ -321,8 +340,9 @@ button[type="submit"]:hover { background-color: #88FFCC; }
 }
 .lade-filter-container .filter-group {
     display: flex;
-    flex-direction: column; /* Label boven select */
+    flex-direction: column;
     gap: 4px;
+    min-width: 0; /* Laat flex items krimpen */
 }
 .lade-filter-container label {
     font-weight: bold;
@@ -331,7 +351,7 @@ button[type="submit"]:hover { background-color: #88FFCC; }
     flex-shrink: 0; 
 }
 .lade-filter-select {
-    width: 100%; /* Volle breedte op mobiel */
+    width: 100%;
     padding: 8px; 
     font-size: 15px;
     background-color: #fdfdfd;
@@ -346,7 +366,9 @@ button[type="submit"]:hover { background-color: #88FFCC; }
 .vriezer-container { display: flex; flex-wrap: wrap; gap: 25px; }
 .vriezer-kolom { 
     flex: 1; 
-    min-width: 300px; 
+    min-width: 300px;
+    /* FIX: Maximale breedte op 100% zetten zodat ze niet uitsteken op mobiel */
+    max-width: 100%; 
 }
 .vriezer-kolom ul {
     list-style-type: none; 
@@ -370,13 +392,12 @@ li {
 li .item-text { 
     flex-grow: 1; 
     margin-right: 15px;
-    min-width: 150px;
+    min-width: 120px; /* Iets minder breed dwingen */
     cursor: grab;
 }
-/* --- *** NIEUW: Categorie styling in lijst *** --- */
 li .item-text .item-categorie {
     display: inline-block;
-    color: #4A90E2; /* Blauw */
+    color: #4A90E2; 
     font-size: 0.9em;
     font-weight: bold;
     margin-right: 8px;
@@ -386,7 +407,6 @@ li .item-text .item-datum {
     color: #555;
     font-size: 0.9em;
 }
-/* Auto Emoji Icoon */
 .emoji-icon {
     font-size: 1.2em;
     margin-right: 6px;
@@ -420,8 +440,54 @@ li .item-buttons {
 .delete-btn:hover { background-color: #FF8F8F; }
 .save-btn { background-color: #66DDAA; color: #1a1a1a; }
 .save-btn:hover { background-color: #88FFCC; }
-.qr-btn { background-color: #333; margin-left: 5px; } /* Zwart voor QR knop */
+.qr-btn { background-color: #333; margin-left: 5px; }
 .qr-btn:hover { background-color: #555; }
+
+
+/* --- STIJLEN VOOR SCAN KNOP & MODAL (FIXED) --- */
+.input-with-button {
+    display: flex;
+    gap: 5px; /* Kleinere gap op mobiel om ruimte te besparen */
+    align-items: center; 
+    width: 100%; /* Forceer breedte */
+}
+.input-with-button input {
+    flex-grow: 1; 
+    width: auto; 
+    /* CRUCIAAL: min-width: 0 zorgt dat het tekstveld krimpt als de knoppen ruimte nodig hebben */
+    min-width: 0; 
+}
+.input-with-button button {
+    flex-shrink: 0; /* Zorg dat de knoppen nooit kleiner worden */
+    padding: 0; 
+    width: 50px; 
+    height: 50px; 
+    font-size: 20px; 
+    justify-content: center;
+}
+
+#barcode-scanner-container {
+    background-color: #222;
+    border-radius: 8px;
+    overflow: hidden;
+}
+#barcode-scanner-container video {
+    width: 100% !important;
+    height: auto !important;
+}
+
+#html5-qrcode-button-camera-stop {
+    background-color: #FF6B6B !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 10px 15px !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    margin-top: 10px !important;
+    width: 100%;
+}
 
 
 /* --- STIJLEN VOOR ALLE MODALS --- */
@@ -434,8 +500,8 @@ li .item-buttons {
     background-color: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    box-sizing: border-box; /* Zeker zijn dat padding binnen de width valt */
+    padding: 10px; /* Minder padding op mobiel */
+    box-sizing: border-box;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
@@ -446,7 +512,7 @@ li .item-buttons {
 
 .modal-content {
     background-color: #ffffff;
-    padding: 30px;
+    padding: 20px; /* Iets compacter */
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     width: 100%;
@@ -503,6 +569,7 @@ li .item-buttons {
 .beheer-kolom { 
     flex: 1; 
     min-width: 300px; 
+    max-width: 100%;
 }
 .modal-content h4 {
     color: #4A90E2;
@@ -521,6 +588,7 @@ li .item-buttons {
     margin: 0;
     border: none;
     padding: 0;
+    font-size: 1.4em; /* Iets kleiner op mobiel */
 }
 #vriezer-beheer-lijst, #lade-beheer-lijst { 
     list-style: none; 
@@ -530,7 +598,7 @@ li .item-buttons {
 #lade-beheer-lijst li {
     background-color: #f9f9f9;
     border: 1px solid #e9e9e9;
-    padding: 10px 15px;
+    padding: 10px;
     margin-bottom: 8px;
     display: flex;
     flex-direction: row; 
@@ -592,7 +660,6 @@ li .item-buttons {
     font-size: 1.1em;
 }
 
-/* Generieke lijst voor 'Wissel Account' en 'Deel' modals */
 .shared-list {
     list-style: none;
     padding: 0;
@@ -722,7 +789,6 @@ li .item-buttons {
 .profile-menu-btn:disabled i {
     color: #ccc;
 }
-/* Icoon kleuren voor knoppen */
 #profile-share-btn i { color: #66DDAA; }
 #export-data-btn i { color: #f0ad4e; }
 #print-btn i { color: #777; }
@@ -863,16 +929,15 @@ li .item-buttons {
 }
 
 
-/* --- NIEUW: STIJLEN VOOR BULK ACTIES & MOVE MODE --- */
+/* --- BULK ACTIES & MOVE MODE --- */
 .bulk-checkbox {
-    display: none; /* Standaard verborgen */
+    display: none; 
     width: 24px;
     height: 24px;
     margin-right: 15px;
     cursor: pointer;
     flex-shrink: 0;
 }
-/* Wanneer 'move-mode' class op body staat, toon checkbox */
 body.move-mode .bulk-checkbox {
     display: block;
 }
@@ -882,22 +947,21 @@ body.move-mode .bulk-checkbox {
     position: fixed;
     bottom: 0;
     left: 0;
-    right: 0; /* Toevoegen voor centreren met margin auto */
+    right: 0; 
     width: 100%;
-    max-width: 1200px; /* AANGEPAST: Beperkt de breedte van alleen de balk */
-    margin: 0 auto; /* Zorgt dat de balk centreert */
-    /* BELANGRIJK: padding en border worden nu CORRECT berekend binnen de 100% breedte */
+    max-width: 1200px; /* Beperkt de breedte op desktop */
+    margin: 0 auto; 
     background-color: #ffffff;
     border-top: 2px solid #66DDAA;
-    padding: 12px 15px; /* Iets minder padding voor mobiel */
+    padding: 10px 15px;
     box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
     display: flex;
-    flex-wrap: wrap; /* Zorgt dat items onder elkaar gaan als het te smal wordt */
+    flex-wrap: wrap; /* Laat items stapelen op mobiel */
     gap: 10px;
     align-items: center;
     justify-content: space-between;
     z-index: 999;
-    transform: translateY(100%); /* Verborgen */
+    transform: translateY(100%); 
     transition: transform 0.3s ease-in-out;
 }
 .bulk-action-bar.visible {
@@ -907,22 +971,24 @@ body.move-mode .bulk-checkbox {
     font-weight: bold;
     color: #333;
     font-size: 0.9em;
-    white-space: nowrap; /* Zorg dat tekst niet raar breekt */
+    white-space: nowrap;
 }
 .bulk-controls {
     display: flex;
     gap: 8px;
     flex-grow: 1;
     justify-content: flex-end;
-    flex-wrap: wrap; /* Zodat dropdowns en knop onder elkaar kunnen op hele kleine schermen */
+    flex-wrap: wrap; 
+    align-items: center;
 }
 .bulk-select {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
-    max-width: 150px; /* Iets smaller maken zodat het past */
     flex-grow: 1;
+    min-width: 100px;
+    max-width: 100%;
 }
 .btn-bulk-move {
     background-color: #4A90E2;
@@ -967,16 +1033,14 @@ body.move-mode .bulk-checkbox {
 }
 
 
-/* --- MEDIA QUERY VOOR GROTERE SCHERMEN --- */
+/* --- MEDIA QUERY VOOR GROTERE SCHERMEN (Desktop aanpassingen) --- */
 @media (min-width: 768px) {
     
     body { padding: 20px; padding-bottom: 80px; }
     .container { padding: 25px; }
 
-    /* 'Wissel Account' knop */
-    .btn-admin span {
-        display: inline-block;
-    }
+    /* Header knoppen normaal formaat */
+    .btn-admin span { display: inline-block; }
     .btn-admin {
         padding: 10px 15px;
         font-size: 15px;
@@ -984,48 +1048,34 @@ body.move-mode .bulk-checkbox {
         height: auto;
         border-radius: 5px;
     }
+    .profile-btn { width: 44px; height: 44px; }
+    h1 { font-size: 1.8rem; }
 
-    #add-item-form {
-        grid-template-columns: 1fr 1fr;
-    }
-    #item-naam {
-        grid-column: 1 / 3; 
-    }
-    .aantal-wrapper {
-        grid-column: 1 / 2;
-    }
+    /* Formulier layout */
+    #add-item-form { grid-template-columns: 1fr 1fr; }
+    #item-naam { grid-column: 1 / 3; }
+    .aantal-wrapper { grid-column: 1 / 2; }
     
     .input-with-button[style*="grid-column"] {
         grid-column: 1 / 3 !important;
+        gap: 10px; /* Meer ruimte op desktop */
     }
     
-    #add-item-form button[type="submit"] {
-        grid-column: 1 / 3; 
-    }
-    #add-item-form div[style*="grid-column"] {
-        grid-column: 1 / 3 !important; 
-    }
+    #add-item-form button[type="submit"] { grid-column: 1 / 3; }
+    #add-item-form div[style*="grid-column"] { grid-column: 1 / 3 !important; }
     
-    /* --- *** Categorie/Datum op desktop *** --- */
-    .form-grid-pair {
-        grid-template-columns: 1fr 1fr; /* Naast elkaar op desktop */
-    }
+    .form-grid-pair { grid-template-columns: 1fr 1fr; }
     
-    /* --- *** Filters op desktop *** --- */
-    .lade-filter-container {
-        grid-template-columns: 1fr 1fr; /* Naast elkaar op desktop */
-    }
+    /* Filters */
+    .lade-filter-container { grid-template-columns: 1fr 1fr; }
     .lade-filter-container .filter-group {
-        flex-direction: row; /* Label naast select */
+        flex-direction: row; 
         align-items: center;
         gap: 10px;
     }
-    .lade-filter-select {
-        width: auto; /* Automatische breedte */
-        flex-grow: 1;
-    }
+    .lade-filter-select { width: auto; flex-grow: 1; }
     
-    /* Vriezer kolom layout */
+    /* Lijst items */
     .vriezer-kolom ul li {
         flex-direction: row; 
         align-items: center; 
@@ -1042,82 +1092,6 @@ body.move-mode .bulk-checkbox {
         flex-shrink: 0;
     }
 }
-/* EINDE VAN DE MEDIA QUERY (min-width: 768px) */
-
-
-/* --- Stijlen die je al had (Logout & Zoekbalk) --- */
-.search-container {
-    position: relative;
-    margin-bottom: 25px; 
-}
-
-.search-container .fa-search {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-}
-
-#search-bar {
-    padding-left: 45px;
-    font-size: 1.1em;
-}
-
-
-/* --- STIJLEN VOOR KLEURCODERING --- */
-li.item-fresh { 
-    border-left: 5px solid #66DDAA; /* Groen */
-}
-li.item-medium { 
-    border-left: 5px solid #FFC107; /* Oranje */
-}
-li.item-old { 
-    border-left: 5px solid #FF6B6B; /* Rood */
-}
-
-/* --- Stijlen voor Scan Knop & Modal --- */
-.input-with-button {
-    display: flex;
-    gap: 10px;
-    align-items: center; 
-}
-.input-with-button input {
-    flex-grow: 1; 
-    width: auto; 
-}
-.input-with-button button {
-    flex-shrink: 0; 
-    padding: 0; 
-    width: 50px; 
-    height: 50px; 
-    font-size: 20px; 
-    justify-content: center;
-}
-
-#barcode-scanner-container {
-    background-color: #222;
-    border-radius: 8px;
-    overflow: hidden;
-}
-#barcode-scanner-container video {
-    width: 100% !important;
-    height: auto !important;
-}
-
-#html5-qrcode-button-camera-stop {
-    background-color: #FF6B6B !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 5px !important;
-    padding: 10px 15px !important;
-    font-size: 15px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    margin-top: 10px !important;
-    width: 100%;
-}
-
 
 /* --- Drag-and-Drop Stijlen --- */
 li.sortable-chosen {
@@ -1209,6 +1183,31 @@ li.sortable-ghost {
     margin-right: 8px; 
 }
 
+/* --- Kleurcodering --- */
+li.item-fresh { border-left: 5px solid #66DDAA; }
+li.item-medium { border-left: 5px solid #FFC107; }
+li.item-old { border-left: 5px solid #FF6B6B; }
+
+/* --- Stijlen voor Scan Knop --- */
+.input-with-button {
+    display: flex;
+    gap: 5px; /* Compacter op mobiel */
+    align-items: center; 
+}
+.input-with-button input {
+    flex-grow: 1; 
+    width: auto; 
+    min-width: 0; /* CRUCIAAL: Laat input krimpen */
+}
+.input-with-button button {
+    flex-shrink: 0; 
+    padding: 0; 
+    width: 50px; 
+    height: 50px; 
+    font-size: 20px; 
+    justify-content: center;
+}
+
 /* --- PRINT STIJLEN --- */
 @media print {
     /* Verberg alles wat niet geprint moet worden */
@@ -1225,7 +1224,7 @@ li.sortable-ghost {
     #scan-btn,
     #manual-ean-btn,
     .profile-btn,
-    .bulk-action-bar, /* Verberg bulk bar */
+    .bulk-action-bar, 
     .btn-toggle-mode,
     .bulk-checkbox {
         display: none !important;
@@ -1274,7 +1273,7 @@ li.sortable-ghost {
         flex-grow: 1;
         color: #000000; 
     }
-    /* NIEUW: Categorie tonen in print */
+    /* Categorie tonen in print */
     .item-text .item-categorie {
         color: #333 !important;
         font-weight: bold;
