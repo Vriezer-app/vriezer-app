@@ -26,6 +26,8 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <!-- QR Code Generator Lib -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <!-- Emoji Picker Lib (Lichtgewicht) -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 </head>
 <body>
 
@@ -57,10 +59,9 @@
         <form id="add-item-form">
             
             <div class="input-with-button" style="grid-column: 1 / 3;">
-                <!-- AANGEPAST: flex-grow: 0 toegevoegd zodat hij NIET uitrekt -->
-                <input type="text" id="item-emoji" placeholder="🏷️" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;" title="Emoji">
+                <!-- AANGEPAST: Klasse 'emoji-trigger' toegevoegd en readonly gemaakt om toetsenbord te voorkomen -->
+                <input type="text" id="item-emoji" class="emoji-trigger" placeholder="🏷️" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px; cursor: pointer;" title="Kies Emoji" readonly>
                 
-                <!-- AANGEPAST: Naamveld heeft height: 50px -->
                 <input type="text" id="item-naam" placeholder="Productnaam" required list="product-suggesties" style="height: 50px;">
                 
                 <button type="button" id="scan-btn" class="btn-beheer" title="Scan barcode">
@@ -92,7 +93,6 @@
             
             <!-- NIEUWE Groepering voor Categorie en Datum -->
             <div class="form-grid-pair" style="grid-column: 1 / 3;">
-                <!-- AANGEPAST: Klasse 'form-field-group' toegevoegd voor gelijke uitlijning -->
                 <div class="form-field-group">
                     <label for="item-categorie" class="form-label">Categorie:</label>
                     <select id="item-categorie" required>
@@ -109,7 +109,6 @@
                     </select>
                 </div>
                 
-                <!-- Rechter kolom heeft al de juiste klasse -->
                 <div class="form-field-group">
                     <label for="item-datum" class="form-label">Ingevroren op:</label>
                     <input type="date" id="item-datum" required>
@@ -172,11 +171,9 @@
                 <input type="hidden" id="edit-item-id">
                 
                 <label for="edit-item-naam">Naam & Emoji:</label>
-                <!-- Gap hersteld naar 10px voor losse blokken -->
                 <div style="display: flex; gap: 10px;">
-                    <!-- AANGEPAST: Emoji: 50x50, los blok met flex-grow: 0 -->
-                    <input type="text" id="edit-item-emoji" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;" placeholder="🏷️">
-                    <!-- Naam: 50px hoog om te lijnen -->
+                    <!-- AANGEPAST: class emoji-trigger en readonly -->
+                    <input type="text" id="edit-item-emoji" class="emoji-trigger" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px; cursor: pointer;" placeholder="🏷️" readonly>
                     <input type="text" id="edit-item-naam" required style="flex-grow: 1; height: 50px;">
                 </div>
                 
@@ -262,8 +259,8 @@
                          <option value="Friet">Friet</option>
                          <option value="Ander">Ander</option>
                     </select>
-                    <!-- AANGEPAST: Los blok 50x50 met flex-grow: 0 -->
-                    <input type="text" id="move-purchased-emoji" placeholder="🏷️" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px;">
+                    <!-- AANGEPAST: class emoji-trigger en readonly -->
+                    <input type="text" id="move-purchased-emoji" class="emoji-trigger" placeholder="🏷️" style="width: 50px; height: 50px; flex-grow: 0; flex-shrink: 0; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 0; font-size: 20px; cursor: pointer;" readonly>
                 </div>
 
                 <div class="modal-buttons">
@@ -271,6 +268,16 @@
                     <button type="button" id="btn-cancel-move-purchased" class="btn-cancel">Annuleren</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- NIEUW: Emoji Picker Modal -->
+    <div id="emoji-picker-modal" class="modal-overlay" style="z-index: 2000;">
+        <div class="modal-content" style="width: auto; padding: 10px;">
+            <div class="modal-header" style="justify-content: flex-end; margin-bottom: 5px;">
+                <button type="button" id="btn-sluit-emoji" class="btn-cancel" style="padding: 5px 10px; font-size: 14px;">Sluiten</button>
+            </div>
+            <emoji-picker id="emoji-picker" class="light"></emoji-picker>
         </div>
     </div>
 
@@ -577,6 +584,53 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="app.js"></script>
+
+    <!-- INLINE SCRIPT VOOR EMOJI PICKER LOGICA -->
+    <script>
+        // Logica voor emoji picker
+        const emojiPickerModal = document.getElementById('emoji-picker-modal');
+        const emojiPicker = document.querySelector('emoji-picker');
+        const sluitEmojiBtn = document.getElementById('btn-sluit-emoji');
+        let currentEmojiInput = null;
+
+        // Functie om modal te openen
+        function openEmojiPicker(inputElement) {
+            currentEmojiInput = inputElement;
+            emojiPickerModal.classList.add('show');
+        }
+
+        // Event listeners toevoegen aan alle emoji inputs (ook dynamisch)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('emoji-trigger')) {
+                openEmojiPicker(e.target);
+            }
+        });
+
+        // Sluit knop
+        sluitEmojiBtn.addEventListener('click', () => {
+            emojiPickerModal.classList.remove('show');
+            currentEmojiInput = null;
+        });
+
+        // Sluit bij klikken buiten content
+        emojiPickerModal.addEventListener('click', (e) => {
+            if (e.target === emojiPickerModal) {
+                emojiPickerModal.classList.remove('show');
+                currentEmojiInput = null;
+            }
+        });
+
+        // Luister naar emoji selectie
+        emojiPicker.addEventListener('emoji-click', event => {
+            if (currentEmojiInput) {
+                currentEmojiInput.value = event.detail.unicode;
+                // Trigger change event voor eventuele listeners in app.js
+                currentEmojiInput.dispatchEvent(new Event('change')); 
+            }
+            emojiPickerModal.classList.remove('show');
+            currentEmojiInput = null;
+        });
+    </script>
 
 </body>
 </html>
