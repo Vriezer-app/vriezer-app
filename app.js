@@ -240,7 +240,7 @@ function formatAantal(aantal, eenheid) {
         if (aantal > 1 && (aantal % 1 === 0)) return `${aantal} zakken`;
         return `${aantal} zakken`;
     }
-    return `${aantal} x ${eenheid}`;
+    return `${aantal}x ${eenheid}`;
 }
 function formatDatum(timestamp) {
     if (!timestamp) return 'Onbekende datum';
