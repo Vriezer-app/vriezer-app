@@ -231,7 +231,7 @@ function showFeedback(message, type = 'success') {
     }, 3000);
 }
 function formatAantal(aantal, eenheid) {
-    if (!eenheid || eenheid === 'stuks') return `${aantal}x stuks`;
+    if (!eenheid || eenheid === 'stuks') return `${aantal}x`;
     if (eenheid === 'zak') {
         if (aantal === 1) return "1 zak";
         if (aantal === 0.75) return "3/4 zak";
