@@ -37,8 +37,7 @@ let geselecteerdeVriezerNaam = null;
 let userUnits = []; 
 const defaultUnits = [
     "stuks", "zak", "boterpot", "ijsdoos", 
-    "Ikea doos 600ml", "iglodoos 450ml", 
-    "iglodoos 1l laag", "iglodoos 1l hoog", 
+    "iglodoos 450ml", "iglodoos 1l laag", "iglodoos 1l hoog", 
     "gram", "kilo", "bakje", "portie"
 ];
 
@@ -241,7 +240,7 @@ function formatAantal(aantal, eenheid) {
         if (aantal > 1 && (aantal % 1 === 0)) return `${aantal} zakken`;
         return `${aantal} zakken`;
     }
-    return `${aantal} ${eenheid}`;
+    return `${aantal}x ${eenheid}`;
 }
 function formatDatum(timestamp) {
     if (!timestamp) return 'Onbekende datum';
