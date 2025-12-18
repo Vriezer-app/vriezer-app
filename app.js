@@ -37,8 +37,7 @@ let geselecteerdeVriezerNaam = null;
 let userUnits = []; 
 const defaultUnits = [
     "stuks", "zak", "boterpot", "ijsdoos", 
-    "Ikea doos 600ml", "iglodoos 450ml", 
-    "iglodoos 1l laag", "iglodoos 1l hoog", 
+    "iglodoos 450ml", "iglodoos 1l laag", "iglodoos 1l hoog", 
     "gram", "kilo", "bakje", "portie"
 ];
 
