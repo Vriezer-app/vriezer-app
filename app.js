@@ -22,7 +22,6 @@ const adminsCollectie = db.collection('admins');
 const sharesCollectie = db.collection('shares');
 const shoppingListCollectie = db.collection('shoppingList'); // Boodschappenlijst
 const weekMenuCollectie = db.collection('weekmenu');
-// NIEUW: Geschiedenis collectie
 const historyCollectie = db.collection('history');
 
 // ---
@@ -37,7 +36,8 @@ let geselecteerdeVriezerNaam = null;
 let userUnits = []; 
 const defaultUnits = [
     "stuks", "zak", "boterpot", "ijsdoos", 
-    "iglodoos 450ml", "iglodoos 1l laag", "iglodoos 1l hoog", 
+    "Ikea doos 600ml", "iglodoos 450ml", 
+    "iglodoos 1l laag", "iglodoos 1l hoog", 
     "gram", "kilo", "bakje", "portie"
 ];
 
@@ -73,18 +73,18 @@ const vriezerSelect = document.getElementById('item-vriezer');
 const schuifSelect = document.getElementById('item-schuif'); 
 const itemDatum = document.getElementById('item-datum');
 const itemCategorie = document.getElementById('item-categorie');
-const itemEmoji = document.getElementById('item-emoji'); // NIEUW
+const itemEmoji = document.getElementById('item-emoji');
 const editModal = document.getElementById('edit-modal');
 const editForm = document.getElementById('edit-item-form');
 const editId = document.getElementById('edit-item-id');
 const editNaam = document.getElementById('edit-item-naam');
 const editAantal = document.getElementById('edit-item-aantal');
-const editEenheid = document.getElementById('edit-item-eenheid');
+const editEenheid = document.getElementById('edit-item-eenheid'); // CRUCIAAL
 const editVriezer = document.getElementById('edit-item-vriezer');
 const editSchuif = document.getElementById('edit-item-schuif');
 const editDatum = document.getElementById('edit-item-datum');
 const editCategorie = document.getElementById('edit-item-categorie');
-const editEmoji = document.getElementById('edit-item-emoji'); // NIEUW
+const editEmoji = document.getElementById('edit-item-emoji');
 const btnCancel = document.getElementById('btn-cancel');
 const logoutBtn = document.getElementById('logout-btn');
 const searchBar = document.getElementById('search-bar');
@@ -204,7 +204,7 @@ const movePurchasedLade = document.getElementById('move-purchased-lade');
 const movePurchasedAantal = document.getElementById('move-purchased-aantal');
 const movePurchasedEenheid = document.getElementById('move-purchased-eenheid');
 const movePurchasedCategorie = document.getElementById('move-purchased-categorie');
-const movePurchasedEmoji = document.getElementById('move-purchased-emoji'); // NIEUW
+const movePurchasedEmoji = document.getElementById('move-purchased-emoji');
 
 
 // ---
@@ -240,7 +240,7 @@ function formatAantal(aantal, eenheid) {
         if (aantal > 1 && (aantal % 1 === 0)) return `${aantal} zakken`;
         return `${aantal} zakken`;
     }
-    return `${aantal}x ${eenheid}`;
+    return `${aantal} ${eenheid}`;
 }
 function formatDatum(timestamp) {
     if (!timestamp) return 'Onbekende datum';
@@ -264,12 +264,10 @@ function getEmojiForCategory(categorie) {
     return emojis[categorie] || "❄️";
 }
 
-// NIEUW: Functie om emoji veld te updaten bij categorie change
+// Functie om emoji veld te updaten bij categorie change
 function updateEmojiField(selectElement, inputElement) {
     const cat = selectElement.value;
     const emoji = getEmojiForCategory(cat);
-    // Vul alleen in als het veld leeg is of als de gebruiker dit waarschijnlijk verwacht
-    // Voor nu: altijd overschrijven als 'hulp', gebruiker kan aanpassen
     inputElement.value = emoji;
 }
 
@@ -450,7 +448,6 @@ auth.onAuthStateChanged((user) => {
         startAlleDataListeners();
         startPendingSharesListener();
         
-        // Check voor QR URL parameters bij laden (als de pagina opent via QR scan)
         checkUrlForLadeFilter();
 
     } else {
@@ -463,17 +460,14 @@ auth.onAuthStateChanged((user) => {
         stopAlleDataListeners(); 
         console.log("Niet ingelogd, terug naar index.html");
         
-        // UI leegmaken
         vriezerLijstenContainer.innerHTML = '';
         dashboard.innerHTML = '';
         vriezerSelect.innerHTML = '<option value="" disabled selected>Kies een vriezer...</option>';
         schuifSelect.innerHTML = '<option value="" disabled selected>Kies eerst een vriezer...</option>';
         
-        // Knoppen resetten/verbergen
         switchAccountKnop.style.display = 'none';
         hideModal(switchAccountModal);
         
-        // Profiel Knop Resetten
         profileImg.src = '';
         profileImg.style.display = 'none';
         profileIcon.style.display = 'block';
@@ -486,15 +480,12 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// AANGEPASTE LOGICA VOOR QR FILTER
 function checkUrlForLadeFilter() {
-    // Haal de query string parameters op
     const urlParams = new URLSearchParams(window.location.search);
     const ladeId = urlParams.get('ladeFilter');
     
     if (ladeId) {
         console.log("QR Filter gevonden in URL:", ladeId);
-        // Sla de lade ID op in een globale variabele om te gebruiken zodra de data geladen is
         window.pendingLadeFilter = ladeId;
     }
 }
@@ -595,7 +586,7 @@ function startAlleDataListeners() {
     
     stopAlleDataListeners(); 
 
-    // Listener voor User Settings (Eenheden)
+    // *** FIX: EENHEDEN LISTENER TOEVOEGEN ***
     usersCollectie.doc(beheerdeUserId).onSnapshot((doc) => {
         if (doc.exists) {
             const data = doc.data();
@@ -610,9 +601,10 @@ function startAlleDataListeners() {
         } else {
             userUnits = [...defaultUnits];
         }
-        renderUnitDropdowns(); 
+        renderUnitDropdowns(); // Zorgt dat de dropdowns gevuld worden
         renderUnitBeheerLijst(); 
     });
+    
     // 1. Vriezers Listener
     vriezersListener = vriezersCollectieBasis
         .where('userId', '==', beheerdeUserId)
@@ -912,7 +904,6 @@ function renderDynamischeLijsten() {
             ladeFilterSelect.innerHTML += `<option value="${lade.id}">${lade.naam}</option>`;
         });
         
-        // AANGEPAST: Pas de pending filter ook toe op de dropdown
         if (window.pendingLadeFilter) {
              const checkLade = vriezerLades.find(l => l.id === window.pendingLadeFilter);
              if (checkLade) {
@@ -977,7 +968,7 @@ function renderDynamischeLijsten() {
                     ladeGroup.classList.add('collapsed');
                 } else {
                     console.log("Lade opengehouden:", lade.naam);
-                    ladeGroup.classList.remove('collapsed'); // Zeker weten open
+                    ladeGroup.classList.remove('collapsed'); 
                 }
             }
             
@@ -1051,12 +1042,11 @@ function renderDynamischeLijsten() {
         vriezerLijstenContainer.appendChild(kolomDiv);
     });
     
-    // AANGEPAST: Reset pas na een timeout zodat de filter daadwerkelijk werkt
     if (window.pendingLadeFilter) {
         setTimeout(() => {
             console.log("Update visibility voor pending filter");
-            updateItemVisibility(); // Forceer update
-            window.pendingLadeFilter = null; // Reset daarna pas
+            updateItemVisibility(); 
+            window.pendingLadeFilter = null; 
         }, 100);
     } else {
         const kanBewerken = (beheerdeUserId === eigenUserId) || 
@@ -2251,65 +2241,6 @@ clearOldWeekmenuBtn.addEventListener('click', async () => {
     
     await batch.commit();
     showFeedback("Oude gerechten verwijderd.", "success");
-});
-
-// --- NIEUW: GESCHIEDENIS (LOGBOEK) ---
-function logHistoryAction(actie, details) {
-    if (!eigenUserId) return;
-    
-    historyCollectie.add({
-        userId: eigenUserId,
-        actie: actie,
-        details: details,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(err => console.error("Kon log niet opslaan:", err));
-}
-
-profileHistoryBtn.addEventListener('click', () => {
-    hideModal(profileModal);
-    showModal(historyModal);
-    startHistoryListener();
-});
-sluitHistoryKnop.addEventListener('click', () => hideModal(historyModal));
-
-function startHistoryListener() {
-    if (historyListener) historyListener();
-    
-    // Laatste 50 acties
-    historyListener = historyCollectie
-        .where("userId", "==", eigenUserId)
-        .orderBy("timestamp", "desc")
-        .limit(50)
-        .onSnapshot(snapshot => {
-            historyListUl.innerHTML = '';
-            if (snapshot.empty) {
-                historyListUl.innerHTML = '<li><i>Geen geschiedenis gevonden.</i></li>';
-                return;
-            }
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
-                const time = data.timestamp ? data.timestamp.toDate().toLocaleString('nl-BE') : 'Zonet';
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <div class="user-info">
-                        <span>${data.actie}: ${data.details}</span>
-                        <small>${time}</small>
-                    </div>
-                `;
-                historyListUl.appendChild(li);
-            });
-        });
-}
-
-btnClearHistory.addEventListener('click', async () => {
-    if (!confirm("Geschiedenis wissen? Dit kan niet ongedaan worden gemaakt.")) return;
-    
-    const snapshot = await historyCollectie.where("userId", "==", eigenUserId).get();
-    const batch = db.batch();
-    snapshot.docs.forEach(doc => batch.delete(doc.ref));
-    
-    await batch.commit();
-    showFeedback("Geschiedenis gewist.", "success");
 });
 
 // --- NIEUW: BULK ACTIES & MOVE MODE ---
