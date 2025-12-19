@@ -473,9 +473,23 @@ async function registreerGebruiker(user) {
 }
 
 async function checkAdminStatus(uid) {
-    try { const doc = await adminsCollectie.doc(uid).get(); isAdmin = doc.exists; } catch (e) { isAdmin = false; }
-    if(isAdmin) { switchAccountKnop.style.display = 'inline-flex'; adminSwitchSection.style.display = 'block'; userSwitchSection.style.display = 'none'; startAdminUserListener(); }
-    else { adminSwitchSection.style.display = 'none'; userSwitchSection.style.display = 'block'; startAcceptedSharesListener(); }
+    try { 
+        const doc = await adminsCollectie.doc(uid).get(); 
+        isAdmin = doc.exists; 
+    } catch (e) { 
+        isAdmin = false; 
+    }
+    
+    if(isAdmin) { 
+        switchAccountKnop.style.display = 'inline-flex'; 
+        adminSwitchSection.style.display = 'block'; 
+        userSwitchSection.style.display = 'none'; 
+        startAdminUserListener(); 
+    } else { 
+        adminSwitchSection.style.display = 'none'; 
+        userSwitchSection.style.display = 'block'; 
+        startAcceptedSharesListener(); 
+    }
     updateSwitchAccountUI();
 }
 
@@ -494,7 +508,13 @@ function schakelBeheer(naarUserId, naarUserEmail) {
 function updateSwitchAccountUI() {
     if (beheerdeUserId === eigenUserId) {
         switchAccountTitel.textContent = 'Je beheert je eigen voorraad.'; switchAccountTitel.style.color = '#555'; switchTerugKnop.style.display = 'none';
-        startPendingSharesListener(); if(isAdmin) startAdminUserListener(); else startAcceptedSharesListener(); startShoppingListListener();
+        startPendingSharesListener(); 
+        
+        // Zorg dat de juiste listener herstart indien nodig
+        if(isAdmin) startAdminUserListener(); 
+        else startAcceptedSharesListener(); 
+        
+        startShoppingListListener();
     } else {
         switchAccountTitel.textContent = `LET OP: Je beheert ${beheerdeUserEmail}!`; switchAccountTitel.style.color = '#FF6B6B'; switchTerugKnop.style.display = 'block';
         if (pendingSharesListener) pendingSharesListener(); if (acceptedSharesListener) acceptedSharesListener(); if (shoppingListListener) shoppingListListener();
@@ -548,10 +568,81 @@ function stopAlleDataListeners() {
     if (historyListener) { historyListener(); historyListener = null; }
 }
 
-function startAdminUserListener() { /* ... (Zelfde als voorheen) ... */ }
-function startAcceptedSharesListener() { /* ... */ }
-function startPendingSharesListener() { /* ... */ }
-function startSharesOwnerListener() { /* ... */ }
+function startAdminUserListener() {
+    if (userListListener) userListListener();
+    userListListener = usersCollectie.orderBy("email").onSnapshot((snapshot) => {
+        adminUserLijst.innerHTML = '';
+        snapshot.docs.forEach(doc => {
+            const user = { id: doc.id, ...doc.data() };
+            if (user.id === eigenUserId) return;
+            const li = document.createElement('li');
+            li.dataset.id = user.id; li.dataset.email = user.email || user.displayName;
+            li.innerHTML = `<div class="user-info"><span>${user.displayName || user.email}</span><small>${user.email}</small></div>`;
+            li.addEventListener('click', () => schakelBeheer(li.dataset.id, li.dataset.email));
+            adminUserLijst.appendChild(li);
+        });
+    });
+}
+
+function startAcceptedSharesListener() {
+    if (acceptedSharesListener) acceptedSharesListener();
+    acceptedSharesListener = sharesCollectie.where("sharedWithId", "==", eigenUserId).where("status", "==", "accepted").onSnapshot((snapshot) => {
+        alleAcceptedShares = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        userSharedLijst.innerHTML = '';
+        if (alleAcceptedShares.length > 0) {
+            if (!isAdmin) switchAccountKnop.style.display = 'inline-flex';
+            alleAcceptedShares.forEach(share => {
+                const li = document.createElement('li');
+                li.dataset.id = share.ownerId; li.dataset.email = share.ownerEmail;
+                li.innerHTML = `<div class="user-info"><span>${share.ownerEmail}</span><small>Rol: ${share.role}</small></div>`;
+                li.addEventListener('click', () => schakelBeheer(li.dataset.id, li.dataset.email));
+                userSharedLijst.appendChild(li);
+            });
+        } else {
+            if (!isAdmin) switchAccountKnop.style.display = 'none';
+            userSharedLijst.innerHTML = '<li><i>Niemand deelt met jou.</i></li>';
+        }
+    });
+}
+
+function startPendingSharesListener() {
+    if (pendingSharesListener) pendingSharesListener();
+    pendingSharesListener = sharesCollectie.where("sharedWithEmail", "==", currentUser.email).where("status", "==", "pending").onSnapshot((snapshot) => {
+        const pending = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        acceptShareLijst.innerHTML = '';
+        if (pending.length > 0) {
+            pending.forEach(share => {
+                const li = document.createElement('li'); li.dataset.id = share.id;
+                li.innerHTML = `
+                    <div class="invite-info"><strong>${share.ownerEmail}</strong><small>wil delen (${share.role}).</small></div>
+                    <div class="invite-buttons"><button class="btn-accept" data-action="accept">Accepteren</button><button class="btn-decline" data-action="decline">Weigeren</button></div>
+                `;
+                acceptShareLijst.appendChild(li);
+            });
+            showModal(acceptShareModal);
+        } else {
+            hideModal(acceptShareModal);
+        }
+    });
+}
+
+function startSharesOwnerListener() {
+    if (sharesOwnerListener) sharesOwnerListener();
+    shareHuidigeLijst.innerHTML = '<li><i>Laden...</i></li>';
+    sharesOwnerListener = sharesCollectie.where("ownerId", "==", eigenUserId).onSnapshot((snapshot) => {
+        const shares = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        shareHuidigeLijst.innerHTML = '';
+        if (shares.length > 0) {
+            shares.forEach(share => {
+                const li = document.createElement('li'); li.dataset.id = share.id;
+                li.innerHTML = `<div class="user-info"><span>${share.sharedWithEmail}</span><small>${share.status} (${share.role})</small></div><div class="item-buttons"><button class="delete-btn"><i class="fas fa-trash-alt"></i></button></div>`;
+                shareHuidigeLijst.appendChild(li);
+            });
+        } else {
+            shareHuidigeLijst.innerHTML = '<li><i>Je deelt nog met niemand.</i></li>';
+        }
+    });
+}
 
 // --- UI RENDERING ---
 
