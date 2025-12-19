@@ -231,6 +231,8 @@ function switchTab(tabName) {
     // Her-render lijsten en dashboard
     renderDynamischeLijsten();
     vulToevoegVriezerDropdown(); 
+    // Zorg dat de bulk dropdown óók de juiste locaties krijgt
+    renderBulkDropdowns();
     updateDashboard();
 }
 
