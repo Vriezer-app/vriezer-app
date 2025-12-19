@@ -1,1338 +1,179 @@
 /* --- Globale instellingen (Mobile-first) --- */
-/* BELANGRIJK: box-sizing zorgt dat padding niet bij de breedte wordt opgeteld */
-*, *:before, *:after {
-    box-sizing: border-box;
-}
+*, *:before, *:after { box-sizing: border-box; }
+html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; background-color: #f4f7f6; color: #333; padding: 10px; padding-bottom: 100px; }
 
-html, body {
-    overflow-x: hidden; /* Voorkom horizontaal scrollen op paginaniveau */
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 15px; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; }
 
-body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    padding: 10px;
-    padding-bottom: 100px;
-}
-
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 15px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    /* Zorg dat de container zelf nooit breder is dan de viewport */
-    overflow: hidden; 
-}
-
-/* --- Header Bar --- */
-.header-bar {
+/* --- Tabs Navigatie --- */
+.tabs-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center; 
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
     gap: 10px;
-}
-h1 { 
-    color: #66DDAA; 
-    margin: 0; 
-    padding: 0; 
-    border: none;
-    font-size: 1.5rem; /* Iets kleiner op mobiel */
-    flex-grow: 1;
-    min-width: 0; /* Laat tekst krimpen */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.header-icons-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0; 
-}
-
-
-/* --- Profiel Knop --- */
-.profile-btn {
-    background-color: #eee;
-    border: 2px solid #ddd;
-    border-radius: 50%;
-    width: 40px; 
-    height: 40px;
-    padding: 0;
-    cursor: pointer;
-    overflow: hidden; 
-    flex-shrink: 0;
-    position: relative; 
-}
-.profile-btn:hover {
-    border-color: #4A90E2;
-}
-.profile-btn i {
-    font-size: 30px;
-    color: #bbb;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-.profile-btn #profile-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    position: relative;
-    z-index: 2;
-}
-
-/* --- Stijlen voor Beheer Knoppen --- */
-.btn-beheer {
-    background-color: #4A90E2; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-.btn-beheer:hover { background-color: #63a4f0; }
-
-/* Wissel Account knop */
-.btn-admin {
-    background-color: #f0ad4e;
-    padding: 0; 
-    width: 40px; 
-    height: 40px;
-    border-radius: 50%; 
-    font-size: 18px; 
-}
-.btn-admin:hover { background-color: #f3bd73; }
-.btn-admin span { display: none; } 
-
-/* Print knop */
-.btn-print {
-    background-color: #777;
-}
-.btn-print:hover { background-color: #888; }
-
-/* Logout knop */
-.btn-logout {
-    background-color: #FF6B6B;
-}
-.btn-logout:hover {
-    background-color: #FF8F8F;
-}
-
-h2 {
-    color: #66DDAA;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-    margin-top: 0;
-}
-
-hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
-
-/* --- Visuele Feedback Berichten --- */
-.feedback {
-    padding: 15px;
     margin-bottom: 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
-    border: 1px solid transparent;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    transform: translateY(-10px);
+    overflow-x: auto;
+    padding-bottom: 5px; /* Voor scrollbar */
+    -webkit-overflow-scrolling: touch;
 }
-.feedback.show {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-}
-.feedback.success {
-    background-color: #d1e7dd;
-    color: #0f5132;
-    border-color: #badbcc;
-}
-.feedback.error {
-    background-color: #f8d7da;
-    color: #842029;
-    border-color: #f5c2c7;
-}
-
-/* --- Dynamisch Dashboard --- */
-.dashboard-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    padding: 10px;
+.tab-btn {
     background-color: #f0f0f0;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-.dashboard-container span {
-    font-size: 0.9em;
-    color: #333;
-}
-.dashboard-container strong {
-    font-size: 0.9em;
-    color: #000;
-}
-
-
-/* --- Formulieren --- */
-#add-item-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    width: 100%; /* Zorg dat formulier niet breder is dan container */
-}
-#add-vriezer-form, #add-lade-form, #share-invite-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-}
-#share-invite-form label {
-    display: block;
-    margin-bottom: -10px;
-    font-weight: bold;
-    color: #555;
-    font-size: 0.9em;
-}
-
-#add-lade-form button { background-color: #4A90E2; }
-#add-vriezer-form button { background-color: #66DDAA; }
-
-
-#item-naam { grid-column: 1 / 2; }
-#item-aantal, #item-eenheid, #item-vriezer, #item-schuif {
-    width: 100%;
-}
-#add-item-form button[type="submit"] { grid-column: 1 / 2; width: 100%; }
-
-#add-item-form div[style*="grid-column"] {
-    grid-column: 1 / 2 !important; 
-}
-
-#add-item-form label[for="remember-drawer-check"] {
-    display: inline;
-    margin: 0;
-    font-weight: normal;
-}
-
-/* --- Formulier Groepering (Categorie & Datum) --- */
-.form-field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 100%; /* Zorg dat de groep de volle breedte van de kolom pakt */
-    /* Zorg voor verticale uitlijning */
-    justify-content: flex-start;
-    /* FIX: Zeker zijn dat de inhoud niet buiten de groep valt */
-    min-width: 0; 
-}
-.form-grid-pair {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    width: 100%;
-    align-items: start; /* Zorg dat ze aan de bovenkant uitlijnen */
-    /* FIX: Zorg dat de grid zelf niet uitbreekt */
-    max-width: 100%;
-}
-
-
-/* --- Aantal Knoppen (UX) --- */
-.aantal-wrapper {
-    display: flex;
-    align-items: center;
-    width: 100%; 
-}
-.aantal-wrapper input[type="number"] {
-    text-align: center;
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-    -moz-appearance: textfield; 
-    min-width: 0;
-}
-.aantal-wrapper input[type="number"]::-webkit-outer-spin-button,
-.aantal-wrapper input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-.aantal-btn {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #333;
-    font-weight: bold;
-    font-size: 1.5rem;
-    line-height: 1;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    flex-shrink: 0;
-    padding: 0;
-}
-.aantal-btn:hover {
-    background-color: #e0e0e0;
-}
-.aantal-btn[data-action="minus"] {
-    border-radius: 5px 0 0 5px;
-}
-.aantal-btn[data-action="plus"] {
-    border-radius: 0 5px 5px 0;
-}
-
-
-input[type="text"], input[type="number"], input[type="email"], select, input[type="date"] {
-    width: 100%;
-    background-color: #fdfdfd;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 12px;
-    font-size: 16px;
-    font-family: 'Inter', system-ui, sans-serif;
-    /* FIX: Zorgt dat inputs niet uit hun container breken */
-    max-width: 100%; 
-    min-width: 0; /* Laat flex items krimpen */
-    height: 50px; /* FIX: Forceer gelijke hoogte voor alle inputs/selects */
-    -webkit-appearance: none; /* FIX voor iOS inputs */
-}
-/* SPECIFIEK VOOR DATUM VELD OP MOBIEL */
-input[type="date"] {
-    width: 100%; /* Forceer 100% breedte */
-    max-width: 100%;
-    box-sizing: border-box; /* Inclusief padding en border */
-    display: block; /* Zorg dat het een blok element is */
-}
-
-/* FIX: Dropdowns mogen niet breder zijn dan het scherm */
-select {
-    max-width: 100%;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-select:required:invalid { color: #999; }
-option[value=""] { color: #999; }
-option { color: #333; }
-
-button[type="submit"] {
-    background-color: #66DDAA;
-    color: #1a1a1a;
     border: none;
-    border-radius: 5px;
-    padding: 12px;
-    font-size: 16px;
+    padding: 12px 20px;
+    border-radius: 25px;
     font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-button[type="submit"]:hover { background-color: #88FFCC; }
-
-/* --- Lade Filter per Vriezer --- */
-.lade-filter-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    align-items: center;
-    gap: 10px;
-    margin-top: 5px; 
-    margin-bottom: 15px; 
-    width: 100%; /* Forceer breedte binnen container */
-}
-.lade-filter-container .filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0; 
-    width: 100%;
-}
-.lade-filter-container label {
-    font-weight: bold;
-    font-size: 0.9em;
-    color: #555;
-    flex-shrink: 0; 
-}
-.lade-filter-select {
-    width: 100%;
-    padding: 8px; 
-    font-size: 15px;
-    background-color: #fdfdfd;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-family: 'Inter', system-ui, sans-serif;
-}
-
-
-/* --- Voorraadlijst Container --- */
-.vriezer-container { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 25px; 
-    width: 100%;
-}
-.vriezer-kolom { 
-    flex: 1 1 100%; /* Neem volledige breedte op mobiel */
-    min-width: 0; /* Laat krimpen indien nodig */
-    max-width: 100%; 
-}
-.vriezer-kolom ul {
-    list-style-type: none; 
-    padding: 0; 
-    margin: 0; 
-}
-
-/* Lijst items (inventaris) - Mobiele weergave */
-li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #ffffff;
-    border: 1px solid #e9e9e9;
-    padding: 10px 12px; /* Iets minder padding */
-    border-radius: 5px;
-    margin-bottom: 10px;
-    flex-wrap: wrap; /* Laat inhoud wrappen als het niet past */
-    gap: 8px;
-    width: 100%;
-}
-li .item-text { 
-    flex-grow: 1; 
-    margin-right: 5px;
-    min-width: 100px; 
-    cursor: grab;
-    word-break: break-word; /* Voorkom dat lange woorden layout breken */
-}
-li .item-text .item-categorie {
-    display: block;
-    color: #4A90E2; 
-    font-size: 0.9em;
-    font-weight: bold;
-    margin-right: 8px;
-}
-li .item-text .item-datum {
-    display: block;
-    color: #555;
-    font-size: 0.9em;
-}
-.emoji-icon {
-    font-size: 1.2em;
-    margin-right: 6px;
-    vertical-align: middle;
-}
-
-li strong { font-size: 1.1em; color: #333; }
-li .item-buttons { 
-    display: flex; 
-    gap: 5px;
-    flex-shrink: 0;
-}
-
-.edit-btn, .delete-btn, .save-btn, .qr-btn {
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.edit-btn { background-color: #4A90E2; }
-.edit-btn:hover { background-color: #63a4f0; }
-.delete-btn { background-color: #FF6B6B; }
-.delete-btn:hover { background-color: #FF8F8F; }
-.save-btn { background-color: #66DDAA; color: #1a1a1a; }
-.save-btn:hover { background-color: #88FFCC; }
-.qr-btn { background-color: #333; margin-left: 5px; }
-.qr-btn:hover { background-color: #555; }
-
-
-/* --- STIJLEN VOOR SCAN KNOP & MODAL (FIXED) --- */
-.input-with-button {
-    display: flex;
-    gap: 5px; /* Kleinere gap op mobiel */
-    align-items: center; 
-    width: 100%;
-}
-.input-with-button input {
-    flex: 1 1 auto; /* Laat groeien en krimpen */
-    width: 1%; /* Hack om flex item echt te laten krimpen */
-    min-width: 50px; /* Minimum breedte zodat je nog iets ziet */
-}
-.input-with-button button {
-    flex: 0 0 50px; /* Vaste breedte, krimpt niet */
-    width: 50px; 
-    height: 50px; 
-    padding: 0; 
-    font-size: 20px; 
-    justify-content: center;
-}
-
-#barcode-scanner-container {
-    background-color: #222;
-    border-radius: 8px;
-    overflow: hidden;
-}
-#barcode-scanner-container video {
-    width: 100% !important;
-    height: auto !important;
-}
-
-#html5-qrcode-button-camera-stop {
-    background-color: #FF6B6B !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 5px !important;
-    padding: 10px 15px !important;
-    font-size: 15px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    margin-top: 10px !important;
-    width: 100%;
-}
-
-
-/* --- STIJLEN VOOR ALLE MODALS --- */
-.modal-overlay {
-    display: none; 
-    position: fixed; 
-    z-index: 100;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    justify-content: center;
-    align-items: center;
-    padding: 10px; 
-    box-sizing: border-box;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
-.modal-overlay.show {
-    display: flex;
-    opacity: 1;
-}
-
-.modal-content {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    transform: scale(0.95);
-    transition: transform 0.2s ease-in-out;
-}
-.modal-overlay.show .modal-content {
-    transform: scale(1);
-}
-
-.modal-content.modal-groot {
-    max-width: 800px;
-}
-.modal-content h2, .modal-content h3 { margin-top: 0; color: #66DDAA; }
-.modal-content h3 { color: #555; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; margin-top: 20px; }
-
-/* Styling voor formulierlabels */
-#add-item-form .form-label, 
-#edit-item-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-    font-size: 0.9em;
-}
-#edit-item-form label {
-    margin-top: 15px;
-}
-
-.modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-.btn-save, .btn-cancel {
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.btn-save { background-color: #66DDAA; color: #1a1a1a; }
-.btn-save:hover { background-color: #88FFCC; }
-.btn-cancel { background-color: #aaa; color: white; }
-.btn-cancel:hover { background-color: #bbb; }
-
-
-/* --- VRIEZER BEHEER MODAL --- */
-.beheer-container { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 30px; 
-}
-.beheer-kolom { 
-    flex: 1 1 100%; 
-    min-width: 250px;
-    max-width: 100%;
-}
-.modal-content h4 {
-    color: #4A90E2;
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-}
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.modal-header h2 {
-    margin: 0;
-    border: none;
-    padding: 0;
-    font-size: 1.3em; 
-}
-#vriezer-beheer-lijst, #lade-beheer-lijst { 
-    list-style: none; 
-    padding: 0; 
-}
-#vriezer-beheer-lijst li, 
-#lade-beheer-lijst li {
-    background-color: #f9f9f9;
-    border: 1px solid #e9e9e9;
-    padding: 10px;
-    margin-bottom: 8px;
-    display: flex;
-    flex-direction: row; 
-    align-items: center; 
-    gap: 8px;
-    border-left: 4px solid #e9e9e9;
-    transition: background-color 0.2s, border-left-color 0.2s;
-    width: 100%;
-}
-#vriezer-beheer-lijst li {
-    cursor: pointer;
-}
-#vriezer-beheer-lijst li:hover {
-    background-color: #f0f0f0;
-}
-#vriezer-beheer-lijst li.selected {
-    background-color: #e0f7fa;
-    border-left-color: #4A90E2;
-    font-weight: bold;
-}
-#vriezer-beheer-lijst li .item-buttons,
-#lade-beheer-lijst li .item-buttons {
-    justify-content: flex-start;
-    flex-shrink: 0; 
-    margin-left: auto;
-}
-#vriezer-beheer-lijst li .beheer-naam-input,
-#lade-beheer-lijst li .beheer-naam-input {
-    width: auto; 
-    flex-grow: 1; 
-    box-sizing: border-box;
-    margin-right: 0;
-    min-width: 0; 
-    display: none;
-}
-#vriezer-beheer-lijst li span,
-#lade-beheer-lijst li span {
-    flex-grow: 1;
-}
-#vriezer-beheer-lijst li.edit-mode span,
-#lade-beheer-lijst li.edit-mode span {
-    display: none;
-}
-#vriezer-beheer-lijst li.edit-mode .beheer-naam-input,
-#lade-beheer-lijst li.edit-mode .beheer-naam-input {
-    display: block;
-}
-
-/* --- Wissel Account Modal --- */
-.admin-huidig-beheer {
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
-.admin-huidig-beheer h3 {
-    border: none;
-    margin: 0 0 10px 0;
-    padding: 0;
-    font-size: 1.1em;
-}
-
-.shared-list {
-    list-style: none;
-    padding: 0;
-    max-height: 300px;
-    overflow-y: auto;
-}
-.shared-list li {
-    background-color: #f9f9f9;
-    padding: 12px 15px;
-    border-radius: 5px;
-    border: 1px solid #eee;
-    margin-bottom: 8px;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-.shared-list li:hover {
-    background-color: #e0f7fa;
-}
-#admin-user-lijst li, #user-shared-lijst li {
-    cursor: pointer;
-}
-.shared-list li .user-info {
-    flex-grow: 1;
-}
-.shared-list li .user-info span {
-    display: block;
-    font-weight: bold;
-    color: #333;
-}
-.shared-list li .user-info small {
     color: #777;
-    font-size: 0.9em;
-}
-.shared-list li .item-buttons {
-    margin-left: auto;
-    flex-shrink: 0;
-}
-#share-huidige-lijst .delete-btn {
-    width: 35px;
-    height: 35px;
-    font-size: 14px;
-}
-
-
-/* --- PROFIEL MODAL --- */
-.profile-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-.profile-header i {
-    font-size: 60px;
-    color: #ccc;
-    display: block;
-}
-.profile-header #profile-modal-img {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #eee;
-    display: none; 
-}
-.profile-header span {
-    font-size: 1.1em;
-    color: #333;
-    font-weight: bold;
-    word-break: break-all;
-}
-
-.profile-menu-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.profile-menu-list li {
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: none;
-    display: block; 
-}
-
-.profile-menu-btn {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    width: 100%;
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
     cursor: pointer;
-    text-align: left;
-    font-family: 'Inter', system-ui, sans-serif;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-.profile-menu-btn:hover:not(:disabled) {
-    background-color: #f0f0f0;
-    border-color: #ddd;
-}
-.profile-menu-btn i {
-    font-size: 18px;
-    color: #4A90E2;
-    width: 20px; 
-    text-align: center;
-}
-.profile-menu-btn:disabled {
-    background-color: #fdfdfd;
-    color: #aaa;
-    cursor: not-allowed;
-}
-.profile-menu-btn:disabled i {
-    color: #ccc;
-}
-#profile-share-btn i { color: #66DDAA; }
-#export-data-btn i { color: #f0ad4e; }
-#print-btn i { color: #777; }
-#profile-shopping-list-btn i { color: #5bc0de; } 
-.profile-menu-btn[disabled] i[class*="fa-file-import"] { color: #ccc; }
-
-
-/* --- Notificatie Modal --- */
-.notificatie-lijst {
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-    max-height: 250px;
-    overflow-y: auto;
-}
-.notificatie-lijst li {
-    background-color: #fef9e7;
-    border-left: 4px solid #FFC107;
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #66512c;
-}
-
-/* --- Accept Share Modal --- */
-.accept-share-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-    max-height: 250px;
-    overflow-y: auto;
-}
-.accept-share-list li {
-    background-color: #f0f8ff;
-    border-left: 4px solid #4A90E2;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-.accept-share-list li .invite-info {
-    flex-grow: 1;
-}
-.accept-share-list li .invite-info strong {
-    color: #333;
-    display: block;
-}
-.accept-share-list li .invite-info small {
-    color: #555;
-}
-.accept-share-list li .invite-buttons {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-}
-.btn-accept {
-    background-color: #66DDAA;
-    color: #1a1a1a;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.btn-decline {
-    background-color: #FF6B6B;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* --- BOODSCHAPPENLIJST STYLING --- */
-.shopping-list {
-    list-style: none;
-    padding: 0;
-    max-height: 350px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    padding: 10px;
-}
-.shopping-list li {
-    display: flex;
-    align-items: center;
-    padding: 12px 10px;
-    margin: 0 0 8px 0;
-    background-color: #fdfdfd;
-    border: 1px solid #f0f0f0;
-    gap: 12px;
-}
-.shopping-list li .shopping-item-checkbox {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-}
-.shopping-list li .shopping-item-name {
-    flex-grow: 1;
-    font-weight: bold;
-    font-size: 1.1em;
-    color: #333;
-    transition: color 0.2s, text-decoration 0.2s;
-}
-.shopping-list li.checked .shopping-item-name {
-    text-decoration: line-through;
-    color: #999;
-    font-weight: normal;
-}
-.shopping-list li .item-buttons {
-    display: flex;
-    gap: 8px;
-    margin-left: auto;
-}
-/* "Gekocht" knop */
-.btn-purchased {
-    background-color: #66DDAA;
-    color: #1a1a1a;
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 5px;
-    padding: 0;
-    font-size: 16px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.btn-purchased:hover {
-    background-color: #88FFCC;
-}
-
-
-/* --- BULK ACTIES & MOVE MODE --- */
-.bulk-checkbox {
-    display: none; 
-    width: 24px;
-    height: 24px;
-    margin-right: 15px;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-body.move-mode .bulk-checkbox {
-    display: block;
-}
-
-/* De balk onderaan */
-.bulk-action-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0; 
-    width: 100%;
-    /* Zorg dat deze balk zelf nooit breder is dan de viewport */
-    max-width: 100vw; 
-    margin: 0 auto; 
-    background-color: #ffffff;
-    border-top: 2px solid #66DDAA;
-    padding: 10px 15px;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 10px;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 999;
-    transform: translateY(100%); 
-    transition: transform 0.3s ease-in-out;
-}
-.bulk-action-bar.visible {
-    transform: translateY(0);
-}
-.bulk-info {
-    font-weight: bold;
-    color: #333;
-    font-size: 0.9em;
     white-space: nowrap;
-}
-.bulk-controls {
     display: flex;
-    gap: 8px;
-    flex-grow: 1;
-    justify-content: flex-end;
-    flex-wrap: wrap; 
     align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
-.bulk-select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    flex-grow: 1;
-    min-width: 80px; /* Iets smaller min-width voor mobiel */
-    max-width: 100%;
-}
-.btn-bulk-move {
+.tab-btn.active {
     background-color: #4A90E2;
     color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 15px;
-    font-weight: bold;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(74, 144, 226, 0.3);
 }
-
-/* Knop om modus te activeren */
-.btn-toggle-mode {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 8px 12px;
-    font-weight: bold;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 10px;
-}
-.btn-toggle-mode.active {
-    background-color: #e0f7fa;
-    border-color: #4A90E2;
-    color: #0056b3;
-}
-
-/* --- QR Code Popup Beeld --- */
-.qr-code-img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 20px auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-}
+/* Kleurvarianten per tab */
+.tab-btn[data-tab="vriezer"].active { background-color: #4A90E2; } /* Blauw */
+.tab-btn[data-tab="koelkast"].active { background-color: #66DDAA; color: #0f5132; } /* Groen */
+.tab-btn[data-tab="voorraad"].active { background-color: #f0ad4e; color: #fff; } /* Oranje */
 
 
-/* --- MEDIA QUERY VOOR GROTERE SCHERMEN (Desktop) --- */
-@media (min-width: 768px) {
-    
-    body { padding: 20px; padding-bottom: 80px; }
-    .container { padding: 25px; }
+/* --- Header Bar --- */
+.header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 20px; gap: 10px; }
+h1 { color: #333; margin: 0; padding: 0; border: none; font-size: 1.5rem; flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header-icons-wrapper { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-    /* Header knoppen normaal formaat */
-    .btn-admin span { display: inline-block; }
-    .btn-admin {
-        padding: 10px 15px;
-        font-size: 15px;
-        width: auto;
-        height: auto;
-        border-radius: 5px;
-    }
-    .profile-btn { width: 44px; height: 44px; }
-    h1 { font-size: 1.8rem; }
+.profile-btn { background-color: #eee; border: 2px solid #ddd; border-radius: 50%; width: 40px; height: 40px; padding: 0; cursor: pointer; overflow: hidden; flex-shrink: 0; position: relative; }
+.profile-btn:hover { border-color: #4A90E2; }
+.profile-btn i { font-size: 30px; color: #bbb; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.profile-btn #profile-img { width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2; }
 
-    /* Formulier layout */
-    #add-item-form { grid-template-columns: 1fr 1fr; }
-    #item-naam { grid-column: 1 / 3; }
-    .aantal-wrapper { grid-column: 1 / 2; }
-    
-    .input-with-button[style*="grid-column"] {
-        grid-column: 1 / 3 !important;
-        gap: 10px; /* Meer ruimte op desktop */
-    }
-    
-    #add-item-form button[type="submit"] { grid-column: 1 / 3; }
-    #add-item-form div[style*="grid-column"] { grid-column: 1 / 3 !important; }
-    
-    .form-grid-pair { grid-template-columns: 1fr 1fr; }
-    
-    /* Filters */
-    .lade-filter-container { grid-template-columns: 1fr 1fr; }
-    .lade-filter-container .filter-group {
-        flex-direction: row; 
-        align-items: center;
-        gap: 10px;
-    }
-    .lade-filter-select { width: auto; flex-grow: 1; }
-    
-    /* Lijst items */
-    .vriezer-kolom ul li {
-        flex-direction: row; 
-        align-items: center; 
-        padding: 15px;
-        gap: 0;
-    }
-    .vriezer-kolom ul li .item-text {
-        margin-right: 15px;
-        margin-bottom: 0;
-    }
-    .vriezer-kolom ul li .item-buttons {
-        width: auto;
-        justify-content: flex-end;
-        flex-shrink: 0;
-    }
-    
-    /* *** FIX: Vriezer kolommen naast elkaar op desktop *** */
-    .vriezer-container {
-        flex-direction: row; /* Zorg dat ze in een rij staan */
-        align-items: flex-start;
-    }
-    .vriezer-kolom {
-        flex: 1; /* Laat kolommen ruimte verdelen */
-        min-width: 300px; /* Minimum breedte behouden */
-        max-width: 50%; /* Maximaal de helft van het scherm bij 2 kolommen, of laat flex het regelen */
-    }
+.btn-beheer { background-color: #4A90E2; color: white; border: none; border-radius: 5px; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-beheer:hover { background-color: #63a4f0; }
+.btn-admin { background-color: #f0ad4e; padding: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; }
+.btn-admin:hover { background-color: #f3bd73; }
+.btn-admin span { display: none; }
+.btn-print { background-color: #777; }
+.btn-print:hover { background-color: #888; }
+.btn-logout { background-color: #FF6B6B; }
+.btn-logout:hover { background-color: #FF8F8F; }
 
-    /* Bulk bar op desktop ook beperken */
-    .bulk-action-bar {
-        max-width: 1200px;
-    }
-}
+h2 { color: #4A90E2; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-top: 0; }
+hr { border: none; height: 1px; background-color: #e0e0e0; margin: 25px 0; }
 
-/* --- Drag-and-Drop Stijlen --- */
-li.sortable-chosen {
-    opacity: 0.8;
-    background-color: #e0f7fa;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    cursor: grabbing; 
-}
-li.sortable-ghost {
-    opacity: 0.4;
-    border-style: dashed;
-    background-color: #f0f0f0;
-}
+.feedback { padding: 15px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; text-align: center; border: 1px solid transparent; display: none; opacity: 0; transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; transform: translateY(-10px); }
+.feedback.show { display: block; opacity: 1; transform: translateY(0); }
+.feedback.success { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
+.feedback.error { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
 
-/* --- ACCORDION VOOR LADES --- */
-.lade-group {
-    margin-bottom: 12px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #eee;
-    background-color: #fff;
-}
+.dashboard-container { display: flex; flex-wrap: wrap; gap: 8px 12px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; margin-bottom: 20px; }
+.dashboard-container span { font-size: 0.9em; color: #333; }
+.dashboard-container strong { font-size: 0.9em; color: #000; }
 
-.lade-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 15px;
-    background-color: #f9f9f9;
-    cursor: pointer;
-    width: 100%;
-    border: none;
-    font: inherit; 
-    color: #333;
-    text-align: left;
-}
-.lade-header:hover {
-    background-color: #f1f1f1;
-}
-.lade-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    pointer-events: none; 
-}
-.lade-header .chevron {
-    transition: transform 0.2s ease;
-    font-size: 0.9em;
-    color: #555;
-}
-.lade-group.collapsed .chevron {
-    transform: rotate(-90deg);
-}
-.lade-content {
-    padding: 0 15px 15px 15px;
-    background-color: #ffffff;
-}
-.lade-group.collapsed .lade-content {
-    display: none;
-}
-.lade-content ul {
-    padding-left: 0;
-    list-style: none;
-    margin: 10px 0 0 0;
-}
+/* Formulieren */
+#add-item-form { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; }
+#add-vriezer-form, #add-lade-form, #share-invite-form { display: grid; grid-template-columns: 1fr; gap: 15px; }
+#item-naam { grid-column: 1 / 2; }
+#item-aantal, #item-eenheid, #item-vriezer, #item-schuif { width: 100%; }
+#add-item-form button[type="submit"] { grid-column: 1 / 2; width: 100%; }
+#add-item-form div[style*="grid-column"] { grid-column: 1 / 2 !important; }
+.form-field-group { display: flex; flex-direction: column; gap: 5px; width: 100%; min-width: 0; }
+.form-grid-pair { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; align-items: start; max-width: 100%; }
 
-.sortable-ghost {
-    background: #f0f8ff;
-}
-/* --- Knop voor Alles Openen/Sluiten --- */
-.btn-full-width-toggle {
-    background-color: #8a8a8a; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    width: 100%;
-    box-sizing: border-box; 
-    margin-bottom: 20px; 
-    text-align: center;
-}
-.btn-full-width-toggle:hover {
-    background-color: #9e9e9e;
-}
-.btn-full-width-toggle i {
-    margin-right: 8px; 
-}
+.aantal-wrapper { display: flex; align-items: center; width: 100%; }
+.aantal-wrapper input[type="number"] { text-align: center; border-left: none; border-right: none; border-radius: 0; -moz-appearance: textfield; min-width: 0; }
+.aantal-wrapper input[type="number"]::-webkit-outer-spin-button, .aantal-wrapper input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.aantal-btn { background-color: #f0f0f0; border: 1px solid #ccc; color: #333; font-weight: bold; font-size: 1.5rem; line-height: 1; width: 50px; height: 50px; cursor: pointer; flex-shrink: 0; padding: 0; }
+.aantal-btn:hover { background-color: #e0e0e0; }
+.aantal-btn[data-action="minus"] { border-radius: 5px 0 0 5px; }
+.aantal-btn[data-action="plus"] { border-radius: 0 5px 5px 0; }
 
-/* --- Kleurcodering --- */
+input[type="text"], input[type="number"], input[type="email"], select, input[type="date"] { width: 100%; background-color: #fdfdfd; color: #333; border: 1px solid #ccc; border-radius: 5px; padding: 12px; font-size: 16px; font-family: 'Inter', system-ui, sans-serif; max-width: 100%; min-width: 0; height: 50px; -webkit-appearance: none; }
+input[type="date"] { display: block; }
+button[type="submit"] { background-color: #66DDAA; color: #1a1a1a; border: none; border-radius: 5px; padding: 12px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; }
+button[type="submit"]:hover { background-color: #88FFCC; }
+
+.lade-filter-container { display: grid; grid-template-columns: 1fr; align-items: center; gap: 10px; margin-top: 5px; margin-bottom: 15px; width: 100%; }
+.lade-filter-container .filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 0; width: 100%; }
+.lade-filter-select { width: 100%; padding: 8px; font-size: 15px; background-color: #fdfdfd; color: #333; border: 1px solid #ccc; border-radius: 5px; }
+
+.vriezer-container { display: flex; flex-wrap: wrap; gap: 25px; width: 100%; }
+.vriezer-kolom { flex: 1 1 100%; min-width: 0; max-width: 100%; }
+.vriezer-kolom ul { list-style-type: none; padding: 0; margin: 0; }
+li { display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; border: 1px solid #e9e9e9; padding: 10px 12px; border-radius: 5px; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; width: 100%; }
+li .item-text { flex-grow: 1; margin-right: 5px; min-width: 100px; cursor: grab; word-break: break-word; }
+li .item-text .item-categorie { display: block; color: #4A90E2; font-size: 0.9em; font-weight: bold; margin-right: 8px; }
+li .item-text .item-datum { display: block; color: #555; font-size: 0.9em; }
+.emoji-icon { font-size: 1.2em; margin-right: 6px; vertical-align: middle; }
+li .item-buttons { display: flex; gap: 5px; flex-shrink: 0; }
+.edit-btn, .delete-btn, .save-btn, .qr-btn { color: white; border: none; border-radius: 5px; padding: 0; width: 40px; height: 40px; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.edit-btn { background-color: #4A90E2; } .delete-btn { background-color: #FF6B6B; } .qr-btn { background-color: #333; margin-left: 5px; }
+
+.input-with-button { display: flex; gap: 5px; align-items: center; width: 100%; }
+.input-with-button input { flex: 1 1 auto; width: 1%; min-width: 50px; }
+.input-with-button button { flex: 0 0 50px; width: 50px; height: 50px; padding: 0; font-size: 20px; justify-content: center; }
+
+.modal-overlay { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; padding: 10px; opacity: 0; transition: opacity 0.2s ease-in-out; }
+.modal-overlay.show { display: flex; opacity: 1; }
+.modal-content { background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.2s ease-in-out; }
+.modal-overlay.show .modal-content { transform: scale(1); }
+.modal-content.modal-groot { max-width: 800px; }
+.modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+.btn-save { background-color: #66DDAA; color: #1a1a1a; }
+.btn-cancel { background-color: #aaa; color: white; }
+
+/* Accordion */
+.lade-group { margin-bottom: 12px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background-color: #fff; }
+.lade-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background-color: #f9f9f9; cursor: pointer; width: 100%; border: none; font: inherit; color: #333; text-align: left; }
+.lade-group.collapsed .chevron { transform: rotate(-90deg); }
+.lade-group.collapsed .lade-content { display: none; }
+.lade-content { padding: 0 15px 15px 15px; }
+.btn-full-width-toggle { background-color: #8a8a8a; color: white; border: none; border-radius: 5px; padding: 12px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 20px; text-align: center; }
+
+/* Kleurcodering & Modus */
 li.item-fresh { border-left: 5px solid #66DDAA; }
 li.item-medium { border-left: 5px solid #FFC107; }
 li.item-old { border-left: 5px solid #FF6B6B; }
 
-/* --- Stijlen voor Scan Knop --- */
-.input-with-button {
-    display: flex;
-    gap: 5px; /* Compacter op mobiel */
-    align-items: center; 
-    width: 100%;
+.bulk-checkbox { display: none; width: 24px; height: 24px; margin-right: 15px; }
+body.move-mode .bulk-checkbox { display: block; }
+.bulk-action-bar { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background-color: #fff; border-top: 2px solid #66DDAA; padding: 10px 15px; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; z-index: 999; transform: translateY(100%); transition: transform 0.3s ease-in-out; }
+.bulk-action-bar.visible { transform: translateY(0); }
+.btn-toggle-mode { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; border-radius: 5px; padding: 8px 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+.btn-toggle-mode.active { background-color: #e0f7fa; border-color: #4A90E2; color: #0056b3; }
+
+/* Desktop */
+@media (min-width: 768px) {
+    body { padding: 20px; padding-bottom: 80px; }
+    .container { padding: 25px; }
+    .btn-admin span { display: inline-block; }
+    .btn-admin { width: auto; height: auto; padding: 10px 15px; font-size: 15px; border-radius: 5px; }
+    #add-item-form { grid-template-columns: 1fr 1fr; }
+    #item-naam { grid-column: 1 / 3; }
+    .aantal-wrapper { grid-column: 1 / 2; }
+    .input-with-button[style*="grid-column"] { grid-column: 1 / 3 !important; }
+    #add-item-form button[type="submit"] { grid-column: 1 / 3; }
+    #add-item-form div[style*="grid-column"] { grid-column: 1 / 3 !important; }
+    .form-grid-pair { grid-template-columns: 1fr 1fr; }
+    .lade-filter-container { grid-template-columns: 1fr 1fr; }
+    .lade-filter-container .filter-group { flex-direction: row; }
+    .vriezer-kolom ul li { flex-direction: row; padding: 15px; gap: 0; }
+    .vriezer-kolom ul li .item-text { margin-right: 15px; }
+    .vriezer-container { flex-direction: row; align-items: flex-start; }
+    .vriezer-kolom { flex: 1; min-width: 300px; max-width: 50%; }
 }
-.input-with-button input {
-    flex: 1 1 auto; 
-    width: 1%; /* Hack om flex item echt te laten krimpen */
-    min-width: 50px; 
-}
-.input-with-button button {
-    flex: 0 0 50px; 
-    width: 50px; 
-    height: 50px; 
-    padding: 0; 
-    font-size: 20px; 
-    justify-content: center;
-}
 
-/* --- PRINT STIJLEN --- */
-@media print {
-    .header-bar,
-    #add-item-form,
-    .search-container,
-    #btn-toggle-alles,
-    #feedback-message,
-    #dashboard,
-    hr,
-    .modal-overlay,
-    .item-buttons,
-    .lade-filter-container,
-    #scan-btn,
-    #manual-ean-btn,
-    .profile-btn,
-    .bulk-action-bar, 
-    .btn-toggle-mode,
-    .bulk-checkbox {
-        display: none !important;
-    }
+/* Lijsten in Beheer Modal */
+#vriezer-beheer-lijst li, #lade-beheer-lijst li { background: #f9f9f9; padding: 10px; margin-bottom: 8px; border: 1px solid #eee; border-left: 4px solid #eee; display: flex; gap: 10px; align-items: center; cursor: pointer; }
+#vriezer-beheer-lijst li.selected { border-left-color: #4A90E2; background: #e0f7fa; }
+#vriezer-beheer-lijst li .item-buttons { margin-left: auto; }
 
-    body, .container {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        box-shadow: none;
-        border: none;
-        background-color: #ffffff; 
-        font-size: 9pt; 
-    }
+/* Profiel Menu */
+.profile-menu-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.profile-menu-btn { display: flex; align-items: center; gap: 15px; width: 100%; background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.profile-menu-btn:hover { background: #f0f0f0; }
 
-    .vriezer-container {
-        display: block !important;
-        flex-direction: column;
-    }
-    
-    .vriezer-kolom {
-        width: 100% !important;
-        page-break-inside: avoid;
-    }
-
-    .lade-group {
-        page-break-inside: avoid;
-    }
-    
-    .lade-group.collapsed .lade-content,
-    .lade-content {
-        display: block !important;
-        max-height: none !important;
-    }
-    
-    .lade-header .chevron {
-        display: none !important;
-    }
-    
-    .vriezer-kolom li {
-        display: flex !important;
-        page-break-inside: avoid;
-    }
-    
-    .item-text {
-        flex-grow: 1;
-        color: #000000; 
-    }
-    .item-text .item-categorie {
-        color: #333 !important;
-        font-weight: bold;
-    }
-    .item-text .item-datum {
-        color: #000 !important;
-    }
-    
-    .item-old, .item-medium, .item-fresh {
-        background-color: transparent !important;
-        border-left: none !important;
-        color: #000000;
-    }
-
-    h1, h2, h3, small {
-        color: #000000 !important;
-    }
-}
+/* Scanner Video */
+#barcode-scanner-container video { width: 100% !important; height: auto !important; }
