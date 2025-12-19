@@ -30,14 +30,13 @@ body { font-family: 'Inter', system-ui, sans-serif; background-color: #f4f7f6; c
     flex-shrink: 0;
 }
 .tab-btn.active {
-    background-color: #4A90E2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     color: white;
-    box-shadow: 0 2px 5px rgba(74, 144, 226, 0.3);
 }
+
 /* Kleurvarianten per tab */
 .tab-btn[data-tab="vriezer"].active { background-color: #4A90E2; } /* Blauw */
-.tab-btn[data-tab="koelkast"].active { background-color: #66DDAA; color: #0f5132; } /* Groen */
-.tab-btn[data-tab="voorraad"].active { background-color: #f0ad4e; color: #fff; } /* Oranje */
+.tab-btn[data-tab="voorraad"].active { background-color: #f0ad4e; } /* Oranje */
 
 
 /* --- Header Bar --- */
@@ -177,3 +176,42 @@ body.move-mode .bulk-checkbox { display: block; }
 
 /* Scanner Video */
 #barcode-scanner-container video { width: 100% !important; height: auto !important; }
+
+/* Boodschappenlijst & Weekmenu */
+.shopping-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+}
+.shopping-list li.checked {
+    opacity: 0.6;
+    background-color: #f9f9f9;
+}
+.shopping-list li.checked .shopping-item-name {
+    text-decoration: line-through;
+    color: #888;
+}
+.shopping-item-checkbox {
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+.btn-purchased {
+    background-color: #66DDAA;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
