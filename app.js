@@ -259,17 +259,17 @@ const getEmojiForCategory = (cat) => {
 
 // FIX: Alleen waarschuwingen (oranje/rood) tonen gekleurde linkerborder. De rest is transparant!
 const getStatusColor = (dagenOud, type = 'vriezer', dagenTotTHT = 999, altijdGoed = false) => {
-    if (altijdGoed) return 'border-l-4 border-transparent';
+    if (altijdGoed) return 'border-l-4 border-green-400 dark:border-green-600';
     if (type === 'voorraad' || type === 'frig') {
-        if (dagenTotTHT === 999) return 'border-l-4 border-transparent'; 
+        if (dagenTotTHT === 999) return 'border-l-4 border-green-400 dark:border-green-600'; 
         if (dagenTotTHT < 0) return 'border-l-4 border-red-500 bg-red-50/50 dark:bg-red-900/10 dark:border-red-600'; 
         if (dagenTotTHT <= 7) return 'border-l-4 border-orange-400 bg-orange-50/50 dark:bg-orange-900/10 dark:border-orange-600'; 
         if (dagenTotTHT <= 30) return 'border-l-4 border-yellow-400 bg-yellow-50/30 dark:bg-yellow-900/10 dark:border-yellow-600'; 
-        return 'border-l-4 border-transparent'; 
+        return 'border-l-4 border-green-400 dark:border-green-600'; 
     } else {
         if (dagenOud > 180) return 'border-l-4 border-red-500 bg-red-50/50 dark:bg-red-900/10 dark:border-red-600'; 
         if (dagenOud > 90) return 'border-l-4 border-yellow-400 bg-yellow-50/30 dark:bg-yellow-900/10 dark:border-yellow-600';
-        return 'border-l-4 border-transparent';
+        return 'border-l-4 border-green-400 dark:border-green-600';
     }
 };
 
