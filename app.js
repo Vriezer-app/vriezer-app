@@ -3578,39 +3578,43 @@ onKeyDown={async (e) => {
                 </div>
             </Modal>
 
-            <Modal isOpen={showLogModal} onClose={() => setShowLogModal(false)} title="Logboek." color="teal">
+<Modal isOpen={showLogModal} onClose={() => setShowLogModal(false)} title="Logboek." color="teal">
                 {logs.length === 0 ? (
                     <p className="text-gray-400 dark:text-gray-500 font-medium text-center py-10">Nog geen activiteiten opgeslagen.</p>
                 ) : (
-                    <ul className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-gray-700 before:to-transparent">
+                    <ul className="space-y-3">
                         {logs.map(log => {
                             const isMine = log.targetUserId === user.uid;
                             const isAdded = log.action === 'Toevoegen';
                             const isDeleted = log.action === 'Verwijderd';
                             
                             return (
-                                <li key={log.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-800 shadow flex-shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 ${isAdded ? 'text-green-500' : isDeleted ? 'text-red-500' : 'text-blue-500'}`}>
-                                        <Icon path={isAdded ? Icons.Plus : isDeleted ? Icons.Trash2 : Icons.Edit2} size={16}/>
-                                    </div>
-                                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <span className="font-extrabold text-gray-800 dark:text-gray-100">{log.item}</span>
-                                            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-900 px-2 py-1 rounded-md">{formatDateTime(log.timestamp)}</span>
-                                        </div>
-                                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${isAdded ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : isDeleted ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
-                                                {log.action}
+                                <li key={log.id} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-3 border border-gray-200/60 dark:border-gray-700/60 shadow-sm transition-all hover:shadow-md flex flex-col gap-1.5">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`flex items-center justify-center w-7 h-7 rounded-lg shadow-sm ${isAdded ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : isDeleted ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                                                <Icon path={isAdded ? Icons.Plus : isDeleted ? Icons.Trash2 : Icons.Edit2} size={14}/>
                                             </span>
-                                            {isAdmin && (
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${isMine ? 'border-green-300 text-green-600 dark:border-green-700 dark:text-green-400' : 'border-orange-300 text-orange-600 dark:border-orange-700 dark:text-orange-400'}`}>
-                                                    {isMine ? 'Eigen' : 'Ander'}
-                                                </span>
-                                            )}
+                                            <span className="font-extrabold text-gray-800 dark:text-gray-100 text-sm tracking-tight">{log.item}</span>
                                         </div>
-                                        {log.details && <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-2 bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg leading-relaxed">{log.details}</p>}
-                                        <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1.5 uppercase tracking-wide">
-                                            <Icon path={Icons.User} size={12}/> {log.actorName}
+                                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">{formatDateTime(log.timestamp)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-end mt-1">
+                                        <div className="flex flex-col gap-1.5">
+                                            <div className="flex gap-2">
+                                                <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest ${isAdded ? 'bg-green-50 text-green-600 border border-green-200 dark:bg-green-900/20 dark:border-green-800/50' : isDeleted ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/20 dark:border-red-800/50' : 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800/50'}`}>
+                                                    {log.action}
+                                                </span>
+                                                {isAdmin && (
+                                                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border ${isMine ? 'border-green-300 text-green-600 dark:border-green-700/50' : 'border-orange-300 text-orange-600 dark:border-orange-700/50'}`}>
+                                                        {isMine ? 'Eigen' : 'Ander'}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {log.details && <p className="text-xs font-medium text-gray-500 dark:text-gray-400 leading-snug">{log.details}</p>}
+                                        </div>
+                                        <div className="text-[9px] font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1 uppercase tracking-widest">
+                                            <Icon path={Icons.User} size={10}/> {log.actorName}
                                         </div>
                                     </div>
                                 </li>
