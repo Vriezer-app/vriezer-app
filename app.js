@@ -19,10 +19,20 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 
 // --- 2. CONFIGURATIE DATA ---
-const APP_VERSION = '10.0'; 
+const APP_VERSION = '10.1'; 
 
 // Versie Geschiedenis Data
 const VERSION_HISTORY = [
+    { 
+        version: '10.1', 
+        type: 'update', 
+        changes: [
+            'Mobiele Weergave: De productnamen worden niet meer vroegtijdig afgekapt op kleine schermen. De tekstgrootte is iets compacter gemaakt voor perfecte leesbaarheid.',
+            'Slimme Actieknoppen: Op je smartphone zijn de actieknoppen (bewerken, verwijderen) nu verborgen. Klik (tap) op een product en ze schuiven met een vloeiende animatie in beeld!',
+            'Rust in de app: De overvloedige groene lijntjes aan de linkerkant zijn verwijderd. Je ziet nu alleen een gekleurde lijn bij waarschuwingen (Oranje/Rood).',
+            'Layout: Eenheden (zoals "pak" of "zak") staan niet langer in het vet, wat zorgt voor een schonere uitstraling.'
+        ] 
+    },
     { 
         version: '10.0', 
         type: 'feature', 
@@ -30,73 +40,6 @@ const VERSION_HISTORY = [
             'Mega UI Update 🚀: Compleet nieuw design met glassmorphism effecten, vloeiende animaties en een nog strakkere dark-mode!',
             'Zwevende elementen: Knoppen en kaarten hebben nu verbeterde hover-effecten en dynamische schaduwen voor een "vettere" look.',
             'Interface: De navigatiebalk is nu stijlvol transparant (backdrop-blur) zodat je content er prachtig onderdoor scrollt.'
-        ] 
-    },
-    { 
-        version: '9.0', 
-        type: 'feature', 
-        changes: [
-            'Nieuw: Snelle Invoer (Rapid Entry)! Klik op het bliksem-icoon (⚡) om een balk te openen waarmee je razendsnel producten toevoegt door simpelweg op Enter te drukken.',
-            'Nieuw: Slimme Auto-invul! Typ je woorden zoals "Gehakt", "Kip", "Melk" of "Brood"? De app kiest nu helemaal zelf de juiste categorie, emoji én een logische houdbaarheidsdatum.',
-            'Nieuw: Kalender Weergave! Wissel met de kalenderknop naar een prachtig chronologisch overzicht van je producten om in één oogopslag te zien wat (bijna) over de datum is.'
-        ] 
-    },
-    { 
-        version: '8.17', 
-        type: 'feature', 
-        changes: [
-            'Nieuw: Uitgebreid Logboek! Je ziet nu exact wát er is gewijzigd (bijv. "Aantal: 5 ➔ 3" of "Lade: Lade 1 ➔ Lade 2").',
-            'Update: Bulk acties (meerdere items tegelijk verplaatsen of verwijderen) worden nu ook per product in het logboek opgeslagen.',
-            'Update: Bij het toevoegen van een product zie je in het logboek nu ook in welke locatie en lade dit is gebeurd.'
-        ] 
-    },
-    { 
-        version: '8.16', 
-        type: 'feature', 
-        changes: [
-            'Nieuw: Prijs & Waarde! Voeg de prijs toe aan producten en zie in je statistieken exact de waarde van je voorraad én je besparingen/verspillingen in Euro.',
-            'Nieuw: WhatsApp Delen. Stuur je boodschappenlijstje met één klik mooi opgemaakt door via WhatsApp.',
-            'Nieuw: Receptenzoeker. Selecteer ingrediënten via "Selecteer" en zoek direct naar recepten op Google!',
-            'Fix: Probleem opgelost waarbij startmeldingen niet altijd correct lieten zien welke producten over de datum zijn.'
-        ] 
-    },
-    { 
-        version: '8.15', 
-        type: 'update', 
-        changes: [
-            'Verwijderd: Barcode scanner functie is weggehaald om de app strak en overzichtelijk te houden.'
-        ] 
-    },
-    { 
-        version: '8.14', 
-        type: 'feature', 
-        changes: [
-            'Nieuw: Minimale Voorraad (Auto-Koop). Stel een minimum in, en de app zet het product automatisch op je lijstje als het (bijna) op is!',
-            'Nieuw: Bulk Acties! Klik op "Selecteer" om meerdere producten tegelijk te verwijderen of te verplaatsen.'
-        ] 
-    },
-    { 
-        version: '8.13', 
-        type: 'feature', 
-        changes: [
-            'Nieuw: Verbeterde Verbruik-knop (-)! Je kan nu exact kiezen hoeveel je wegneemt en dit wordt perfect in het logboek geregistreerd.',
-            'Verwijderd: Favorieten (sterretjes) functionaliteit is op verzoek uit de app gehaald.'
-        ] 
-    },
-    { 
-        version: '8.12', 
-        type: 'update', 
-        changes: [
-            'Update: Categorie-filters passen zich nu slim aan per tabblad.',
-            'Update: Compactere header met Filter & Sorteer samengevoegd in een strak pop-up menu.'
-        ] 
-    },
-    { 
-        version: '8.11', 
-        type: 'feature', 
-        changes: [
-            'Nieuw: Boodschappenlijst groepeert nu automatisch op winkel.',
-            'Nieuw: "Wis afgevinkt" knop toegevoegd aan de boodschappenlijst.'
         ] 
     }
 ];
@@ -314,17 +257,19 @@ const getEmojiForCategory = (cat) => {
     return emojis[cat] || "📦";
 };
 
+// FIX: Alleen waarschuwingen (oranje/rood) tonen gekleurde linkerborder. De rest is transparant!
 const getStatusColor = (dagenOud, type = 'vriezer', dagenTotTHT = 999, altijdGoed = false) => {
-    if (altijdGoed) return 'border-l-4 border-green-400 dark:border-green-600';
+    if (altijdGoed) return 'border-l-4 border-transparent';
     if (type === 'voorraad' || type === 'frig') {
-        if (dagenTotTHT === 999) return 'border-l-4 border-green-400 dark:border-green-600'; 
-        if (dagenTotTHT < 0) return 'border-l-4 border-red-500 bg-red-50 dark:bg-red-900/10 dark:border-red-600'; 
-        if (dagenTotTHT <= 30) return 'border-l-4 border-yellow-400 dark:border-yellow-600'; 
-        return 'border-l-4 border-green-400 dark:border-green-600'; 
+        if (dagenTotTHT === 999) return 'border-l-4 border-transparent'; 
+        if (dagenTotTHT < 0) return 'border-l-4 border-red-500 bg-red-50/50 dark:bg-red-900/10 dark:border-red-600'; 
+        if (dagenTotTHT <= 7) return 'border-l-4 border-orange-400 bg-orange-50/50 dark:bg-orange-900/10 dark:border-orange-600'; 
+        if (dagenTotTHT <= 30) return 'border-l-4 border-yellow-400 bg-yellow-50/30 dark:bg-yellow-900/10 dark:border-yellow-600'; 
+        return 'border-l-4 border-transparent'; 
     } else {
-        if (dagenOud > 180) return 'border-l-4 border-red-500 dark:border-red-600'; 
-        if (dagenOud > 90) return 'border-l-4 border-yellow-400 dark:border-yellow-600';
-        return 'border-l-4 border-green-400 dark:border-green-600';
+        if (dagenOud > 180) return 'border-l-4 border-red-500 bg-red-50/50 dark:bg-red-900/10 dark:border-red-600'; 
+        if (dagenOud > 90) return 'border-l-4 border-yellow-400 bg-yellow-50/30 dark:bg-yellow-900/10 dark:border-yellow-600';
+        return 'border-l-4 border-transparent';
     }
 };
 
@@ -413,7 +358,6 @@ const Toast = ({ message, type = "success", onClose }) => {
     );
 };
 
-// Modals kunnen nu position="center", "left" of "right" meegegeven krijgen
 const Modal = ({ isOpen, onClose, title, children, color = "blue", size = "md", position = "center", hideBackdrop = false, hideCloseButton = false }) => {
     if (!isOpen) return null;
     
@@ -481,12 +425,10 @@ function App() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [usersList, setUsersList] = useState([]);
     
-    // Admin Dashboard States
     const [dashboardUser, setDashboardUser] = useState('');
     const [dashboardData, setDashboardData] = useState({ vriezers: [], lades: [], items: [], loading: false });
     const [openDashboardLades, setOpenDashboardLades] = useState(new Set());
 
-    // User Settings
     const [managedUserHiddenTabs, setManagedUserHiddenTabs] = useState([]);
     const [myHiddenTabs, setMyHiddenTabs] = useState([]);
     const [darkMode, setDarkMode] = useState(false);
@@ -496,26 +438,21 @@ function App() {
     const [savedOpenLades, setSavedOpenLades] = useState(null);
     const [stats, setStats] = useState({ wasted: 0, consumed: 0, wastedValue: 0, consumedValue: 0 });
     
-    // Onboarding Tour States
     const [tourSteps, setTourSteps] = useState(DEFAULT_TOUR_STEPS);
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [onboardingStep, setOnboardingStep] = useState(0);
     const [globalOnboardingActive, setGlobalOnboardingActive] = useState(true);
     const [maintenanceMode, setMaintenanceMode] = useState(false);    
     
-    // Touch States for swipe
     const [touchStart, setTouchStart] = useState(null);
     const [touchEnd, setTouchEnd] = useState(null);
     const isDragging = useRef(false);
 
-    // Tour Admin States
     const [showTourAdminModal, setShowTourAdminModal] = useState(false);
     const [editingTourSteps, setEditingTourSteps] = useState([]);
 
-    // Data Loading States
     const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-    // Data
     const [activeTab, setActiveTab] = useState('vriezer');
     const [items, setItems] = useState([]);
     const [vriezers, setVriezers] = useState([]);
@@ -538,12 +475,11 @@ function App() {
     ingredienten: [], stappen: []
     });
 
-    // UI filters, Sort & Bulk Mode
     const [search, setSearch] = useState('');
     const [sortBy, setSortBy] = useState('name');
     const [showRapidEntry, setShowRapidEntry] = useState(false);
     const [rapidEntryText, setRapidEntryText] = useState('');
-    const [viewMode, setViewMode] = useState('list'); // 'list' of 'calendar'
+    const [viewMode, setViewMode] = useState('list'); 
     const [draggedMenuItem, setDraggedMenuItem] = useState(null);
     const [weekOffset, setWeekOffset] = useState(0);
     const [menuSearch, setMenuSearch] = useState('');  
@@ -553,15 +489,17 @@ function App() {
     const [editingItem, setEditingItem] = useState(null);
     const [notification, setNotification] = useState(null);
     const [auditLade, setAuditLade] = useState(null);
-    const [auditedItems, setAuditedItems] = useState(new Set()); // Onthoudt welke items je hebt afgevinkt
+    const [auditedItems, setAuditedItems] = useState(new Set()); 
     const [draggedLocId, setDraggedLocId] = useState(null); 
     
+    // TAPPED ITEM STATE VOOR SMARTPHONE ANIMATIE
+    const [tappedItemId, setTappedItemId] = useState(null);
+
     const [isBulkMode, setIsBulkMode] = useState(false);
     const [selectedBulkItems, setSelectedBulkItems] = useState(new Set());
     const [showBulkMoveModal, setShowBulkMoveModal] = useState(false);
     const [bulkMoveTarget, setBulkMoveTarget] = useState({ vriezerId: '', ladeId: '' });
 
-    // Modals & Menu
     const [showAddModal, setShowAddModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [showWhatsNew, setShowWhatsNew] = useState(false);
@@ -580,7 +518,6 @@ function App() {
     const [showShoppingModal, setShowShoppingModal] = useState(false); 
     const [beheerTab, setBeheerTab] = useState('locaties');
 
-    // Shopping / Consume Flow States
     const [showShopifyModal, setShowShopifyModal] = useState(false);
     const [itemToShopify, setItemToShopify] = useState(null);
     const [shopForDeletedItem, setShopForDeletedItem] = useState('');
@@ -590,7 +527,6 @@ function App() {
     const [itemToConsume, setItemToConsume] = useState(null);
     const [consumeAmount, setConsumeAmount] = useState(1);
 
-// Forms
     const [formData, setFormData] = useState({
         naam: '', 
         aantal: 1, 
@@ -627,7 +563,6 @@ function App() {
     const [eenheidFilter, setEenheidFilter] = useState('vries'); 
     const [modalType, setModalType] = useState('vriezer');
 
-    // Editing states voor Lades, Units en Categorieën
     const [editingLadeId, setEditingLadeId] = useState(null);
     const [editingLadeName, setEditingLadeName] = useState('');
     const [editingUnitName, setEditingUnitName] = useState(null);
@@ -662,7 +597,6 @@ function App() {
         }
     };
 
-    // --- AUTH & SETUP ---
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (u) => {
             if (u) {
@@ -737,7 +671,6 @@ function App() {
         return () => unsubscribe();
     }, []);
 
-// Global Onboarding Settings, Tour Steps & Onderhoud
     useEffect(() => {
         const unsub = db.collection('settings').doc('onboarding').onSnapshot(doc => {
             if (doc.exists) setGlobalOnboardingActive(doc.data().isActive !== false);
@@ -747,7 +680,6 @@ function App() {
             if (doc.exists && doc.data().steps) setTourSteps(doc.data().steps);
         });
 
-        // NIEUW: Luisteraar voor Onderhoudsmodus
         const unsubMaintenance = db.collection('settings').doc('maintenance').onSnapshot(doc => {
             if (doc.exists) setMaintenanceMode(doc.data().active === true);
         });
@@ -755,11 +687,10 @@ function App() {
         return () => { unsub(); unsubSteps(); unsubMaintenance(); };
     }, []);
 
-    // Show Onboarding if user hasn't seen it and hasn't been explicitly disabled
     useEffect(() => {
         if (user) {
             if (myTourDisabled) {
-                setShowOnboarding(false); // Forceer sluiten als admin het live uitschakelt
+                setShowOnboarding(false); 
             } else if (globalOnboardingActive && !myHasSeenTutorial) {
                 setShowOnboarding(true);
             }
@@ -767,7 +698,6 @@ function App() {
     }, [user, globalOnboardingActive, myTourDisabled, myHasSeenTutorial]);
 
 
-    // Sync Data
     useEffect(() => {
         if(!beheerdeUserId) return;
         const unsub = db.collection('users').doc(beheerdeUserId).onSnapshot(doc => {
@@ -797,7 +727,6 @@ function App() {
         return () => unsub();
     }, [beheerdeUserId]);
 
-    // Data Listeners
     useEffect(() => {
         if (!beheerdeUserId) return;
         
@@ -856,7 +785,6 @@ function App() {
         return () => unsubLogs();
     }, [user, showLogModal, beheerdeUserId, isAdmin]); 
 
-    // OPHALEN VAN DASHBOARD DATA
     useEffect(() => {
         if (!dashboardUser) {
             setDashboardData({ vriezers: [], lades: [], items: [], loading: false });
@@ -893,7 +821,6 @@ function App() {
         return () => { isMounted = false; };
     }, [dashboardUser]);
 
-    // Derived variables (Using sortLocaties to respect the drag-and-drop order)
     const filteredLocaties = sortLocaties(vriezers.filter(l => l.type === activeTab));
     const activeItems = items.filter(i => filteredLocaties.some(l => l.id === i.vriezerId));
     const modalLocaties = sortLocaties(vriezers.filter(l => l.type === modalType));
@@ -928,7 +855,6 @@ function App() {
         })
     ];
 
-    // Categorieën voor het Hoofdscherm (Afhankelijk van actieve tab!)
     let tabCategorieen = CATEGORIEEN_VRIES;
     if (activeTab === 'voorraad') tabCategorieen = CATEGORIEEN_VOORRAAD;
     else if (activeTab === 'frig') tabCategorieen = CATEGORIEEN_FRIG;
@@ -949,7 +875,6 @@ function App() {
         setNotification({ msg, type, id: Date.now() });
     };
 
-    // Alerts Logic
     const alerts = items.filter(i => {
         if (i.altijdGoed) return false;
         const loc = vriezers.find(v => v.id === i.vriezerId);
@@ -963,7 +888,6 @@ function App() {
     });
 
     useEffect(() => {
-        // Zodra data klaar is met inladen in Firebase
         if (isDataLoaded && !hasCheckedAlerts.current) {
             const lastVersion = localStorage.getItem('app_version');
             if (lastVersion !== APP_VERSION || alerts.length > 0) {
@@ -974,7 +898,6 @@ function App() {
         }
     }, [isDataLoaded, alerts.length]); 
 
-    // --- HANDLERS ---
     const handleGoogleLogin = async () => { 
         try { 
             const provider = new firebase.auth.GoogleAuthProvider();
@@ -998,7 +921,6 @@ function App() {
             const type = loc ? loc.type : 'Onbekend';
             const ladeNaam = item.ladeNaam || 'Onbekend';
 
-            // Zorg dat komma's of quotes in de tekst het CSV formaat niet breken
             const escapeCSV = (str) => `"${(str || '').replace(/"/g, '""')}"`;
 
             return [
@@ -1028,7 +950,6 @@ function App() {
         document.body.removeChild(link);
     };
     
-    // Drag and Drop handlers voor Locaties
     const handleDragStart = (e, id) => {
         setDraggedLocId(id);
         e.dataTransfer.setData("text/plain", id);
@@ -1072,7 +993,6 @@ function App() {
         setDraggedLocId(null);
     };
 
-    // Item CRUD
 const handleOpenAdd = () => {
         setEditingItem(null);
         setModalType(activeTab); 
@@ -1141,7 +1061,6 @@ const handleOpenAdd = () => {
         };
         try {
             if(editingItem) {
-                // Uitgebreide logica om verschillen bij te houden
                 let changes = [];
                 if (editingItem.naam !== data.naam) changes.push(`Naam: ${editingItem.naam} ➔ ${data.naam}`);
                 if (parseFloat(editingItem.aantal) !== parseFloat(data.aantal)) changes.push(`Aantal: ${editingItem.aantal} ➔ ${data.aantal}`);
@@ -1163,12 +1082,10 @@ const handleOpenAdd = () => {
                 const aantalKeerToevoegen = parseInt(formData.bulkAanmaak) || 1;
                 const batchPromises = [];
                 
-                // Schiet het product X keer in de database
                 for(let i = 0; i < aantalKeerToevoegen; i++) {
                     batchPromises.push(db.collection('items').add(data));
                 }
                 
-                // Wacht tot alle kopieën zijn opgeslagen
                 await Promise.all(batchPromises);
                 
                 const locNaam = loc ? loc.naam : 'Onbekende locatie';
@@ -1198,7 +1115,6 @@ const handleOpenAdd = () => {
         } catch(err) { showNotification("Er ging iets mis: " + err.message, 'error'); }
     };
 
-    // Auto-shopping logica
     const checkMinimumStock = async (item, newAantal) => {
         if (item.minimumVoorraad && newAantal < item.minimumVoorraad) {
             const onList = shoppingList.some(s => s.naam.toLowerCase() === item.naam.toLowerCase() && !s.checked);
@@ -1271,7 +1187,6 @@ const handleOpenAdd = () => {
 
         try {
             if (amount >= currentAantal) {
-                // Product is volledig op!
                 await db.collection('items').doc(itemToConsume.id).delete();
                 await db.collection('users').doc(beheerdeUserId).update({ 
                     'stats.consumed': firebase.firestore.FieldValue.increment(1),
@@ -1291,7 +1206,6 @@ const handleOpenAdd = () => {
                 setShowShopifyModal(true);
                 setItemToConsume(null);
             } else {
-                // Er blijft nog wat over, dus updaten en waarde berekenen
                 const newAantal = currentAantal - amount;
                 const fraction = amount / currentAantal;
                 const consumedValue = (itemToConsume.prijs || 0) * fraction;
@@ -1562,7 +1476,6 @@ const openEdit = (item) => {
         setShowAddModal(true);
     };
 
-    // Bulk Functies
     const toggleBulkSelection = (id) => {
         const newSet = new Set(selectedBulkItems);
         if(newSet.has(id)) newSet.delete(id);
@@ -1578,7 +1491,6 @@ const openEdit = (item) => {
         selectedBulkItems.forEach(id => {
             batch.delete(db.collection('items').doc(id));
             
-            // Log de bulk delete individueel in het logboek
             const item = items.find(i => i.id === id);
             if (item) {
                 logAction('Verwijderd', item.naam, 'Via Bulk Actie', user, beheerdeUserId);
@@ -1615,7 +1527,6 @@ const openEdit = (item) => {
                 ladeNaam: targetLade ? targetLade.naam : ''
             });
 
-            // Log de bulk move in het logboek
             const item = items.find(i => i.id === id);
             if (item) {
                 logAction('Bewerkt', item.naam, `Verplaatst via Bulk naar Lade: ${targetLade ? targetLade.naam : '?'}`, user, beheerdeUserId);
@@ -1831,7 +1742,6 @@ const openEdit = (item) => {
         await db.collection('users').doc(userId).set({ hiddenTabs: newTabs }, { merge: true });
     };
 
-    // Onboarding User Toggle
     const toggleUserTourDisabled = async (userId, currentStatus) => {
         try {
             await db.collection('users').doc(userId).set({ tourDisabled: !currentStatus }, { merge: true });
@@ -1880,7 +1790,6 @@ const openEdit = (item) => {
         }
     };
 
-    // --- Onboarding Handlers ---
     const finishTutorial = async () => {
         setShowOnboarding(false);
         if (user) {
@@ -1915,15 +1824,12 @@ const openEdit = (item) => {
         const minSwipeDistance = 50;
 
         if (distance > minSwipeDistance) {
-            // Swipe links -> Volgende stap
             nextTourStep();
         } else if (distance < -minSwipeDistance) {
-            // Swipe rechts -> Vorige stap
             if (onboardingStep > 0) {
                 setOnboardingStep(onboardingStep - 1);
             }
         }
-        // Reset touches
         setTouchStart(null);
         setTouchEnd(null);
     };
@@ -1938,7 +1844,6 @@ const openEdit = (item) => {
             try {
                 const usersSnap = await db.collection('users').get();
                 const batch = db.batch();
-                // Wijzigen hier: We laten tourDisabled met rust, zodat geblokkeerde mensen niet ineens de tour toch krijgen.
                 usersSnap.docs.forEach(u => batch.update(u.ref, { hasSeenTutorial: false }));
                 await batch.commit();
                 showNotification("Tutorial succesvol gereset voor alle gebruikers!", "success");
@@ -1964,7 +1869,6 @@ const toggleMaintenanceMode = async () => {
         }
     };
 
-    // --- Admin Tour Editing ---
     const openTourAdmin = () => {
         setEditingTourSteps([...tourSteps]);
         setShowTourAdminModal(true);
@@ -2006,8 +1910,6 @@ const toggleMaintenanceMode = async () => {
         setEditingTourSteps(newSteps);
     };
 
-
-    // Bepaal of we in "Zoek" modus zitten en of er iets is gevonden in de actieve tab
     const isSearching = search.trim().length > 0;
     let totalFoundItemsInActiveTab = 0;
     if (isSearching) {
@@ -2020,7 +1922,6 @@ const toggleMaintenanceMode = async () => {
 
     const totalStockValue = items.reduce((acc, item) => acc + (parseFloat(item.prijs) || 0), 0);
 
-    // --- RENDER ---
     if (!user) return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300">
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] max-w-sm w-full text-center border border-white/20">
@@ -2033,13 +1934,12 @@ const toggleMaintenanceMode = async () => {
             </div>
         </div>
     );
-// Onderhoudsscherm voor normale gebruikers
+
     if (maintenanceMode && !isAdmin) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300 text-center">
                 <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 max-w-sm w-full flex flex-col items-center animate-in fade-in zoom-in duration-500">
                     
-                    {/* Het Logo in een mooie cirkel met subtiele onderhouds-badge */}
                     <div className="w-24 h-24 bg-gradient-to-tr from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-5 relative shadow-inner border border-blue-100/50 dark:border-blue-800/50">
                         <Icon className="animate-pulse" path={Icons.Box} size={40}/>
                         <div className="absolute bottom-0 right-0 w-8 h-8 bg-yellow-400 text-yellow-900 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-800 shadow-sm translate-x-1 translate-y-1">
@@ -2054,7 +1954,6 @@ const toggleMaintenanceMode = async () => {
                         We zijn achter de schermen bezig met een update. Nog heel even geduld, we zijn zo snel mogelijk weer online!
                     </p>
 
-                    {/* Subtielere Uitloggen knop */}
                     <button onClick={handleLogout} className="px-4 py-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors text-xs flex items-center gap-1.5 active:scale-95">
                         <Icon path={Icons.LogOut} size={14}/> Uitloggen
                     </button>
@@ -2064,7 +1963,6 @@ const toggleMaintenanceMode = async () => {
     }
     const currentVersionData = VERSION_HISTORY.find(v => v.version === APP_VERSION);
 
-    // Boodschappen groeperen per winkel voor weergave
     const groupedShoppingList = shoppingList.reduce((acc, item) => {
         const winkelKey = item.winkel || 'Geen winkel gekozen';
         if(!acc[winkelKey]) acc[winkelKey] = [];
@@ -2244,7 +2142,7 @@ const toggleMaintenanceMode = async () => {
                         <input 
                             autoFocus
                             type="text" 
-                            placeholder="Typ een product en druk op Enter (bijv. 'Kip' of 'Melk')..." 
+                            placeholder="Typ een product en druk op Enter (bijv. 'Kip' of 'Melk')...." 
                             className="flex-grow bg-transparent outline-none font-extrabold text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-lg"
                             value={rapidEntryText}
                             onChange={(e) => setRapidEntryText(e.target.value)}
@@ -2252,17 +2150,14 @@ onKeyDown={async (e) => {
     if (e.key === 'Enter' && rapidEntryText.trim()) {
         e.preventDefault();
         
-        // 1. Haal de slimme data op
         const info = analyzeProductName(rapidEntryText.trim()) || { cat: null, emoji: null, dagenHoudbaar: null };
         
-        // 2. Bepaal de standaard locatie én lade op basis van de actieve tab
         const defaultLoc = filteredLocaties.length > 0 ? filteredLocaties[0].id : '';
         const availableLades = lades.filter(l => l.vriezerId === defaultLoc).sort((a,b) => a.naam.localeCompare(b.naam));
         const defaultLadeId = availableLades.length > 0 ? availableLades[0].id : '';
         const defaultLadeNaam = availableLades.length > 0 ? availableLades[0].naam : '';
         const fallbackCat = activeTab === 'voorraad' ? 'Pasta' : 'Vlees';
         
-        // 3. Bereken THT als we niet in de vriezer zitten
         let tht = null;
         if (info.dagenHoudbaar && (activeTab === 'frig' || activeTab === 'voorraad')) {
             const d = new Date();
@@ -2270,7 +2165,6 @@ onKeyDown={async (e) => {
             tht = d;
         }
 
-        // 4. Opslaan in Firebase
         try {
             await db.collection('items').add({
                 naam: rapidEntryText.trim(),
@@ -2279,8 +2173,8 @@ onKeyDown={async (e) => {
                 categorie: info.cat || fallbackCat,
                 emoji: info.emoji || '📦',
                 vriezerId: defaultLoc,
-                ladeId: defaultLadeId,     // Dit is de fix!
-                ladeNaam: defaultLadeNaam, // Dit is de fix!
+                ladeId: defaultLadeId,
+                ladeNaam: defaultLadeNaam,
                 minimumVoorraad: null,
                 prijs: null,
                 ingevrorenOp: new Date(),
@@ -2289,13 +2183,12 @@ onKeyDown={async (e) => {
                 userId: beheerdeUserId
             });
             
-            // 5. Logboek actie en notificatie
             const loc = vriezers.find(v => v.id === defaultLoc);
             const locNaam = loc ? loc.naam : 'Onbekende locatie';
             await logAction('Toevoegen', rapidEntryText.trim(), `Snel ingevoerd in ${locNaam} (${defaultLadeNaam || 'Geen lade'})`, user, beheerdeUserId);
             
             showNotification(`${rapidEntryText.trim()} razendsnel toegevoegd!`, 'success');
-            setRapidEntryText(''); // Leegmaken voor de volgende invoer
+            setRapidEntryText('');
         } catch (err) {
             showNotification("Fout bij snel toevoegen: " + err.message, "error");
         }
@@ -2309,7 +2202,7 @@ onKeyDown={async (e) => {
                         )}
                     </div>
                 )}
-                {/* Bulk Action Bar (Sticky) */}
+                
                 {isBulkMode && (
                     <div className="sticky top-[76px] z-20 bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-between flex-wrap gap-2 animate-in fade-in slide-in-from-top-4 border border-white/10 backdrop-blur-md">
                         <div className="flex items-center gap-3">
@@ -2330,7 +2223,6 @@ onKeyDown={async (e) => {
                     </div>
                 )}
 
-{/* Het Weekmenu of de Normale weergave en recepten */}
 {activeTab === 'recepten' ? (
     <div className="space-y-6 animate-in fade-in duration-300">
         <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-800">
@@ -2360,7 +2252,6 @@ onKeyDown={async (e) => {
                             <div className="h-1/3 p-3 flex items-center justify-center text-center bg-white dark:bg-gray-800 z-10">
                                 <span className="font-bold text-sm text-gray-900 dark:text-gray-100 line-clamp-2 leading-tight">{r.naam}</span>
                             </div>
-                            {/* Verwijder knop zichtbaar bij hover */}
                             <button onClick={(e) => { e.stopPropagation(); if(confirm('Recept verwijderen?')) db.collection('recepten').doc(r.id).delete(); }} className="absolute top-2 right-2 p-2 bg-red-500/90 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600 backdrop-blur-md">
                                 <Icon path={Icons.Trash2} size={14}/>
                             </button>
@@ -2372,7 +2263,6 @@ onKeyDown={async (e) => {
 {recepten.length === 0 && <p className="text-center text-gray-500 italic py-12 text-lg">Nog geen recepten toegevoegd...</p>}
     </div>
 ) : activeTab === 'weekmenu' ? (() => {
-                    // Bereken de exacte datums voor de gekozen week
                     const baseDate = new Date();
                     const dayNum = baseDate.getDay() || 7; 
                     baseDate.setHours(0,0,0,0);
@@ -2386,7 +2276,6 @@ onKeyDown={async (e) => {
 
                     return (
                         <div className="flex flex-col lg:flex-row gap-6 animate-in fade-in duration-300 print:block">
-                            {/* Kolom 1: Het Weekmenu (Dagen) */}
                             <div className="flex-1 space-y-4 print:w-full">
                                 <div className="flex items-center justify-between mb-2 border-b border-gray-200 dark:border-gray-800 pb-4">
                                     <div>
@@ -2396,7 +2285,6 @@ onKeyDown={async (e) => {
                                         <p className="text-gray-500 dark:text-gray-400 text-sm print:hidden">Sleep producten of voeg zelf gerechten toe.</p>
                                     </div>
                                     <div className="flex gap-2 print:hidden bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                                        {/* NIEUWE PRINT KNOP */}
                                         <button onClick={() => window.print()} className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 transition-colors flex items-center gap-2 mr-1 font-bold text-sm" title="Print Weekmenu">
                                             <Icon path={Icons.Printer} size={18} /> <span className="hidden sm:inline">Print</span>
                                         </button>
@@ -2461,13 +2349,12 @@ onKeyDown={async (e) => {
                                                                 <div>
                                                                     <p className="font-bold text-gray-900 dark:text-gray-100 truncate print:text-black">{item.naam}</p>
                                                                     {item.vriezerId !== 'custom_menu' && (
-                                                                        <p className="text-[11px] font-medium text-gray-500">{formatAantal(item.aantal)} {item.eenheid}</p>
+                                                                        <p className="text-[11px] text-gray-500"><span className="font-bold">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span></p>
                                                                     )}
                                                                 </div>
                                                             </div>
                                                             <button 
                                                                 onClick={async () => {
-                                                                    // Aangepaste verwijder-logica voor zelfgetypte tekst
                                                                     if (item.vriezerId === 'custom_menu') {
                                                                         await db.collection('items').doc(item.id).delete();
                                                                     } else {
@@ -2483,7 +2370,6 @@ onKeyDown={async (e) => {
                                                     ))
                                                 )}
                                                 
-                                                {/* NIEUW: Zelf tekst typen */}
                                                 <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-700 print:hidden">
                                                     <input 
                                                         type="text" 
@@ -2499,7 +2385,7 @@ onKeyDown={async (e) => {
                                                                         naam: customMenuInput.text.trim(),
                                                                         aantal: 1,
                                                                         eenheid: 'stuks',
-                                                                        vriezerId: 'custom_menu', // Speciaal ID voor handmatige gerechten
+                                                                        vriezerId: 'custom_menu', 
                                                                         ladeId: '',
                                                                         categorie: 'Menu',
                                                                         emoji: '🍽️',
@@ -2521,12 +2407,10 @@ onKeyDown={async (e) => {
                                 })}
                             </div>
 
-                            {/* Kolom 2: Beschikbare Voorraad */}
                             <div className="w-full lg:w-1/3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-5 rounded-3xl border border-gray-200/50 dark:border-gray-700/50 h-fit sticky top-[88px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] print:hidden">
                                 <h3 className="font-black text-xl text-gray-800 dark:text-gray-100 mb-1 tracking-tight">Beschikbaar</h3>
                                 <p className="text-sm font-medium text-gray-500 mb-4">Vriezer & Koelkast</p>
                                 
-                                {/* Snel zoeken binnen het weekmenu */}
                                 <div className="relative mb-4">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <Icon path={Icons.Search} size={16} className="text-gray-400"/>
@@ -2571,7 +2455,7 @@ onKeyDown={async (e) => {
                                                 <span className="text-2xl drop-shadow-sm">{item.emoji || '📦'}</span>
                                                 <div className="truncate">
                                                     <p className="font-bold text-sm text-gray-800 dark:text-gray-100 truncate">{item.naam}</p>
-                                                    <p className="text-[11px] font-medium text-gray-500">{formatAantal(item.aantal)} {item.eenheid}</p>
+                                                    <p className="text-[11px] text-gray-500"><span className="font-bold">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span></p>
                                                 </div>
                                             </div>
                                     ))}
@@ -2620,7 +2504,6 @@ onKeyDown={async (e) => {
                             </div>
 
                             {(() => {
-                                // 1. Bereken voor elk item de relevante kalenderdatum en resterende dagen
                                 const calendarItems = activeItems.map(item => {
                                     let eventDate = null;
                                     let resterendeDagen = 999;
@@ -2629,7 +2512,6 @@ onKeyDown={async (e) => {
                                         eventDate = item.houdbaarheidsDatum.toDate ? item.houdbaarheidsDatum.toDate() : new Date(item.houdbaarheidsDatum);
                                         resterendeDagen = getDagenTotTHT(item.houdbaarheidsDatum);
                                     } else if (activeTab === 'vriezer' && item.ingevrorenOp) {
-                                        // Fix: Voor vriezer gebruiken we ingevrorenOp + 180 dagen als de 'vervaldatum'
                                         const invriesDatum = item.ingevrorenOp.toDate ? item.ingevrorenOp.toDate() : new Date(item.ingevrorenOp);
                                         eventDate = new Date(invriesDatum);
                                         eventDate.setDate(eventDate.getDate() + 180);
@@ -2641,9 +2523,8 @@ onKeyDown={async (e) => {
                                     }
 
                                     return { ...item, eventDate, resterendeDagen };
-                                }).filter(item => item.eventDate !== null); // Filter items uit die écht geen datum hebben
+                                }).filter(item => item.eventDate !== null); 
 
-                                // 2. Als er na de berekening niks overblijft, toon fallback
                                 if (calendarItems.length === 0) {
                                     return (
                                         <div className="text-center py-16 text-gray-400 dark:text-gray-500 italic text-lg font-medium">
@@ -2652,14 +2533,12 @@ onKeyDown={async (e) => {
                                     );
                                 }
 
-                                // 3. Render de chronologische lijst
                                 return (
                                     <div className="space-y-4">
                                         {calendarItems
                                             .sort((a, b) => a.resterendeDagen - b.resterendeDagen)
                                             .map(item => {
-                                                // Bepaal de kleur van de border aan de linkerkant
-                                                let borderStyle = "border-l-[6px] border-green-500 bg-gradient-to-r from-green-50/50 to-transparent dark:from-green-950/20 dark:border-green-500";
+                                                let borderStyle = "border-l-[6px] border-transparent";
                                                 if (item.resterendeDagen < 0) borderStyle = "border-l-[6px] border-red-500 bg-gradient-to-r from-red-50/80 to-transparent dark:from-red-950/30 dark:border-red-600";
                                                 else if (item.resterendeDagen <= 7) borderStyle = "border-l-[6px] border-orange-400 bg-gradient-to-r from-orange-50/70 to-transparent dark:from-orange-950/20 dark:border-orange-500";
                                                 else if (item.resterendeDagen <= 30) borderStyle = "border-l-[6px] border-yellow-400 bg-gradient-to-r from-yellow-50/70 to-transparent dark:from-yellow-950/20 dark:border-yellow-500";
@@ -2667,7 +2546,6 @@ onKeyDown={async (e) => {
                                                 return (
                                                     <div key={item.id} className={`flex items-center justify-between p-4 sm:p-5 rounded-2xl border border-gray-100/50 dark:border-gray-700/50 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 ${borderStyle}`}>
                                                         <div className="flex items-center gap-4 min-w-0">
-                                                    {/* Kalender Blaadje Icoon */}
                                                             <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/80 dark:border-gray-700 flex flex-col items-center justify-center flex-shrink-0 shadow-sm">
                                                                 <span className="text-[11px] uppercase font-black text-red-500 tracking-widest leading-none mt-1">
                                                                     {item.eventDate.toLocaleString('nl-BE', { month: 'short' })}
@@ -2681,12 +2559,12 @@ onKeyDown={async (e) => {
                                                             </div>
 
                                                             <div className="min-w-0">
-                                                                <p className="font-extrabold text-lg text-gray-900 dark:text-white flex items-center gap-2 truncate">
+                                                                <p className="font-bold text-base sm:text-lg text-gray-900 dark:text-white whitespace-normal sm:truncate leading-tight flex items-center gap-2">
                                                                     <span className="text-2xl flex-shrink-0 drop-shadow-sm">{item.emoji || '📦'}</span>
-                                                                    <span className="truncate">{item.naam}</span>
+                                                                    <span>{item.naam}</span>
                                                                 </p>
                                                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
-                                                                    Aantal: <span className="font-bold text-gray-800 dark:text-gray-200">{formatAantal(item.aantal)} {item.eenheid}</span>
+                                                                    Aantal: <span className="font-bold text-gray-800 dark:text-gray-200">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span>
                                                                     {item.ladeNaam && ` • ${item.ladeNaam}`}
                                                                     {activeTab === 'vriezer' && <span className="text-gray-400 dark:text-gray-500 italic"> (Ingevroren: {formatDate(item.ingevrorenOp)})</span>}
                                                                 </p>
@@ -2763,7 +2641,7 @@ onKeyDown={async (e) => {
                                                 
                                                 return (
                                                     <div key={lade.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100/50 dark:border-gray-700/50 overflow-hidden page-break-inside-avoid transition-all duration-300">
-                                                                                               <div className="bg-gray-50/80 dark:bg-gray-800/80 px-5 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-100/80 dark:hover:bg-gray-700 transition-colors print:bg-white" onClick={() => toggleLade(lade.id)}>
+                                                        <div className="bg-gray-50/80 dark:bg-gray-800/80 px-5 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-100/80 dark:hover:bg-gray-700 transition-colors print:bg-white" onClick={() => toggleLade(lade.id)}>
                                                             <h3 className="font-extrabold text-gray-800 dark:text-gray-100 text-sm flex items-center gap-2">
                                                                 {isCollapsed ? <Icon path={Icons.ChevronRight} className="print:hidden text-gray-400"/> : <Icon path={Icons.ChevronDown} className="print:hidden text-gray-400"/>} 
                                                                 {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
@@ -2789,10 +2667,8 @@ onKeyDown={async (e) => {
                                                                     
                                                                     const isSelected = selectedBulkItems.has(item.id);
                                                                     const bgClass = isBulkMode && isSelected ? 'bg-indigo-50/50 dark:bg-indigo-900/20' : 'bg-transparent';
-const colorClass = getStatusColor(dagenOud, vriezer.type, dagenTotTHT, item.altijdGoed);
-const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, item.altijdGoed);
-
-                                                                    
+                                                                    const colorClass = getStatusColor(dagenOud, vriezer.type, dagenTotTHT, item.altijdGoed);
+                                                                    const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, item.altijdGoed);
                                                                     
                                                                     const catObj = actieveCategorieen.find(c => (c.name || c) === item.categorie);
                                                                     const catColor = catObj ? (catObj.color || 'gray') : 'gray';
@@ -2800,8 +2676,8 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                                                     return (
                                                                         <li 
                                                                             key={item.id} 
-                                                                            onClick={() => isBulkMode ? toggleBulkSelection(item.id) : null}
-                                                                            className={`flex items-center justify-between p-4 ${bgClass} ${colorClass} group transition-all duration-200 ${isBulkMode ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30' : 'hover:bg-gray-50/50 dark:hover:bg-gray-700/30'}`}
+                                                                            onClick={() => isBulkMode ? toggleBulkSelection(item.id) : setTappedItemId(tappedItemId === item.id ? null : item.id)}
+                                                                            className={`flex items-center justify-between p-4 ${bgClass} ${colorClass} group transition-all duration-200 ${isBulkMode ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30' : 'cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30'}`}
                                                                         >
                                                                             <div className="flex items-center gap-4 overflow-hidden min-w-0">
                                                                                 {isBulkMode && (
@@ -2812,16 +2688,15 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                                                                 <span className={`text-3xl drop-shadow-sm flex-shrink-0 ${isBulkMode ? 'hidden sm:block' : ''}`}>{item.emoji||'📦'}</span>
                                                                                 <div className="min-w-0 flex-grow">
                                                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                                                        <p className="font-extrabold text-base text-gray-900 dark:text-gray-100 truncate tracking-tight">{item.naam}</p>
+                                                                                        <p className={`font-bold text-sm sm:text-base text-gray-900 dark:text-gray-100 tracking-tight leading-tight transition-all ${tappedItemId === item.id ? 'whitespace-normal' : 'truncate'}`}>{item.naam}</p>
                                                                                         {item.categorie && item.categorie !== "Geen" && (
                                                                                             <Badge type={catColor} text={item.categorie} />
-)}
-                                                                                        {/* DIT IS DE NIEUWE WEEKMENU BADGE: */}
+                                                                                        )}
                                                                                         {item.geplandeDatum && (
                                                                                             <Badge type="pink" text={`Menu: ${new Date(item.geplandeDatum).toLocaleDateString('nl-BE', {weekday: 'short', day: '2-digit', month: '2-digit'})}`} />
                                                                                         )}
                                                                                     </div>
-                                                                                                                                                                        {item.tags && item.tags.length > 0 && (
+                                                                                    {item.tags && item.tags.length > 0 && (
                                                                                         <div className="flex flex-wrap gap-1.5 mt-1.5">
                                                                                             {item.tags.map(t => (
                                                                                                 <span key={t} className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-gray-100/80 text-gray-600 border border-gray-200/50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 shadow-sm">
@@ -2831,8 +2706,8 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                                                                         </div>
                                                                                     )}
 
-                                                                                    <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1 flex flex-wrap items-center gap-x-2">
-                                                                                        <span className="font-extrabold text-gray-800 dark:text-gray-200">{formatAantal(item.aantal)} {item.eenheid}</span>
+                                                                                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex flex-wrap items-center gap-x-2">
+                                                                                        <span className="font-bold text-gray-800 dark:text-gray-200">{formatAantal(item.aantal)}</span> <span className="font-normal text-gray-600 dark:text-gray-400 ml-0.5">{item.eenheid}</span>
                                                                                         {!isStockItem && <span className={`text-xs ${dateColorClass}`}> • {formatDate(item.ingevrorenOp)}</span>}
                                                                                         {!isStockItem && item.houdbaarheidsDatum && <span className="text-xs text-gray-500 dark:text-gray-500"> • THT: {formatDate(item.houdbaarheidsDatum)}</span>}
                                                                                         {isStockItem && item.houdbaarheidsDatum && <span className={`text-xs ${dateColorClass}`}> • THT: {formatDate(item.houdbaarheidsDatum)}</span>}
@@ -2848,11 +2723,11 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                                                             </div>
                                                                             
                                                                             {!isBulkMode && (
-                                                                                <div className="flex flex-wrap items-center gap-1.5 flex-shrink-0 print:hidden ml-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                                                    <button onClick={(e)=>{e.stopPropagation(); initConsume(item)}} className="p-2 text-orange-600 bg-orange-50 dark:bg-orange-900/30 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-orange-100 dark:border-orange-800/50" title="Verbruik"><Icon path={Icons.Minus} size={16}/></button>
-                                                                                    <button onClick={(e)=>{e.stopPropagation(); handleDuplicate(item)}} className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-indigo-100 dark:border-indigo-800/50" title="Dupliceer"><Icon path={Icons.Copy} size={16}/></button>
-                                                                                    <button onClick={(e)=>{e.stopPropagation(); openEdit(item)}} className="p-2 text-blue-600 bg-blue-50 dark:bg-blue-900/30 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-blue-100 dark:border-blue-800/50" title="Bewerken"><Icon path={Icons.Edit2} size={16}/></button>
-                                                                                    <button onClick={(e)=>{e.stopPropagation(); initDelete(item)}} className="p-2 text-red-600 bg-red-50 dark:bg-red-900/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-red-100 dark:border-red-800/50" title="Verwijderen"><Icon path={Icons.Trash2} size={16}/></button>
+                                                                                <div className={`flex flex-nowrap items-center gap-1.5 flex-shrink-0 print:hidden transition-all duration-300 overflow-hidden ${tappedItemId === item.id ? 'max-w-[200px] opacity-100 ml-3' : 'max-w-0 opacity-0 ml-0 md:ml-3 md:max-w-[200px] md:opacity-0 md:group-hover:opacity-100'}`}>
+                                                                                    <button onClick={(e)=>{e.stopPropagation(); initConsume(item)}} className="p-2 text-orange-600 bg-orange-50 dark:bg-orange-900/30 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-orange-100 dark:border-orange-800/50 flex-shrink-0" title="Verbruik"><Icon path={Icons.Minus} size={16}/></button>
+                                                                                    <button onClick={(e)=>{e.stopPropagation(); handleDuplicate(item)}} className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-indigo-100 dark:border-indigo-800/50 flex-shrink-0" title="Dupliceer"><Icon path={Icons.Copy} size={16}/></button>
+                                                                                    <button onClick={(e)=>{e.stopPropagation(); openEdit(item)}} className="p-2 text-blue-600 bg-blue-50 dark:bg-blue-900/30 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-blue-100 dark:border-blue-800/50 flex-shrink-0" title="Bewerken"><Icon path={Icons.Edit2} size={16}/></button>
+                                                                                    <button onClick={(e)=>{e.stopPropagation(); initDelete(item)}} className="p-2 text-red-600 bg-red-50 dark:bg-red-900/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-red-100 dark:border-red-800/50 flex-shrink-0" title="Verwijderen"><Icon path={Icons.Trash2} size={16}/></button>
                                                                                 </div>
                                                                             )}
                                                                         </li>
@@ -2872,7 +2747,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 )}
             </main>
 
-            {/* Bulk Verplaats Modal */}
             <Modal isOpen={showBulkMoveModal} onClose={() => setShowBulkMoveModal(false)} title="Verplaats Items." color="indigo">
                 <form onSubmit={handleBulkMove} className="space-y-5">
                     <p className="text-gray-700 dark:text-gray-300 font-medium">Naar welke locatie wil je deze <strong>{selectedBulkItems.size}</strong> items verplaatsen?</p>
@@ -2905,7 +2779,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
 <Modal isOpen={showRecipeViewModal} onClose={() => setShowRecipeViewModal(false)} title="Recept Bekijken." color="teal" size="lg">
     {editingRecipe && (
         <div className="space-y-6">
-            {/* FOTO: Nu over de volledige breedte met negatieve marges (-mx-5 -mt-5) */}
             {editingRecipe.fotoUrl && (
                 <div 
                     className="-mt-5 -mx-5 mb-6 h-64 sm:h-80 bg-cover bg-center border-b border-gray-200 dark:border-gray-700 shadow-sm" 
@@ -2915,7 +2788,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             
             <div className="flex justify-between items-start border-b border-gray-100 dark:border-gray-700 pb-5">
                 <h2 className="text-3xl font-black text-gray-900 dark:text-white pr-4 leading-tight tracking-tight">{editingRecipe.naam}</h2>
-                {/* BEWERK KNOP: Nu heel subtiel en onopvallend */}
                 <button onClick={() => { 
                     setRecipeFormData(editingRecipe); 
                     setShowRecipeViewModal(false); 
@@ -2991,7 +2863,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             </div>
         </div>
 
-        {/* Ingrediënten Toevoegen */}
         <div className="p-4 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
             <h4 className="font-extrabold mb-3 text-gray-800 dark:text-gray-200 flex items-center gap-2"><Icon path={Icons.ShoppingCart} size={18}/> Ingrediënten</h4>
             <div className="space-y-2 mb-3">
@@ -3009,7 +2880,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             <button type="button" onClick={() => setRecipeFormData({...recipeFormData, ingredienten: [...recipeFormData.ingredienten, {naam: '', aantal: 1, eenheid: 'stuks'}]})} className="text-sm font-extrabold text-teal-600 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 px-4 py-2.5 rounded-xl w-full transition-colors border border-teal-100 dark:border-teal-800/50">+ Ingrediënt toevoegen</button>
         </div>
 
-        {/* Stappen Toevoegen */}
         <div className="p-4 border border-gray-200/60 dark:border-gray-700/60 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
             <h4 className="font-extrabold mb-3 text-gray-800 dark:text-gray-200 flex items-center gap-2"><Icon path={Icons.List} size={18}/> Bereidingswijze (Stappen)</h4>
             <div className="space-y-3 mb-3">
@@ -3040,7 +2910,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
     </div>
 </Modal>
                                                                                     
-            {/* Verbruik (Consume) Modal */}
             <Modal isOpen={showConsumeModal} onClose={() => setShowConsumeModal(false)} title="Product verwerken." color="orange">
                 {itemToConsume && (
                     <div className="space-y-5">
@@ -3096,7 +2965,7 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 )}
             </Modal>
 
-            {/* Filter Modal */}
+           {/* Filter Modal */}
             <Modal isOpen={showFilterModal} onClose={() => setShowFilterModal(false)} title="Filter & Sorteer." color="blue">
                 <div className="space-y-6">
                     <div>
@@ -3169,7 +3038,7 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 <button onClick={handleOpenAdd} className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-[0_8px_30px_rgba(79,70,229,0.4)] flex items-center justify-center z-40 print:hidden hover:scale-110 hover:shadow-[0_8px_40px_rgba(79,70,229,0.6)] hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={32}/></button>
             )}
 
-          {/* Add/Edit Modal */}
+            {/* Add/Edit Modal */}
             <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title={editingItem ? "Bewerken." : "Toevoegen."} color="blue">
                 <form onSubmit={handleSaveItem} className="space-y-5">
                     <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1.5 rounded-xl mb-2 border border-gray-200/50 dark:border-gray-700/50">
@@ -3903,7 +3772,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             
 <Modal isOpen={showUserAdminModal} onClose={() => setShowUserAdminModal(false)} title="Gebruikers." color="pink">
                 
-                {/* --- START NIEUW ONDERHOUDSMODUS BLOK --- */}
                 <div className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 p-5 rounded-2xl border border-red-200/60 dark:border-red-800/50 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
                     <div>
                         <h4 className="font-extrabold text-red-800 dark:text-red-300 flex items-center gap-2">
@@ -3918,7 +3786,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                         {maintenanceMode ? 'Onderhoud is AAN' : 'Zet in Onderhoud'}
                     </button>
                 </div>
-                {/* --- EINDE NIEUW ONDERHOUDSMODUS BLOK --- */}
 
                 <div className="bg-gray-50/80 dark:bg-gray-800/50 p-5 rounded-2xl border border-gray-200/60 dark:border-gray-700/50 mb-6 shadow-sm">
                     <h4 className="font-extrabold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
@@ -4041,7 +3908,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 </ul>
             </Modal>
 
-            {/* Tour Admin Modal (Om de inhoud aan te passen) */}
             <Modal isOpen={showTourAdminModal} onClose={() => setShowTourAdminModal(false)} title="Tour Aanpassen." color="purple" size="lg">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">Hier kun je de inhoud van de rondleiding stap-voor-stap aanpassen. Gebruik de pijltjes om de volgorde te veranderen.</p>
                 <div className="space-y-5">
@@ -4104,7 +3970,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 </div>
             </Modal>
 
-            {/* Meldingen Modal (Links uitgelijnd indien onboarding ook open is) */}
             <Modal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} title="Meldingen." color="red" position={showOnboarding && tourSteps.length > 0 ? "left" : "center"}>
                 {alerts.length > 0 && (
                     <div className="bg-gradient-to-r from-red-50 to-rose-50 border-l-[6px] border-red-500 p-5 rounded-r-2xl mb-6 dark:from-red-900/20 dark:to-rose-900/20 dark:border-red-600 shadow-sm animate-pulse">
@@ -4155,7 +4020,7 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                     } else if (type.includes('Fix') || type.includes('Opgelost') || type.includes('Hersteld')) {
                                         IconComp = Icons.Wrench;
                                         iconColor = "text-green-600 bg-green-100 dark:bg-green-900/40 dark:text-green-400 border-green-200 dark:border-green-800/50";
-                                    } else if (type.includes('Update')) {
+                                    } else if (type.includes('Update') || type.includes('Mobiele')) {
                                          IconComp = Icons.Zap;
                                          iconColor = "text-blue-500 bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800/50";
                                     }
@@ -4178,7 +4043,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 </div>
             </Modal>
 
-            {/* De Onboarding Tour Modal (Rechts uitgelijnd indien Meldingen ook open zijn) */}
             {tourSteps && tourSteps[onboardingStep] && (
                 <Modal isOpen={showOnboarding} onClose={() => {}} title={`Rondleiding (${onboardingStep + 1}/${tourSteps.length})`} color={tourSteps[onboardingStep].colorName || 'blue'} position={showWhatsNew ? "right" : "center"} hideBackdrop={showWhatsNew} hideCloseButton={true}>
                     <div 
@@ -4224,7 +4088,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 </Modal>
             )}
 
-            {/* Versiegeschiedenis Modal (Los) */}
             <Modal isOpen={showVersionHistory} onClose={() => setShowVersionHistory(false)} title="Nieuws." color="blue">
                 <div className="mb-10 text-center px-4">
                     <h3 className="text-xl font-black text-gray-900 dark:text-white mb-3 tracking-tight leading-tight">
@@ -4262,7 +4125,7 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                     } else if (type.includes('Fix') || type.includes('Opgelost') || type.includes('Hersteld')) {
                                         IconComp = Icons.Wrench;
                                         iconColor = "text-green-600 bg-green-50 border-green-100 dark:bg-green-900/30 dark:border-green-800/50 dark:text-green-400";
-                                    } else if (type.includes('Update')) {
+                                    } else if (type.includes('Update') || type.includes('Mobiele')) {
                                          IconComp = Icons.Zap;
                                          iconColor = "text-blue-500 bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-300";
                                     }
@@ -4334,7 +4197,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                                         {v.naam}
                                                     </h4>
                                                     
-                                                    {/* Lades in een grid (max 3 naast elkaar), klikken om te openen */}
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-start mt-2">
                                                         {dashboardData.lades.filter(l => l.vriezerId === v.id).sort((a,b) => a.naam.localeCompare(b.naam)).map(l => {
                                                             const ladeItems = dashboardData.items.filter(i => i.ladeId === l.id).sort((a,b) => a.naam.localeCompare(b.naam));
@@ -4399,7 +4261,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                     )}
                 </div>
             </Modal>
-            {/* Voorraad-Balans (Audit) Modal */}
             <Modal isOpen={!!auditLade} onClose={() => setAuditLade(null)} title={`Balans: ${auditLade?.naam}`} color="blue" size="lg">
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-5 rounded-2xl border border-blue-200/60 dark:border-blue-800/50 text-sm text-blue-900 dark:text-blue-200 shadow-sm">
@@ -4419,7 +4280,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 flex-shrink-0">
-                                    {/* Snelle + en - knoppen voor correcties */}
                                     {!isChecked && (
                                         <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-xl p-1.5 mr-2 border border-gray-200/80 dark:border-gray-700 shadow-inner">
                                             <button onClick={async () => {
