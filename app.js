@@ -3169,7 +3169,7 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 <button onClick={handleOpenAdd} className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-[0_8px_30px_rgba(79,70,229,0.4)] flex items-center justify-center z-40 print:hidden hover:scale-110 hover:shadow-[0_8px_40px_rgba(79,70,229,0.6)] hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={32}/></button>
             )}
 
-            {/* Add/Edit Modal */}
+          {/* Add/Edit Modal */}
             <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title={editingItem ? "Bewerken." : "Toevoegen."} color="blue">
                 <form onSubmit={handleSaveItem} className="space-y-5">
                     <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1.5 rounded-xl mb-2 border border-gray-200/50 dark:border-gray-700/50">
@@ -3193,37 +3193,30 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                         
                         <div className="relative flex-grow">
                             <input 
-    type="text" 
-    placeholder="Naam van je product..." 
-    className="w-full h-14 px-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white/50 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500 font-bold text-lg transition-all shadow-sm" 
-    value={formData.naam} 
-    onChange={e => {
-        const ingetypt = e.target.value;
-        const slimmeData = analyzeProductName(ingetypt); // Check of we dit woord herkennen
-        
-        setFormData(prevData => {
-            // 1. We updaten sowieso de naam die je aan het typen bent
-            let newData = { ...prevData, naam: ingetypt };
-            
-            // 2. Als onze slimme functie een match vindt, vullen we de rest ook in!
-            if (slimmeData.cat) {
-                newData.categorie = slimmeData.cat;
-                newData.emoji = slimmeData.emoji;
-                
-                // 3. Als er een houdbaarheid is én we zitten in Frig of Stock, vul de datum in
-                if (slimmeData.dagenHoudbaar && (modalType === 'frig' || modalType === 'voorraad')) {
-                    const d = new Date();
-                    d.setDate(d.getDate() + slimmeData.dagenHoudbaar);
-                    // Zet de datum om naar het YYYY-MM-DD formaat voor het input veld
-                    newData.houdbaarheidsDatum = d.toISOString().split('T')[0]; 
-                }
-            }
-            
-            return newData;
-        });
-    }} 
-    required 
-/>
+                                type="text" 
+                                placeholder="Naam van je product..." 
+                                className="w-full h-14 px-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white/50 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500 font-bold text-lg transition-all shadow-sm" 
+                                value={formData.naam} 
+                                onChange={e => {
+                                    const ingetypt = e.target.value;
+                                    const slimmeData = analyzeProductName(ingetypt); 
+                                    
+                                    setFormData(prevData => {
+                                        let newData = { ...prevData, naam: ingetypt };
+                                        if (slimmeData.cat) {
+                                            newData.categorie = slimmeData.cat;
+                                            newData.emoji = slimmeData.emoji;
+                                            if (slimmeData.dagenHoudbaar && (modalType === 'frig' || modalType === 'voorraad')) {
+                                                const d = new Date();
+                                                d.setDate(d.getDate() + slimmeData.dagenHoudbaar);
+                                                newData.houdbaarheidsDatum = d.toISOString().split('T')[0]; 
+                                            }
+                                        }
+                                        return newData;
+                                    });
+                                }} 
+                                required 
+                            />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -3339,36 +3332,55 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                     </button>
                                 )
                             })}
-                                            </div>
+                        </div>
                     </div>                                   
                     </div>
-                    {/* HIER EINDIGT DE NIEUWE SCHAKELAAR */}
+
+                    <div className="pt-2 mb-2">
+                        <button
+                            type="button"
+                            onClick={() => setFormData({...formData, altijdGoed: !formData.altijdGoed})}
+                            className={`w-full p-4 rounded-xl flex items-center justify-between font-extrabold border-2 transition-all active:scale-[0.98] ${
+                                formData.altijdGoed 
+                                ? 'bg-green-50 border-green-400 text-green-700 dark:bg-green-900/30 dark:border-green-600 dark:text-green-400 shadow-sm' 
+                                : 'bg-gray-50 border-gray-200 text-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300'
+                            }`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Icon path={Icons.Check} size={20} />
+                                Permanent goed (negeer datums)
+                            </span>
+                            <div className={`w-12 h-7 rounded-full p-1 transition-colors border shadow-inner ${formData.altijdGoed ? 'bg-green-500 border-green-600' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-700'}`}>
+                                <div className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform ${formData.altijdGoed ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                            </div>
+                        </button>
+                    </div>
 
                     {modalType === 'vriezer' && !formData.altijdGoed && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Invriesdatum.</label>
-                            <input type="date" className="w-full p-2 bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg" value={formData.ingevrorenOp} onChange={e => setFormData({...formData, ingevrorenOp: e.target.value})} required /></div>
-                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">THT (Optioneel)</label>
-                            <input type="date" className="w-full p-2 bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
+                            <div className="space-y-1.5"><label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide">Invriesdatum.</label>
+                            <input type="date" className="w-full p-3.5 bg-white dark:bg-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 rounded-xl font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.ingevrorenOp} onChange={e => setFormData({...formData, ingevrorenOp: e.target.value})} required /></div>
+                            <div className="space-y-1.5"><label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide">THT (Optioneel)</label>
+                            <input type="date" className="w-full p-3.5 bg-white dark:bg-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 rounded-xl font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
                         </div>
                     )}
-                                  {(modalType === 'voorraad' || modalType === 'frig') && !formData.altijdGoed && (
-                        <div className="space-y-1"><label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Houdbaarheidsdatum (THT).</label>
-                        <input type="date" className="w-full p-2 bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
+                    {(modalType === 'voorraad' || modalType === 'frig') && !formData.altijdGoed && (
+                        <div className="space-y-1.5"><label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide">Houdbaarheidsdatum (THT).</label>
+                        <input type="date" className="w-full p-3.5 bg-white dark:bg-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 rounded-xl font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
                     )}
 
-                    <div className="space-y-1"><label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Categorie.</label>
-                    <select className="w-full p-3 bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg" value={formData.categorie} onChange={e => setFormData({...formData, categorie: e.target.value})}>
+                    <div className="space-y-1.5"><label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide">Categorie.</label>
+                    <select className="w-full p-3.5 bg-white dark:bg-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 rounded-xl font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.categorie} onChange={e => setFormData({...formData, categorie: e.target.value})}>
                         {actieveCategorieen.map(c => <option key={c.name||c} value={c.name||c}>{c.name||c}</option>)}
                     </select></div>
-                    {/* Extra inplanbalk voor Weekmenu indien geactiveerd door admin */}
+
                     {!myHiddenTabs.includes('weekmenu') && (
-                        <div className="space-y-1 p-3 bg-pink-50/40 dark:bg-pink-950/10 border border-pink-200/60 dark:border-pink-800/40 rounded-xl mt-2 animate-in fade-in duration-200">
-                            <label className="text-xs font-bold text-pink-700 dark:text-pink-400 uppercase flex items-center gap-1.5">
-                                <Icon path={Icons.Calendar} size={14} /> Inplannen in Week. (Optioneel)
+                        <div className="space-y-1.5 p-4 bg-pink-50/50 dark:bg-pink-900/20 border-2 border-pink-200/60 dark:border-pink-800/40 rounded-xl mt-3 animate-in fade-in duration-200 shadow-sm">
+                            <label className="text-xs font-black text-pink-600 dark:text-pink-400 uppercase tracking-wide flex items-center gap-1.5">
+                                <Icon path={Icons.Calendar} size={16} /> Inplannen in Week. (Optioneel)
                             </label>
                             <select 
-                                className="w-full p-3 bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 outline-none"
+                                className="w-full p-3.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold focus:ring-2 focus:ring-pink-500 outline-none shadow-sm transition-all"
                                 value={formData.geplandeDatum || ''} 
                                 onChange={e => setFormData({...formData, geplandeDatum: e.target.value || ''})}
                             >
@@ -3379,7 +3391,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                         const day = monday.getDay() || 7;
                                         monday.setHours(0,0,0,0);
                                         monday.setDate(monday.getDate() - day + 1);
-                                        
                                         return Array.from({length: 7}).map((_, i) => {
                                             const d = new Date(monday);
                                             d.setDate(monday.getDate() + i);
@@ -3395,7 +3406,6 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                         const day = nextMonday.getDay() || 7;
                                         nextMonday.setHours(0,0,0,0);
                                         nextMonday.setDate(nextMonday.getDate() - day + 1 + 7);
-                                        
                                         return Array.from({length: 7}).map((_, i) => {
                                             const d = new Date(nextMonday);
                                             d.setDate(nextMonday.getDate() + i);
@@ -3408,35 +3418,36 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                             </select>
                         </div>
                     )}
-{/* Bulk (Batch) Aanmaak: Product los toevoegen */}
+
                     {!editingItem && (
-                        <div className="space-y-1 p-3 bg-indigo-50/40 dark:bg-indigo-950/10 border border-indigo-200/60 dark:border-indigo-800/40 rounded-xl mt-2 mb-2 animate-in fade-in duration-200">
-                            <label className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase flex items-center gap-1.5">
-                                <Icon path={Icons.Copy} size={14} /> Opsplitsen in losse items (Optioneel)
+                        <div className="space-y-1.5 p-4 bg-indigo-50/50 dark:bg-indigo-900/20 border-2 border-indigo-200/60 dark:border-indigo-800/40 rounded-xl mt-3 animate-in fade-in duration-200 shadow-sm">
+                            <label className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wide flex items-center gap-1.5">
+                                <Icon path={Icons.Copy} size={16} /> Opsplitsen in losse items (Optioneel)
                             </label>
-                            <div className="flex items-center gap-3 mt-1">
+                            <div className="flex items-center gap-4 mt-2">
                                 <input 
                                     type="number" 
                                     min="1" 
                                     max="50"
-                                    className="w-20 p-2 text-center bg-white dark:bg-gray-700 dark:text-white border border-indigo-300 dark:border-indigo-600 rounded-lg text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-20 p-3.5 text-center bg-white dark:bg-gray-800 dark:text-white border border-indigo-200 dark:border-indigo-700 rounded-lg text-lg font-black focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm transition-all"
                                     value={formData.bulkAanmaak || 1} 
                                     onChange={e => setFormData({...formData, bulkAanmaak: e.target.value})}
                                 />
-                                <span className="text-xs font-medium text-indigo-800 dark:text-indigo-300 leading-tight">
+                                <span className="text-xs font-bold text-indigo-800 dark:text-indigo-300 leading-relaxed">
                                     Hoe vaak wil je dit product als<br/> een APARTE regel opslaan?
                                 </span>
                             </div>
                         </div>
                     )}                                                                                    
+                    
                     {!editingItem && (
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" id="rememberLocation" checked={rememberLocation} onChange={e => setRememberLocation(e.target.checked)} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600" />
-                            <label htmlFor="rememberLocation" className="text-sm text-gray-700 dark:text-gray-300">Onthoud locatie en lade</label>
+                        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50 mt-2">
+                            <input type="checkbox" id="rememberLocation" checked={rememberLocation} onChange={e => setRememberLocation(e.target.checked)} className="w-5 h-5 text-blue-600 rounded-md focus:ring-blue-500 border-gray-300 dark:border-gray-600 shadow-sm transition-all" />
+                            <label htmlFor="rememberLocation" className="text-sm font-bold text-gray-700 dark:text-gray-300 cursor-pointer">Onthoud locatie en lade voor volgende</label>
                         </div>
                     )}
 
-                    <button type="submit" className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md">Opslaan</button>
+                    <button type="submit" className="w-full py-4 mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-lg rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all">Opslaan</button>
                 </form>
             </Modal>
 
@@ -3448,22 +3459,22 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             {/* Shopping List Modal */}
             <Modal isOpen={showShoppingModal} onClose={() => setShowShoppingModal(false)} title="Boodschappenlijst." color="blue">
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-white dark:bg-gray-700/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 p-4 mb-4">
-                        <form onSubmit={handleAddShoppingItem} className="flex flex-col gap-2">
-                            <div className="flex gap-2">
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-5 mb-5">
+                        <form onSubmit={handleAddShoppingItem} className="flex flex-col gap-3">
+                            <div className="flex gap-3">
                                 <input 
                                     type="text" 
                                     placeholder="Wat moet je kopen?" 
-                                    className="flex-grow p-3 min-w-0 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" 
+                                    className="flex-grow p-4 min-w-0 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white font-bold transition-all shadow-sm" 
                                     value={shoppingFormData.naam} 
                                     onChange={e => setShoppingFormData({...shoppingFormData, naam: e.target.value})} 
                                     required
                                 />
-                                <div className="relative w-28 sm:w-32 flex-shrink-0">
+                                <div className="relative w-32 sm:w-36 flex-shrink-0">
                                     <input 
                                         type="number" 
                                         step="0.25"
-                                        className="w-full h-12 text-center border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 outline-none dark:text-white pr-5 pl-1 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                        className="w-full h-full text-center border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 outline-none dark:text-white font-black text-lg pr-6 pl-2 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
                                         value={shoppingFormData.aantal} 
                                         onChange={e => setShoppingFormData({...shoppingFormData, aantal: e.target.value})} 
                                     />
@@ -3473,9 +3484,9 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                         const current = parseFloat(shoppingFormData.aantal) || 0;
                                         setShoppingFormData({...shoppingFormData, aantal: Math.round((current + 0.25) * 100) / 100});
                                       }}
-                                      className="absolute right-1 top-1 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer"
+                                      className="absolute right-1.5 top-1.5 w-6 h-5 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
                                     >
-                                      <Icon path={Icons.ChevronRight} size={10} className="rotate-[-90deg]" />
+                                      <Icon path={Icons.ChevronRight} size={14} className="rotate-[-90deg]" />
                                     </button>
                                     <button 
                                       type="button"
@@ -3483,47 +3494,46 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                         const current = parseFloat(shoppingFormData.aantal) || 0;
                                         setShoppingFormData({...shoppingFormData, aantal: Math.max(0, Math.round((current - 0.25) * 100) / 100)});
                                       }}
-                                      className="absolute right-1 bottom-1 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer"
+                                      className="absolute right-1.5 bottom-1.5 w-6 h-5 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
                                     >
-                                      <Icon path={Icons.ChevronRight} size={10} className="rotate-[90deg]" />
+                                      <Icon path={Icons.ChevronRight} size={14} className="rotate-[90deg]" />
                                     </button>
                                 </div>
                             </div>
                             
-                            <div className="flex gap-2">
+                            <div className="flex gap-3">
                                 <select 
-                                    className="flex-grow p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                    className="flex-grow p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white font-bold transition-all shadow-sm"
                                     value={shoppingFormData.winkel}
                                     onChange={e => setShoppingFormData({...shoppingFormData, winkel: e.target.value})}
                                 >
                                     <option value="">Kies winkel (optioneel)...</option>
                                     {WINKELS.map(w => <option key={w.name} value={w.name}>{w.name}</option>)}
                                 </select>
-                                <button type="submit" className="bg-blue-600 text-white px-6 rounded-xl font-bold flex-shrink-0 flex items-center justify-center"><Icon path={Icons.Plus}/></button>
+                                <button type="submit" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 rounded-xl font-extrabold flex-shrink-0 flex items-center justify-center shadow-lg shadow-blue-500/30 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all"><Icon path={Icons.Plus} size={24}/></button>
                             </div>
                         </form>
                     </div>
 
-                    <div className="flex justify-between items-end mb-2">
-                        <h4 className="font-bold text-sm text-gray-700 dark:text-gray-300">Jouw Lijstje</h4>
+                    <div className="flex justify-between items-end mb-3 px-1">
+                        <h4 className="font-extrabold text-sm text-gray-800 dark:text-gray-200 uppercase tracking-widest">Jouw Lijstje</h4>
                         <div className="flex gap-2">
-                            <button onClick={handleShareWhatsApp} className="text-xs flex items-center gap-1 font-bold text-green-600 hover:text-green-700 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded transition-colors" title="Deel via WhatsApp">
+                            <button onClick={handleShareWhatsApp} className="text-xs flex items-center gap-1.5 font-bold text-white bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95" title="Deel via WhatsApp">
                                 <Icon path={Icons.MessageCircle} size={14}/> WhatsApp
                             </button>
                             {shoppingList.some(i => i.checked) && (
-                                <button onClick={clearCheckedShopping} className="text-xs flex items-center gap-1 font-bold text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded transition-colors">
+                                <button onClick={clearCheckedShopping} className="text-xs flex items-center gap-1.5 font-bold text-red-600 hover:text-white bg-red-100 hover:bg-red-500 dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-600 px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95">
                                     <Icon path={Icons.Trash2} size={14}/> Wis afgevinkt
                                 </button>
                             )}
                         </div>
                     </div>
 
-                    <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-                        {shoppingList.length === 0 && <p className="text-center text-gray-400 py-8">Je boodschappenlijst is leeg.</p>}
+                    <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                        {shoppingList.length === 0 && <p className="text-center text-gray-400 py-10 font-medium italic">Je boodschappenlijst is leeg.</p>}
                         
                         {Object.entries(groupedShoppingList)
                             .sort(([winkelA], [winkelB]) => {
-                                // "Geen winkel gekozen" onderaan
                                 if (winkelA === 'Geen winkel gekozen') return 1;
                                 if (winkelB === 'Geen winkel gekozen') return -1;
                                 return winkelA.localeCompare(winkelB);
@@ -3533,28 +3543,28 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                 const winkelColor = winkelObj ? winkelObj.color : 'gray';
 
                                 return (
-                                    <div key={winkel} className="mb-4">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className={`w-2 h-2 rounded-full bg-${winkelColor}-500`}></span>
-                                            <h5 className="font-bold text-xs uppercase text-gray-500 dark:text-gray-400 tracking-wider">{winkel}</h5>
+                                    <div key={winkel} className="mb-5 animate-in fade-in slide-in-from-bottom-2">
+                                        <div className="flex items-center gap-2.5 mb-3 px-1">
+                                            <span className={`w-3 h-3 rounded-full bg-${winkelColor}-500 shadow-sm`}></span>
+                                            <h5 className="font-black text-xs uppercase text-gray-600 dark:text-gray-300 tracking-widest">{winkel}</h5>
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-2.5">
                                             {lijstItems.sort((a,b) => a.checked - b.checked).map(item => (
-                                                <div key={item.id} className={`flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl border ${item.checked ? 'border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800' : 'border-gray-200 dark:border-gray-600'}`}>
-                                                    <div className="flex items-center gap-3 cursor-pointer overflow-hidden flex-grow" onClick={() => toggleShoppingItem(item)}>
-                                                        <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${item.checked ? 'bg-blue-500 border-blue-500' : 'border-gray-300 dark:border-gray-500'}`}>
-                                                            {item.checked && <Icon path={Icons.Check} size={14} className="text-white"/>}
+                                                <div key={item.id} className={`flex items-center justify-between p-3.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border transition-all duration-300 shadow-sm hover:shadow-md ${item.checked ? 'border-blue-200/50 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-800/30' : 'border-gray-200/60 dark:border-gray-700/60 hover:border-blue-300 dark:hover:border-blue-600'}`}>
+                                                    <div className="flex items-center gap-4 cursor-pointer overflow-hidden flex-grow group" onClick={() => toggleShoppingItem(item)}>
+                                                        <div className={`w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${item.checked ? 'bg-blue-500 border-blue-500 shadow-sm' : 'border-gray-300 dark:border-gray-500 group-hover:border-blue-400'}`}>
+                                                            {item.checked && <Icon path={Icons.Check} size={16} className="text-white"/>}
                                                         </div>
                                                         <div className="flex flex-col min-w-0">
-                                                            <span className={`font-medium truncate ${item.checked ? 'text-gray-400 line-through' : 'text-gray-800 dark:text-gray-200'}`}>
-                                                                {item.aantal > 0 && <span className="font-bold text-blue-600 mr-1">{formatAantal(item.aantal)} {item.eenheid}</span>}
+                                                            <span className={`font-bold text-base truncate transition-colors ${item.checked ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-900 dark:text-gray-100'}`}>
+                                                                {item.aantal > 0 && <span className={`font-black mr-2 ${item.checked ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'}`}>{formatAantal(item.aantal)} {item.eenheid}</span>}
                                                                 {item.naam}
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex gap-2 flex-shrink-0 ml-2">
-                                                        <button onClick={() => moveShoppingToStock(item)} className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg" title="Naar voorraad"><Icon path={Icons.Box} size={18}/></button>
-                                                        <button onClick={() => deleteShoppingItem(item.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg" title="Verwijderen"><Icon path={Icons.Trash2} size={18}/></button>
+                                                    <div className="flex gap-2 flex-shrink-0 ml-3">
+                                                        <button onClick={() => moveShoppingToStock(item)} className="p-2 text-green-600 bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 rounded-xl transition-all active:scale-95 shadow-sm" title="Naar voorraad"><Icon path={Icons.Box} size={18}/></button>
+                                                        <button onClick={() => deleteShoppingItem(item.id)} className="p-2 text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 rounded-xl transition-all active:scale-95 shadow-sm" title="Verwijderen"><Icon path={Icons.Trash2} size={18}/></button>
                                                     </div>
                                                 </div>
                                             ))}
@@ -3568,30 +3578,30 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
 
             {/* Delete Confirmation Modal */}
             <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Product verwijderen." color="red">
-                <p className="text-gray-800 dark:text-gray-200 mb-6">Wat is de reden voor het verwijderen van <strong>{itemToDelete?.naam}</strong>?</p>
-                <div className="grid grid-cols-1 gap-3">
-                    <button onClick={() => confirmDelete('consumed')} className="flex items-center justify-center gap-2 p-3 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200 rounded-xl font-bold hover:bg-green-200 dark:hover:bg-green-900/60 transition">
-                        <Icon path={Icons.Utensils} /> Opgegeten
+                <p className="text-gray-800 dark:text-gray-200 mb-6 font-medium">Wat is de reden voor het verwijderen van <strong>{itemToDelete?.naam}</strong>?</p>
+                <div className="grid grid-cols-1 gap-4">
+                    <button onClick={() => confirmDelete('consumed')} className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/40 dark:to-emerald-900/40 dark:text-green-300 rounded-2xl font-extrabold hover:shadow-md transition-all active:scale-95 border border-green-200 dark:border-green-800">
+                        <Icon path={Icons.Utensils} size={24} /> Opgegeten
                     </button>
-                    <button onClick={() => confirmDelete('wasted')} className="flex items-center justify-center gap-2 p-3 bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200 rounded-xl font-bold hover:bg-red-200 dark:hover:bg-red-900/60 transition">
-                        <Icon path={Icons.Trash2} /> Weggegooid (Verspild)
+                    <button onClick={() => confirmDelete('wasted')} className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-red-100 to-rose-100 text-red-800 dark:from-red-900/40 dark:to-rose-900/40 dark:text-red-300 rounded-2xl font-extrabold hover:shadow-md transition-all active:scale-95 border border-red-200 dark:border-red-800">
+                        <Icon path={Icons.Trash2} size={24} /> Weggegooid (Verspild)
                     </button>
-                    <button onClick={() => confirmDelete('other')} className="flex items-center justify-center gap-2 p-3 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 transition">
+                    <button onClick={() => confirmDelete('other')} className="flex items-center justify-center gap-3 p-4 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-2xl font-bold hover:shadow-md transition-all active:scale-95 border border-gray-200 dark:border-gray-700">
                         Andere reden / Foutje
                     </button>
                 </div>
             </Modal>
 
-            {/* Shopify Modal (Choose store and quantity after delete) */}
+            {/* Shopify Modal */}
             <Modal isOpen={showShopifyModal} onClose={() => setShowShopifyModal(false)} title="Boodschappenlijst?" color="blue">
-                <p className="text-gray-800 dark:text-gray-200 mb-4">Wil je <strong>{itemToShopify?.naam}</strong> op de boodschappenlijst zetten?</p>
+                <p className="text-gray-800 dark:text-gray-200 mb-5 font-medium">Wil je <strong>{itemToShopify?.naam}</strong> op de boodschappenlijst zetten?</p>
                 
-                <div className="space-y-4">
-                    <div className="flex gap-3">
+                <div className="space-y-5">
+                    <div className="flex gap-4">
                         <div className="flex-1 min-w-0">
-                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1 block">Winkel (optioneel)</label>
+                            <label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5 block">Winkel (optioneel)</label>
                             <select 
-                                className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500 dark:text-white font-bold transition-all shadow-sm"
                                 value={shopForDeletedItem}
                                 onChange={(e) => setShopForDeletedItem(e.target.value)}
                             >
@@ -3599,13 +3609,13 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                 {WINKELS.map(w => <option key={w.name} value={w.name}>{w.name}</option>)}
                             </select>
                         </div>
-                        <div className="w-32 sm:w-36 flex-shrink-0">
-                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1 block">Aantal</label>
+                        <div className="w-32 sm:w-40 flex-shrink-0">
+                            <label className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5 block">Aantal</label>
                             <div className="relative">
                                 <input 
                                     type="number" 
                                     step="0.25"
-                                    className="w-full h-12 text-center border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 outline-none dark:text-white pr-6 pl-1 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                                    className="w-full h-[56px] text-center border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 outline-none dark:text-white pr-7 pl-2 font-black text-lg appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
                                     value={aantalForShopifyItem} 
                                     onChange={(e) => setAantalForShopifyItem(e.target.value)}
                                 />
@@ -3615,9 +3625,9 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                     const current = parseFloat(aantalForShopifyItem) || 0;
                                     setAantalForShopifyItem(Math.round((current + 0.25) * 100) / 100);
                                   }}
-                                  className="absolute right-1 top-1 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer"
+                                  className="absolute right-1.5 top-1.5 w-6 h-5 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
                                 >
-                                  <Icon path={Icons.ChevronRight} size={10} className="rotate-[-90deg]" />
+                                  <Icon path={Icons.ChevronRight} size={14} className="rotate-[-90deg]" />
                                 </button>
                                 <button 
                                   type="button"
@@ -3625,19 +3635,19 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                     const current = parseFloat(aantalForShopifyItem) || 0;
                                     setAantalForShopifyItem(Math.max(0, Math.round((current - 0.25) * 100) / 100));
                                   }}
-                                  className="absolute right-1 bottom-1 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer"
+                                  className="absolute right-1.5 bottom-1.5 w-6 h-5 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
                                 >
-                                  <Icon path={Icons.ChevronRight} size={10} className="rotate-[90deg]" />
+                                  <Icon path={Icons.ChevronRight} size={14} className="rotate-[90deg]" />
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <button onClick={() => setShowShopifyModal(false)} className="p-3 bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 transition">
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                        <button onClick={() => setShowShopifyModal(false)} className="p-4 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active:scale-95 border border-gray-200 dark:border-gray-700">
                             Nee
                         </button>
-                        <button onClick={handleAddToShoppingFromDelete} className="p-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-md">
+                        <button onClick={handleAddToShoppingFromDelete} className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-extrabold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">
                             Ja, voeg toe
                         </button>
                     </div>
@@ -3646,49 +3656,49 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
 
             {/* Stats Modal */}
             <Modal isOpen={showStatsModal} onClose={() => setShowStatsModal(false)} title="Statistieken." color="purple">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-2xl text-center border border-blue-100 dark:border-blue-800 mb-4 shadow-sm">
-                    <span className="block text-4xl font-black text-blue-600 dark:text-blue-400 mb-1">€{totalStockValue.toFixed(2)}</span>
-                    <span className="text-xs uppercase font-bold tracking-wider text-blue-800 dark:text-blue-200">Totale Voorraadwaarde</span>
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-3xl text-center border border-blue-100/50 dark:border-blue-800/50 mb-6 shadow-sm">
+                    <span className="block text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 mb-2 drop-shadow-sm">€{totalStockValue.toFixed(2)}</span>
+                    <span className="text-xs uppercase font-black tracking-widest text-blue-800/80 dark:text-blue-200/80">Totale Voorraadwaarde</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl text-center border border-green-100 dark:border-green-800">
-                        <span className="block text-3xl font-bold text-green-600 dark:text-green-400">{stats.consumed}</span>
-                        <span className="text-xs uppercase tracking-wide text-green-800 dark:text-green-200 block mb-1">Producten gegeten</span>
-                        {stats.consumedValue > 0 && <span className="text-sm font-semibold text-green-700 dark:text-green-300">Waarde: €{(stats.consumedValue || 0).toFixed(2)}</span>}
+                <div className="grid grid-cols-2 gap-5 mb-8">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-5 rounded-3xl text-center border border-green-100/50 dark:border-green-800/50 shadow-sm">
+                        <span className="block text-4xl font-black text-green-600 dark:text-green-400 mb-1 drop-shadow-sm">{stats.consumed}</span>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-green-800/80 dark:text-green-200/80 block mb-2">Producten gegeten</span>
+                        {stats.consumedValue > 0 && <span className="text-sm font-extrabold text-green-700 dark:text-green-300 bg-green-100/50 dark:bg-green-800/30 px-3 py-1 rounded-lg">Waarde: €{(stats.consumedValue || 0).toFixed(2)}</span>}
                     </div>
-                    <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl text-center border border-red-100 dark:border-red-800">
-                        <span className="block text-3xl font-bold text-red-600 dark:text-red-400">{stats.wasted}</span>
-                        <span className="text-xs uppercase tracking-wide text-red-800 dark:text-red-200 block mb-1">Weggegooid</span>
-                        {stats.wastedValue > 0 && <span className="text-sm font-semibold text-red-700 dark:text-red-300">Waarde: €{(stats.wastedValue || 0).toFixed(2)}</span>}
+                    <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 p-5 rounded-3xl text-center border border-red-100/50 dark:border-red-800/50 shadow-sm">
+                        <span className="block text-4xl font-black text-red-600 dark:text-red-400 mb-1 drop-shadow-sm">{stats.wasted}</span>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-red-800/80 dark:text-red-200/80 block mb-2">Weggegooid</span>
+                        {stats.wastedValue > 0 && <span className="text-sm font-extrabold text-red-700 dark:text-red-300 bg-red-100/50 dark:bg-red-800/30 px-3 py-1 rounded-lg">Waarde: €{(stats.wastedValue || 0).toFixed(2)}</span>}
                     </div>
                 </div>
                 {stats.consumed + stats.wasted > 0 ? (
-                    <div className="relative pt-1">
-                        <div className="flex mb-2 items-center justify-between">
-                            <span className="text-xs font-semibold inline-block text-blue-600 dark:text-blue-400">Verspillingspercentage</span>
-                            <span className="text-xs font-semibold inline-block text-blue-600 dark:text-blue-400">
+                    <div className="relative pt-2">
+                        <div className="flex mb-3 items-center justify-between">
+                            <span className="text-xs font-black uppercase tracking-wide text-gray-600 dark:text-gray-400">Verspillingspercentage</span>
+                            <span className="text-sm font-black text-red-500">
                                 {Math.round((stats.wasted / (stats.consumed + stats.wasted)) * 100)}%
                             </span>
                         </div>
-                        <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200 dark:bg-green-900">
-                            <div style={{ width: `${Math.round((stats.wasted / (stats.consumed + stats.wasted)) * 100)}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500"></div>
+                        <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-green-200 dark:bg-green-900 shadow-inner">
+                            <div style={{ width: `${Math.round((stats.wasted / (stats.consumed + stats.wasted)) * 100)}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-red-500 to-rose-500"></div>
                         </div>
-                        <p className="text-xs text-center text-gray-500 italic">Gebaseerd op handmatige invoer bij verwijderen.</p>
+                        <p className="text-xs text-center text-gray-400 dark:text-gray-500 font-medium italic mt-2">Gebaseerd op handmatige invoer bij verwijderen.</p>
                     </div>
-                ) : <p className="text-center text-gray-400 text-sm">Nog geen data beschikbaar.</p>}
+                ) : <p className="text-center text-gray-400 font-medium text-sm">Nog geen verbruiksdata beschikbaar.</p>}
             </Modal>
             
             <Modal isOpen={showSuggestionModal} onClose={() => setShowSuggestionModal(false)} title="Wat eten we vandaag?" color="yellow">
-                <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">Deze producten hebben prioriteit op basis van houdbaarheid:</p>
-                <div className="space-y-3">
-                    {getSuggestions().length === 0 ? <p className="italic text-gray-400 text-center">Alles lijkt vers!</p> : getSuggestions().map(item => (
-                        <div key={item.id} className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-xl border border-yellow-200 dark:border-gray-600 shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <span className="text-2xl">{item.emoji}</span>
+                <p className="text-gray-600 dark:text-gray-300 mb-5 font-medium">Deze producten hebben prioriteit op basis van houdbaarheid:</p>
+                <div className="space-y-4">
+                    {getSuggestions().length === 0 ? <p className="italic font-medium text-gray-400 text-center py-8">Alles lijkt vers! Je bent goed bezig.</p> : getSuggestions().map(item => (
+                        <div key={item.id} className="flex items-center justify-between p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-yellow-200/60 dark:border-yellow-700/50 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center gap-4">
+                                <span className="text-3xl drop-shadow-sm">{item.emoji}</span>
                                 <div>
-                                    <p className="font-bold text-gray-800 dark:text-gray-100">{item.naam}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    <p className="font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">{item.naam}</p>
+                                    <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-0.5">
                                         {item.type === 'vriezer' ? `${item.daysOld} dgn in vriezer` : `THT: ${formatDate(item.houdbaarheidsDatum)}`}
                                     </p>
                                 </div>
@@ -3701,36 +3711,39 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
 
             <Modal isOpen={showLogModal} onClose={() => setShowLogModal(false)} title="Logboek." color="teal">
                 {logs.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center italic py-4">Nog geen activiteiten.</p>
+                    <p className="text-gray-400 dark:text-gray-500 font-medium text-center py-10">Nog geen activiteiten opgeslagen.</p>
                 ) : (
-                    <ul className="space-y-3">
+                    <ul className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-gray-700 before:to-transparent">
                         {logs.map(log => {
                             const isMine = log.targetUserId === user.uid;
                             const isAdded = log.action === 'Toevoegen';
                             const isDeleted = log.action === 'Verwijderd';
                             
                             return (
-                                <li key={log.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-100 dark:border-gray-600 text-sm">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <span className="font-bold text-gray-700 dark:text-gray-200">{log.item}</span>
-                                        <span className="text-xs text-gray-400 dark:text-gray-500">{formatDateTime(log.timestamp)}</span>
+                                <li key={log.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-800 shadow flex-shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 ${isAdded ? 'text-green-500' : isDeleted ? 'text-red-500' : 'text-blue-500'}`}>
+                                        <Icon path={isAdded ? Icons.Plus : isDeleted ? Icons.Trash2 : Icons.Edit2} size={16}/>
                                     </div>
-                                    <div className="flex justify-between items-center mt-2">
-                                        <div className="flex gap-2">
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isAdded ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : isDeleted ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
+                                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="font-extrabold text-gray-800 dark:text-gray-100">{log.item}</span>
+                                            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-900 px-2 py-1 rounded-md">{formatDateTime(log.timestamp)}</span>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${isAdded ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : isDeleted ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
                                                 {log.action}
                                             </span>
                                             {isAdmin && (
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${isMine ? 'border-green-300 text-green-600 dark:border-green-700 dark:text-green-400' : 'border-orange-300 text-orange-600 dark:border-orange-700 dark:text-orange-400'}`}>
+                                                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${isMine ? 'border-green-300 text-green-600 dark:border-green-700 dark:text-green-400' : 'border-orange-300 text-orange-600 dark:border-orange-700 dark:text-orange-400'}`}>
                                                     {isMine ? 'Eigen' : 'Ander'}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                        {log.details && <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-2 bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg leading-relaxed">{log.details}</p>}
+                                        <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1.5 uppercase tracking-wide">
                                             <Icon path={Icons.User} size={12}/> {log.actorName}
                                         </div>
                                     </div>
-                                    {log.details && <p className="text-xs text-gray-400 mt-1 pl-1 border-l-2 border-gray-200 dark:border-gray-600 leading-relaxed">{log.details}</p>}
                                 </li>
                             );
                         })}
@@ -3739,20 +3752,20 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             </Modal>
 
             <Modal isOpen={showBeheerModal} onClose={() => setShowBeheerModal(false)} title="Instellingen." color="purple">
-                <div className="flex border-b dark:border-gray-700 mb-4">
-                    <button onClick={() => setBeheerTab('locaties')} className={`flex-1 py-2 font-medium ${beheerTab==='locaties'?'text-blue-600 border-b-2 border-blue-600':'text-gray-500 dark:text-gray-400'}`}>Locaties.</button>
-                    <button onClick={() => setBeheerTab('categorieen')} className={`flex-1 py-2 font-medium ${beheerTab==='categorieen'?'text-purple-600 border-b-2 border-purple-600':'text-gray-500 dark:text-gray-400'}`}>Categorieën.</button>
-                    <button onClick={() => setBeheerTab('eenheden')} className={`flex-1 py-2 font-medium ${beheerTab==='eenheden'?'text-orange-600 border-b-2 border-orange-600':'text-gray-500 dark:text-gray-400'}`}>Eenheden.</button>
+                <div className="flex bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl mb-6 border border-gray-200 dark:border-gray-700">
+                    <button onClick={() => setBeheerTab('locaties')} className={`flex-1 py-2 font-extrabold text-sm rounded-lg transition-all ${beheerTab==='locaties'?'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Locaties.</button>
+                    <button onClick={() => setBeheerTab('categorieen')} className={`flex-1 py-2 font-extrabold text-sm rounded-lg transition-all ${beheerTab==='categorieen'?'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Categorieën.</button>
+                    <button onClick={() => setBeheerTab('eenheden')} className={`flex-1 py-2 font-extrabold text-sm rounded-lg transition-all ${beheerTab==='eenheden'?'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Eenheden.</button>
                 </div>
 
                 {beheerTab === 'locaties' && (
                     <div className="space-y-6">
                         <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <h4 className="font-bold text-gray-700 dark:text-gray-300">Locaties</h4>
-                                <span className="text-[10px] uppercase text-gray-400 font-bold bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">Sleep om te sorteren</span>
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="font-extrabold text-gray-800 dark:text-gray-200">Locaties</h4>
+                                <span className="text-[10px] uppercase text-gray-400 font-bold tracking-widest bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-md shadow-sm">Sleep om te sorteren</span>
                             </div>
-                            <ul className="space-y-2 mb-4 relative">
+                            <ul className="space-y-3 mb-5 relative">
                                 {filteredLocaties.map(l => (
                                     <li 
                                         key={l.id} 
@@ -3761,129 +3774,129 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                         onDragOver={handleDragOver}
                                         onDrop={(e) => handleDrop(e, l.id)}
                                         onDragEnd={handleDragEnd}
-                                        className={`flex justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded items-center border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-opacity ${draggedLocId === l.id ? 'opacity-40' : 'opacity-100'}`}
+                                        className={`flex justify-between p-3 bg-white dark:bg-gray-800 rounded-xl items-center border shadow-sm transition-all ${draggedLocId === l.id ? 'opacity-40 border-blue-400 border-dashed' : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600'}`}
                                     >
                                         <div className="flex items-center gap-3 w-full">
-                                            <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" title="Sleep om volgorde aan te passen">
-                                                <Icon path={Icons.GripVertical} size={16}/>
+                                            <div className="cursor-grab active:cursor-grabbing p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" title="Sleep om volgorde aan te passen">
+                                                <Icon path={Icons.GripVertical} size={18}/>
                                             </div>
                                             <button 
                                                 onClick={() => cycleLocatieColor(l)}
-                                                className={`w-6 h-6 flex-shrink-0 rounded-full bg-gradient-to-br ${GRADIENTS[l.color || 'blue']} border border-gray-200 shadow-sm transition-transform hover:scale-110`}
+                                                className={`w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br ${GRADIENTS[l.color || 'blue']} border-2 border-white dark:border-gray-800 shadow-md transition-transform hover:scale-110 active:scale-95`}
                                                 title="Klik om kleur te wijzigen"
                                             ></button>
-                                            <span onClick={() => setSelectedLocatieForBeheer(l.id)} className={`cursor-pointer flex-grow ${selectedLocatieForBeheer===l.id?'text-blue-600 font-bold':''}`}>{l.naam}</span>
+                                            <span onClick={() => setSelectedLocatieForBeheer(l.id)} className={`cursor-pointer flex-grow font-bold ${selectedLocatieForBeheer===l.id?'text-blue-600 dark:text-blue-400':''}`}>{l.naam}</span>
                                         </div>
-                                        <button onClick={() => handleDeleteLocatie(l.id)} className="text-red-500 p-1 ml-2 flex-shrink-0"><Icon path={Icons.Trash2}/></button>
+                                        <button onClick={() => handleDeleteLocatie(l.id)} className="text-red-500 p-2 ml-2 flex-shrink-0 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-lg transition-colors active:scale-95"><Icon path={Icons.Trash2} size={16}/></button>
                                     </li>
                                 ))}
                             </ul>
-                            <form onSubmit={handleAddLocatie} className="flex gap-2">
+                            <form onSubmit={handleAddLocatie} className="flex gap-3">
                                 <select 
                                     value={newLocatieColor} 
                                     onChange={e => setNewLocatieColor(e.target.value)}
-                                    className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-700 dark:text-white w-24 text-sm"
+                                    className="border-2 border-gray-200 dark:border-gray-700 p-3 rounded-xl bg-white dark:bg-gray-800 dark:text-white w-28 text-sm font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm"
                                 >
                                     {Object.keys(GRADIENTS).map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
-                                <input className="flex-grow border border-gray-300 dark:border-gray-600 p-2 rounded dark:bg-gray-700 dark:text-white" placeholder="Nieuwe locatie" value={newLocatieNaam} onChange={e=>setNewLocatieNaam(e.target.value)} required />
-                                <button className="bg-blue-600 text-white px-3 rounded">+</button>
+                                <input className="flex-grow border-2 border-gray-200 dark:border-gray-700 p-3 rounded-xl bg-white dark:bg-gray-800 dark:text-white text-sm font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe locatie" value={newLocatieNaam} onChange={e=>setNewLocatieNaam(e.target.value)} required />
+                                <button className="bg-blue-600 text-white px-5 rounded-xl font-extrabold shadow-md hover:bg-blue-700 active:scale-95 transition-all">+</button>
                             </form>
                         </div>
                         {selectedLocatieForBeheer && (
-                            <div className="pt-4 border-t dark:border-gray-700">
-                                <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-2">Lades</h4>
-                                <ul className="space-y-2 mb-3">
+                            <div className="pt-6 border-t border-gray-100 dark:border-gray-700 animate-in fade-in slide-in-from-top-2">
+                                <h4 className="font-extrabold text-gray-800 dark:text-gray-200 mb-3">Lades <span className="text-blue-500 font-medium text-sm ml-1">in {filteredLocaties.find(l => l.id === selectedLocatieForBeheer)?.naam}</span></h4>
+                                <ul className="space-y-3 mb-4">
                                     {lades.filter(l => l.vriezerId === selectedLocatieForBeheer).sort((a,b)=>a.naam.localeCompare(b.naam)).map(l => (
-                                        <li key={l.id} className="flex justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded items-center">
+                                        <li key={l.id} className="flex justify-between p-3 bg-white dark:bg-gray-800 rounded-xl items-center border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:border-blue-200">
                                             {editingLadeId === l.id ? 
-                                                <div className="flex gap-2 w-full"><input className="flex-grow border p-1 rounded dark:bg-gray-600 dark:text-white" value={editingLadeName} onChange={e=>setEditingLadeName(e.target.value)} /><button onClick={()=>saveLadeName(l.id)} className="text-green-600"><Icon path={Icons.Check}/></button></div> 
+                                                <div className="flex gap-3 w-full"><input className="flex-grow border-2 border-blue-400 p-2 rounded-lg bg-white dark:bg-gray-700 dark:text-white font-bold focus:outline-none" value={editingLadeName} onChange={e=>setEditingLadeName(e.target.value)} /><button onClick={()=>saveLadeName(l.id)} className="bg-green-500 text-white px-4 rounded-lg font-bold shadow-sm active:scale-95"><Icon path={Icons.Check}/></button></div> 
                                                 : 
-                                                <><span>{l.naam}</span><div className="flex gap-2"><button onClick={()=>startEditLade(l)} className="text-blue-500"><Icon path={Icons.Edit2} size={16}/></button><button onClick={() => handleDeleteLade(l.id)} className="text-red-500"><Icon path={Icons.Trash2} size={16}/></button></div></>
+                                                <><span className="font-bold text-gray-700 dark:text-gray-200">{l.naam}</span><div className="flex gap-2"><button onClick={()=>startEditLade(l)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-2 rounded-lg transition-all active:scale-95"><Icon path={Icons.Edit2} size={16}/></button><button onClick={() => handleDeleteLade(l.id)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-2 rounded-lg transition-all active:scale-95"><Icon path={Icons.Trash2} size={16}/></button></div></>
                                             }
                                         </li>
                                     ))}
                                 </ul>
-                                <form onSubmit={handleAddLade} className="flex gap-2"><input className="flex-grow border border-gray-300 dark:border-gray-600 p-2 rounded dark:bg-gray-700 dark:text-white" placeholder="Nieuwe lade" value={newLadeNaam} onChange={e=>setNewLadeNaam(e.target.value)} required /><button className="bg-blue-600 text-white px-3 rounded">+</button></form>
+                                <form onSubmit={handleAddLade} className="flex gap-3"><input className="flex-grow border-2 border-gray-200 dark:border-gray-700 p-3 rounded-xl bg-white dark:bg-gray-800 dark:text-white text-sm font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe lade" value={newLadeNaam} onChange={e=>setNewLadeNaam(e.target.value)} required /><button className="bg-blue-600 text-white px-5 rounded-xl font-extrabold shadow-md hover:bg-blue-700 active:scale-95 transition-all">+</button></form>
                             </div>
                         )}
                     </div>
                 )}
                 {beheerTab === 'categorieen' && (
-                    <div>
-                        <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-2">Categorieën</h4>
-                        <ul className="space-y-2 mb-3">
+                    <div className="animate-in fade-in slide-in-from-left-2">
+                        <h4 className="font-extrabold text-gray-800 dark:text-gray-200 mb-4">Categorieën</h4>
+                        <ul className="space-y-3 mb-5">
                             {actieveCategorieen.map(cat => (
-                                <li key={cat.name} className="flex justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded items-center">
+                                <li key={cat.name} className="flex justify-between p-3 bg-white dark:bg-gray-800 rounded-xl items-center border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:border-purple-200">
                                     {editingCatName === cat.name ?
-                                        <div className="flex gap-2 w-full items-center">
-                                            <input className="flex-grow border p-1 rounded dark:bg-gray-600 dark:text-white" value={editCatInputName} onChange={e=>setEditCatInputName(e.target.value)} />
-                                            <select className="border p-1 rounded dark:bg-gray-600 dark:text-white" value={editCatInputColor} onChange={e=>setEditCatInputColor(e.target.value)}>
+                                        <div className="flex gap-3 w-full items-center">
+                                            <input className="flex-grow border-2 border-purple-400 p-2 rounded-lg bg-white dark:bg-gray-700 dark:text-white font-bold focus:outline-none" value={editCatInputName} onChange={e=>setEditCatInputName(e.target.value)} />
+                                            <select className="border-2 border-purple-400 p-2 rounded-lg bg-white dark:bg-gray-700 dark:text-white font-bold focus:outline-none" value={editCatInputColor} onChange={e=>setEditCatInputColor(e.target.value)}>
                                                 {Object.keys(BADGE_COLORS).map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
-                                            <button onClick={saveCat} className="text-green-600"><Icon path={Icons.Check}/></button>
+                                            <button onClick={saveCat} className="bg-green-500 text-white px-4 rounded-lg font-bold shadow-sm active:scale-95"><Icon path={Icons.Check}/></button>
                                         </div>
                                         :
                                         <>
-                                            <div className="flex items-center gap-2"><div className={`w-3 h-3 rounded-full bg-${cat.color}-500`}></div><span>{cat.name}</span></div>
+                                            <div className="flex items-center gap-3"><div className={`w-4 h-4 rounded-full bg-${cat.color}-500 shadow-sm border border-white dark:border-gray-800`}></div><span className="font-bold text-gray-700 dark:text-gray-200">{cat.name}</span></div>
                                             <div className="flex gap-2">
-                                                <button onClick={()=>startEditCat(cat)} className="text-blue-500"><Icon path={Icons.Edit2} size={16}/></button>
-                                                <button onClick={() => handleDeleteCat(cat.name)} className="text-red-500"><Icon path={Icons.Trash2} size={16}/></button>
+                                                <button onClick={()=>startEditCat(cat)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-2 rounded-lg transition-all active:scale-95"><Icon path={Icons.Edit2} size={16}/></button>
+                                                <button onClick={() => handleDeleteCat(cat.name)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-2 rounded-lg transition-all active:scale-95"><Icon path={Icons.Trash2} size={16}/></button>
                                             </div>
                                         </>
                                     }
                                 </li>
                             ))}
                         </ul>
-                        <form onSubmit={handleAddCat} className="flex gap-2 items-center">
-                            <input className="flex-grow border p-2 rounded dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600" placeholder="Naam" value={newCatName} onChange={e=>setNewCatName(e.target.value)} required />
-                            <select className="border p-2 rounded dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600" value={newCatColor} onChange={e=>setNewCatColor(e.target.value)}>
+                        <form onSubmit={handleAddCat} className="flex gap-3 items-center">
+                            <input className="flex-grow border-2 border-gray-200 dark:border-gray-700 p-3 rounded-xl bg-white dark:bg-gray-800 dark:text-white text-sm font-bold focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 outline-none transition-all shadow-sm" placeholder="Naam" value={newCatName} onChange={e=>setNewCatName(e.target.value)} required />
+                            <select className="border-2 border-gray-200 dark:border-gray-700 p-3 rounded-xl bg-white dark:bg-gray-800 dark:text-white text-sm font-bold focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={newCatColor} onChange={e=>setNewCatColor(e.target.value)}>
                                 {Object.keys(BADGE_COLORS).map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
-                            <button className="bg-purple-600 text-white px-3 rounded">+</button>
+                            <button className="bg-purple-600 text-white px-5 rounded-xl font-extrabold shadow-md hover:bg-purple-700 active:scale-95 transition-all">+</button>
                         </form>
                     </div>
                 )}
                 {beheerTab === 'eenheden' && (
-                    <div>
-                        <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-2">Mijn eenheden</h4>
-                        <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg mb-4">
-                            <button onClick={() => setEenheidFilter('vries')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${eenheidFilter === 'vries' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <div className="animate-in fade-in slide-in-from-right-2">
+                        <h4 className="font-extrabold text-gray-800 dark:text-gray-200 mb-4">Mijn eenheden</h4>
+                        <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1.5 rounded-xl mb-5 border border-gray-200/50 dark:border-gray-700/50">
+                            <button onClick={() => setEenheidFilter('vries')} className={`flex-1 py-2 text-sm font-extrabold rounded-lg transition-all active:scale-95 ${eenheidFilter === 'vries' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
                                 Vriezer.
                             </button>
                             {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                                <button onClick={() => setEenheidFilter('frig')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${eenheidFilter === 'frig' ? 'bg-white dark:bg-gray-600 shadow text-green-600 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                                <button onClick={() => setEenheidFilter('frig')} className={`flex-1 py-2 text-sm font-extrabold rounded-lg transition-all active:scale-95 ${eenheidFilter === 'frig' ? 'bg-white dark:bg-gray-700 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
                                     Frig.
                                 </button>
                             )}
                             {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                                <button onClick={() => setEenheidFilter('voorraad')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${eenheidFilter === 'voorraad' ? 'bg-white dark:bg-gray-600 shadow text-orange-600 dark:text-orange-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                                <button onClick={() => setEenheidFilter('voorraad')} className={`flex-1 py-2 text-sm font-extrabold rounded-lg transition-all active:scale-95 ${eenheidFilter === 'voorraad' ? 'bg-white dark:bg-gray-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
                                     Stock.
                                 </button>
                             )}
                         </div>
 
-                        <ul className="space-y-2 mb-3">
+                        <ul className="space-y-3 mb-5">
                             {(
                                 eenheidFilter === 'voorraad' ? customUnitsVoorraad : 
                                 eenheidFilter === 'frig' ? customUnitsFrig :
                                 customUnitsVries
-                            ).length === 0 ? <li className="text-gray-400 italic">Geen eigen eenheden voor {eenheidFilter}.</li> : 
+                            ).length === 0 ? <li className="text-gray-400 font-medium italic text-center py-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">Geen eigen eenheden voor {eenheidFilter}.</li> : 
                             (
                                 eenheidFilter === 'voorraad' ? customUnitsVoorraad : 
                                 eenheidFilter === 'frig' ? customUnitsFrig :
                                 customUnitsVries
                             ).map(u => (
-                                <li key={u} className="flex justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded items-center">
+                                <li key={u} className="flex justify-between p-3 bg-white dark:bg-gray-800 rounded-xl items-center border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:border-gray-300">
                                     {editingUnitName === u ? 
-                                        <div className="flex gap-2 w-full"><input className="flex-grow border p-1 rounded dark:bg-gray-600 dark:text-white" value={editUnitInput} onChange={e=>setEditUnitInput(e.target.value)} /><button onClick={saveUnitName} className="text-green-600"><Icon path={Icons.Check}/></button></div>
+                                        <div className="flex gap-3 w-full"><input className="flex-grow border-2 border-blue-400 p-2 rounded-lg bg-white dark:bg-gray-700 dark:text-white font-bold focus:outline-none" value={editUnitInput} onChange={e=>setEditUnitInput(e.target.value)} /><button onClick={saveUnitName} className="bg-green-500 text-white px-4 rounded-lg font-bold shadow-sm active:scale-95"><Icon path={Icons.Check}/></button></div>
                                         :
-                                        <><span>{u}</span><div className="flex gap-2"><button onClick={()=>startEditUnit(u)} className="text-blue-500"><Icon path={Icons.Edit2} size={16}/></button><button onClick={() => handleDeleteUnit(u)} className="text-red-500"><Icon path={Icons.Trash2} size={16}/></button></div></>
+                                        <><span className="font-bold text-gray-700 dark:text-gray-200">{u}</span><div className="flex gap-2"><button onClick={()=>startEditUnit(u)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-2 rounded-lg transition-all active:scale-95"><Icon path={Icons.Edit2} size={16}/></button><button onClick={() => handleDeleteUnit(u)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-2 rounded-lg transition-all active:scale-95"><Icon path={Icons.Trash2} size={16}/></button></div></>
                                     }
                                 </li>
                             ))}
                         </ul>
-                        <form onSubmit={handleAddUnit} className="flex gap-2"><input className="flex-grow border p-2 rounded dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600" placeholder="Nieuwe eenheid" value={newUnitNaam} onChange={e=>setNewUnitNaam(e.target.value)} required /><button className={`text-white px-3 rounded ${eenheidFilter === 'voorraad' ? 'bg-orange-500' : eenheidFilter === 'frig' ? 'bg-green-600' : 'bg-blue-600'}`}>+</button></form>
+                        <form onSubmit={handleAddUnit} className="flex gap-3"><input className="flex-grow border-2 border-gray-200 dark:border-gray-700 p-3 rounded-xl bg-white dark:bg-gray-800 dark:text-white text-sm font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe eenheid" value={newUnitNaam} onChange={e=>setNewUnitNaam(e.target.value)} required /><button className={`text-white font-extrabold px-5 rounded-xl shadow-md active:scale-95 transition-all ${eenheidFilter === 'voorraad' ? 'bg-orange-500 hover:bg-orange-600' : eenheidFilter === 'frig' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}>+</button></form>
                     </div>
                 )}
             </Modal>
@@ -3891,137 +3904,136 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
 <Modal isOpen={showUserAdminModal} onClose={() => setShowUserAdminModal(false)} title="Gebruikers." color="pink">
                 
                 {/* --- START NIEUW ONDERHOUDSMODUS BLOK --- */}
-                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-200 dark:border-red-800 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 p-5 rounded-2xl border border-red-200/60 dark:border-red-800/50 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
                     <div>
-                        <h4 className="font-bold text-red-800 dark:text-red-300 flex items-center gap-2">
+                        <h4 className="font-extrabold text-red-800 dark:text-red-300 flex items-center gap-2">
                             <Icon path={Icons.Wrench} size={18}/> Onderhoudsmodus
                         </h4>
-                        <p className="text-xs text-red-600 dark:text-red-400 mt-1">Blokkeer toegang voor normale gebruikers. Jij als Admin kan nog wel in de app om te testen.</p>
+                        <p className="text-xs font-medium text-red-600/80 dark:text-red-400/80 mt-1">Blokkeer toegang voor normale gebruikers. Jij als Admin kan nog wel in de app om te testen.</p>
                     </div>
                     <button 
                         onClick={toggleMaintenanceMode} 
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors flex-shrink-0 ${maintenanceMode ? 'bg-red-600 text-white shadow-md' : 'bg-white text-red-600 border border-red-200 hover:bg-red-50 dark:bg-transparent dark:border-red-700 dark:hover:bg-red-900/40'}`}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-extrabold transition-all active:scale-95 flex-shrink-0 shadow-sm ${maintenanceMode ? 'bg-red-600 text-white shadow-md hover:bg-red-700' : 'bg-white text-red-600 border-2 border-red-200 hover:bg-red-50 dark:bg-transparent dark:border-red-700/50 dark:hover:bg-red-900/40'}`}
                     >
                         {maintenanceMode ? 'Onderhoud is AAN' : 'Zet in Onderhoud'}
                     </button>
                 </div>
                 {/* --- EINDE NIEUW ONDERHOUDSMODUS BLOK --- */}
 
-                {/* Hier begint het blok dat je al had: */}
-                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
-                    <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
+                <div className="bg-gray-50/80 dark:bg-gray-800/50 p-5 rounded-2xl border border-gray-200/60 dark:border-gray-700/50 mb-6 shadow-sm">
+                    <h4 className="font-extrabold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
                         <Icon path={Icons.BookOpen} size={18} /> Algemene Rondleiding (Tour)
                     </h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Stel in of nieuwe gebruikers standaard de tour te zien krijgen.</p>
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-4">Stel in of nieuwe gebruikers standaard de tour te zien krijgen.</p>
                     <div className="flex flex-col sm:flex-row gap-3">
-                        <button onClick={toggleGlobalOnboardingStatus} className={`flex-1 py-2 px-3 rounded-lg text-sm font-bold flex justify-center items-center gap-2 transition-colors ${globalOnboardingActive ? 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300' : 'bg-gray-200 text-gray-600 border border-gray-300 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}`}>
-                            <Icon path={globalOnboardingActive ? Icons.Check : Icons.X} size={16} /> 
+                        <button onClick={toggleGlobalOnboardingStatus} className={`flex-1 py-3 px-4 rounded-xl text-sm font-extrabold flex justify-center items-center gap-2 transition-all active:scale-95 shadow-sm ${globalOnboardingActive ? 'bg-green-100 text-green-700 border-2 border-green-200 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800/50' : 'bg-gray-200 text-gray-600 border-2 border-gray-300 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}`}>
+                            <Icon path={globalOnboardingActive ? Icons.Check : Icons.X} size={18} /> 
                             {globalOnboardingActive ? 'Tour staat AAN' : 'Tour is UIT'}
                         </button>
-                        <button onClick={resetTutorialForEveryone} className="flex-1 py-2 px-3 bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-300 rounded-lg text-sm font-bold transition-colors">
+                        <button onClick={resetTutorialForEveryone} className="flex-1 py-3 px-4 bg-red-100 text-red-700 border-2 border-red-200 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800/50 rounded-xl text-sm font-extrabold transition-all active:scale-95 shadow-sm">
                             Reset Tour voor Iedereen
                         </button>
                     </div>
                 </div>
 
-                <ul className="divide-y divide-gray-100 dark:divide-gray-700">
+                <ul className="divide-y divide-gray-100 dark:divide-gray-700/50 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                     {usersList.map(u => (
-                        <li key={u.id} className="py-3 flex flex-col gap-2">
+                        <li key={u.id} className="p-4 flex flex-col gap-3 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
                             <div className="flex flex-col sm:flex-row justify-between sm:items-center items-start">
                                 <div>
-                                    <p className="font-bold dark:text-white">
+                                    <p className="font-extrabold text-gray-900 dark:text-white text-lg flex items-center gap-2">
                                         {u.email || u.displayName}
-                                        {u.id === beheerdeUserId && <span className="ml-2 text-[10px] bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300 px-2 py-0.5 rounded-full uppercase tracking-wide border border-blue-200 dark:border-blue-700">Huidig</span>}
+                                        {u.id === beheerdeUserId && <span className="text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 px-2 py-0.5 rounded-md uppercase tracking-widest border border-blue-200 dark:border-blue-800/50">Huidig</span>}
                                     </p>
-                                    <p className="text-xs text-gray-500">{u.id}</p>
+                                    <p className="text-xs font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-900 inline-block px-2 py-0.5 rounded mt-1 border border-gray-200 dark:border-gray-800">{u.id}</p>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0 justify-end">
-                                    <button onClick={() => { setDashboardUser(u.id); setShowUserAdminModal(false); setShowDashboardModal(true); }} className="px-3 py-1 rounded text-xs font-bold bg-indigo-100 text-indigo-600 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:hover:bg-indigo-800 transition shadow-sm flex items-center gap-1">
-                                        <Icon path={Icons.LayoutDashboard} size={12}/> Dashboard
+                                <div className="flex flex-wrap items-center gap-2 mt-3 sm:mt-0 justify-end">
+                                    <button onClick={() => { setDashboardUser(u.id); setShowUserAdminModal(false); setShowDashboardModal(true); }} className="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50 transition-all shadow-sm flex items-center gap-1.5 active:scale-95">
+                                        <Icon path={Icons.LayoutDashboard} size={14}/> Dashboard
                                     </button>
                                     {u.id !== beheerdeUserId && (
-                                        <button onClick={() => { setBeheerdeUserId(u.id); setShowUserAdminModal(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className="px-3 py-1 rounded text-xs font-bold bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-800 transition shadow-sm">
+                                        <button onClick={() => { setBeheerdeUserId(u.id); setShowUserAdminModal(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-all shadow-sm active:scale-95">
                                             Wissel
                                         </button>
                                     )}
-                                    <button onClick={() => toggleUserStatus(u.id, u.disabled)} className={`px-3 py-1 rounded text-xs font-bold shadow-sm ${u.disabled ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300 hover:bg-red-200' : 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-300 hover:bg-green-200'}`}>
+                                    <button onClick={() => toggleUserStatus(u.id, u.disabled)} className={`px-3 py-1.5 rounded-lg text-xs font-extrabold shadow-sm transition-all active:scale-95 border ${u.disabled ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50 hover:bg-red-100' : 'bg-green-50 text-green-600 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50 hover:bg-green-100'}`}>
                                         {u.disabled ? 'Geblokkeerd' : 'Actief'}
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-1 mt-1 bg-gray-50 dark:bg-gray-800 p-2 rounded border dark:border-gray-700">
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                            <div className="flex flex-col gap-1.5 mt-2 bg-gray-50/80 dark:bg-gray-900/50 p-3 rounded-xl border border-gray-200/60 dark:border-gray-700/50">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('frig')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'frig')}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        className="rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
                                     />
                                     <span>Verberg 'Frig.' tabblad</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('voorraad')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'voorraad')}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        className="rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
                                     />
                                     <span>Verberg 'Stock.' tabblad</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1 border-t border-gray-100 dark:border-gray-700 pt-1">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mt-1 border-t border-gray-200/60 dark:border-gray-700/60 pt-2">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('weekmenu')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'weekmenu')}
-                                        className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                                        className="rounded-md border-gray-300 text-pink-600 focus:ring-pink-500 w-4 h-4"
                                     />
-                                    <span className="font-medium text-pink-700 dark:text-pink-400">Verberg 'Week.' tabblad</span>
+                                    <span className="font-bold text-pink-700 dark:text-pink-400">Verberg 'Week.' tabblad</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('recepten')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'recepten')}
-                                        className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                        className="rounded-md border-gray-300 text-teal-600 focus:ring-teal-500 w-4 h-4"
                                     />
-                                    <span className="font-medium text-teal-700 dark:text-teal-400">Verberg 'Recepten.' tabblad</span>
+                                    <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Recepten.' tabblad</span>
                                 </div>                                    
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('balans')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        className="rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
                                     />
-                                    <span className="font-medium text-blue-700 dark:text-blue-400">Verberg 'Balans' knop (Rechten beperken)</span>
+                                    <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Balans' knop (Rechten beperken)</span>
                                 </div>
 
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-600 pt-2 mt-1">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 border-t border-gray-200/60 dark:border-gray-700/60 pt-3 mt-2">
                                     <input 
                                         type="checkbox" 
                                         checked={u.tourDisabled || false} 
                                         onChange={() => toggleUserTourDisabled(u.id, u.tourDisabled)}
-                                        className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                                        className="rounded-md border-gray-300 text-orange-600 focus:ring-orange-500 w-4 h-4"
                                     />
-                                    <span className="font-medium text-orange-700 dark:text-orange-400">Rondleiding uitzetten voor deze gebruiker</span>
+                                    <span className="font-bold text-orange-700 dark:text-orange-400">Rondleiding uitzetten voor deze gebruiker</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
                                     <input 
                                         type="checkbox" 
                                         checked={u.showHelpButton || false} 
                                         onChange={() => toggleUserHelpButton(u.id, u.showHelpButton)}
-                                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                                        className="rounded-md border-gray-300 text-red-600 focus:ring-red-500 w-4 h-4"
                                     />
-                                    <span className="font-medium text-red-700 dark:text-red-400">Toon lichtrode 'Hulp' knop in hoofdmenu</span>
+                                    <span className="font-bold text-red-700 dark:text-red-400">Toon lichtrode 'Hulp' knop in hoofdmenu</span>
                                 </div>
                                 
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mt-2">
-                                    <button onClick={() => triggerTourForUser(u.id)} className="w-full py-1.5 bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300 rounded text-xs font-bold hover:bg-purple-200 transition">
+                                <div className="flex items-center gap-2 mt-3">
+                                    <button onClick={() => triggerTourForUser(u.id)} className="w-full py-2 bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 dark:bg-purple-900/30 dark:border-purple-800/50 dark:text-purple-300 dark:hover:bg-purple-900/50 rounded-lg text-xs font-extrabold transition-all active:scale-95 shadow-sm">
                                         Zet Tour opnieuw klaar
                                     </button>
                                 </div>
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-[10px] uppercase font-bold tracking-widest text-gray-400 dark:text-gray-500 mt-1">
                                 Laatst gezien: {u.laatstGezien ? formatDateTime(u.laatstGezien) : 'Nooit'}
                             </p>
                         </li>
@@ -4031,61 +4043,62 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
 
             {/* Tour Admin Modal (Om de inhoud aan te passen) */}
             <Modal isOpen={showTourAdminModal} onClose={() => setShowTourAdminModal(false)} title="Tour Aanpassen." color="purple" size="lg">
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Hier kun je de inhoud van de rondleiding stap-voor-stap aanpassen. Gebruik de pijltjes om de volgorde te veranderen.</p>
-                <div className="space-y-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">Hier kun je de inhoud van de rondleiding stap-voor-stap aanpassen. Gebruik de pijltjes om de volgorde te veranderen.</p>
+                <div className="space-y-5">
                     {editingTourSteps.map((step, index) => (
-                        <div key={index} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 relative">
-                            <div className="absolute top-3 right-3 flex gap-1">
-                                <button onClick={() => moveEditStep(index, 'up')} disabled={index === 0} className={`p-1 rounded ${index === 0 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                        <div key={index} className="bg-white/50 dark:bg-gray-800/50 p-5 rounded-2xl border-2 border-gray-200/60 dark:border-gray-700/60 relative shadow-sm hover:shadow-md transition-shadow">
+                            <div className="absolute top-4 right-4 flex gap-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                <button onClick={() => moveEditStep(index, 'up')} disabled={index === 0} className={`p-1.5 rounded-md transition-colors ${index === 0 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 hover:bg-white hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-600'}`}>
                                     <Icon path={Icons.ChevronDown} className="rotate-180" size={16}/>
                                 </button>
-                                <button onClick={() => moveEditStep(index, 'down')} disabled={index === editingTourSteps.length - 1} className={`p-1 rounded ${index === editingTourSteps.length - 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                                <button onClick={() => moveEditStep(index, 'down')} disabled={index === editingTourSteps.length - 1} className={`p-1.5 rounded-md transition-colors ${index === editingTourSteps.length - 1 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 hover:bg-white hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-600'}`}>
                                     <Icon path={Icons.ChevronDown} size={16}/>
                                 </button>
-                                <button onClick={() => handleDeleteEditStep(index)} className="p-1 rounded text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40">
+                                <div className="w-px bg-gray-300 dark:bg-gray-600 mx-0.5"></div>
+                                <button onClick={() => handleDeleteEditStep(index)} className="p-1.5 rounded-md text-red-500 hover:bg-white hover:shadow-sm dark:hover:bg-gray-600 transition-colors">
                                     <Icon path={Icons.Trash2} size={16}/>
                                 </button>
                             </div>
                             
-                            <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-3">Stap {index + 1}</h4>
+                            <h4 className="font-extrabold text-lg text-purple-600 dark:text-purple-400 mb-4 border-b border-gray-100 dark:border-gray-700/50 pb-2 inline-block">Stap {index + 1}</h4>
                             
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Titel</label>
-                                    <input type="text" className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600" value={step.title} onChange={e => handleUpdateEditStep(index, 'title', e.target.value)} />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-black text-gray-500 uppercase tracking-widest block">Titel</label>
+                                    <input type="text" className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white font-bold focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.title} onChange={e => handleUpdateEditStep(index, 'title', e.target.value)} />
                                 </div>
-                                <div className="flex gap-2">
-                                    <div className="flex-grow">
-                                        <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Icoon</label>
-                                        <select className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600" value={step.icon} onChange={e => handleUpdateEditStep(index, 'icon', e.target.value)}>
+                                <div className="flex gap-3">
+                                    <div className="flex-grow space-y-1.5">
+                                        <label className="text-xs font-black text-gray-500 uppercase tracking-widest block">Icoon</label>
+                                        <select className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white font-bold focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.icon} onChange={e => handleUpdateEditStep(index, 'icon', e.target.value)}>
                                             {Object.keys(Icons).map(iconName => <option key={iconName} value={iconName}>{iconName}</option>)}
                                         </select>
                                     </div>
-                                    <div className="flex-shrink-0 w-10 flex items-end justify-center pb-2 text-gray-600 dark:text-gray-300">
-                                        <Icon path={Icons[step.icon] || Icons.Box} size={24}/>
+                                    <div className="flex-shrink-0 w-14 flex items-end justify-center pb-2.5 text-purple-500 dark:text-purple-400 drop-shadow-sm">
+                                        <Icon path={Icons[step.icon] || Icons.Box} size={32}/>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div className="mb-3">
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Tekst (Content)</label>
-                                <textarea className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600 h-20" value={step.content} onChange={e => handleUpdateEditStep(index, 'content', e.target.value)} />
+                            <div className="mb-4 space-y-1.5">
+                                <label className="text-xs font-black text-gray-500 uppercase tracking-widest block">Tekst (Content)</label>
+                                <textarea className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white font-medium h-24 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm resize-none" value={step.content} onChange={e => handleUpdateEditStep(index, 'content', e.target.value)} />
                             </div>
 
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Kleur (Thema)</label>
-                                <select className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600" value={step.colorName} onChange={e => handleUpdateEditStep(index, 'colorName', e.target.value)}>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-black text-gray-500 uppercase tracking-widest block">Kleur (Thema)</label>
+                                <select className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white font-bold focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.colorName} onChange={e => handleUpdateEditStep(index, 'colorName', e.target.value)}>
                                     {TOUR_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                         </div>
                     ))}
                     
-                    <button onClick={handleAddEditStep} className="w-full py-3 bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-xl font-bold border-2 border-dashed border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition">
-                        + Nieuwe Stap Toevoegen
+                    <button onClick={handleAddEditStep} className="w-full py-4 bg-gray-50 text-gray-600 dark:bg-gray-800/50 dark:text-gray-300 rounded-2xl font-extrabold border-2 border-dashed border-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:border-gray-400 dark:hover:bg-gray-700 dark:hover:border-gray-500 transition-all active:scale-95 flex justify-center items-center gap-2">
+                        <Icon path={Icons.Plus} size={20}/> Nieuwe Stap Toevoegen
                     </button>
                     
-                    <button onClick={saveTourStepsToDb} className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold shadow-md hover:bg-purple-700 transition">
+                    <button onClick={saveTourStepsToDb} className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all mt-4 text-lg">
                         Tour Opslaan
                     </button>
                 </div>
@@ -4094,21 +4107,24 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             {/* Meldingen Modal (Links uitgelijnd indien onboarding ook open is) */}
             <Modal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} title="Meldingen." color="red" position={showOnboarding && tourSteps.length > 0 ? "left" : "center"}>
                 {alerts.length > 0 && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 dark:bg-red-900/20">
-                        <h4 className="font-bold text-red-800 dark:text-red-300">Let op!</h4>
-                        <ul>
+                    <div className="bg-gradient-to-r from-red-50 to-rose-50 border-l-[6px] border-red-500 p-5 rounded-r-2xl mb-6 dark:from-red-900/20 dark:to-rose-900/20 dark:border-red-600 shadow-sm animate-pulse">
+                        <h4 className="font-extrabold text-red-800 dark:text-red-300 text-lg mb-2 flex items-center gap-2">
+                            <Icon path={Icons.Alert} size={20}/> Let op!
+                        </h4>
+                        <ul className="space-y-1.5 pl-1">
                             {alerts.map(i => {
                                 const loc = vriezers.find(v => v.id === i.vriezerId);
                                 const type = loc ? (loc.type || 'vriezer') : 'vriezer';
                                 const isStock = type === 'voorraad' || type === 'frig';
                                 
                                 return (
-                                    <li key={i.id} className="text-red-700 dark:text-red-300">
+                                    <li key={i.id} className="text-red-700 dark:text-red-300 font-bold flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                                         {i.naam} 
-                                        <span className="text-xs ml-1 font-semibold opacity-75">
+                                        <span className="text-xs font-black opacity-75 uppercase tracking-wide bg-red-100 dark:bg-red-900/40 px-2 py-0.5 rounded-md border border-red-200 dark:border-red-800/50">
                                             {isStock 
-                                                ? `(Verlopen: ${formatDate(i.houdbaarheidsDatum)})` 
-                                                : `(${getDagenOud(i.ingevrorenOp)} dagen oud)`
+                                                ? `Verlopen: ${formatDate(i.houdbaarheidsDatum)}` 
+                                                : `${getDagenOud(i.ingevrorenOp)} dagen oud`
                                             }
                                         </span>
                                     </li>
@@ -4119,36 +4135,39 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                 )}
                 <div className="space-y-4">
                     {currentVersionData && (
-                        <div>
-                            <h4 className="font-bold text-blue-600 dark:text-blue-400 mb-4 text-lg">Versie {APP_VERSION}</h4>
-                            <ul className="space-y-3">
+                        <div className="bg-gray-50/50 dark:bg-gray-800/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+                            <div className="flex items-center gap-3 mb-5">
+                                <h4 className="font-extrabold text-blue-600 dark:text-blue-400 text-xl tracking-tight">Versie {APP_VERSION}</h4>
+                                <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800/50">Nieuw</span>
+                            </div>
+                            <ul className="space-y-4">
                                 {currentVersionData.changes.map((change, idx) => {
                                     const parts = change.split(': ');
                                     const type = parts[0];
                                     const text = parts.slice(1).join(': ');
                                     
                                     let IconComp = Icons.Zap;
-                                    let iconColor = "text-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300";
+                                    let iconColor = "text-blue-500 bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800/50";
 
-                                    if (type.includes('Feature') || type.includes('Nieuw')) {
+                                    if (type.includes('Feature') || type.includes('Nieuw') || type.includes('Mega')) {
                                         IconComp = Icons.Star;
-                                        iconColor = "text-yellow-500 bg-yellow-50 dark:bg-yellow-900/30 dark:text-yellow-300";
+                                        iconColor = "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/40 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50";
                                     } else if (type.includes('Fix') || type.includes('Opgelost') || type.includes('Hersteld')) {
                                         IconComp = Icons.Wrench;
-                                        iconColor = "text-green-500 bg-green-50 dark:bg-green-900/30 dark:text-green-300";
+                                        iconColor = "text-green-600 bg-green-100 dark:bg-green-900/40 dark:text-green-400 border-green-200 dark:border-green-800/50";
                                     } else if (type.includes('Update')) {
                                          IconComp = Icons.Zap;
-                                         iconColor = "text-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300";
+                                         iconColor = "text-blue-500 bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800/50";
                                     }
 
                                     return (
-                                        <li key={idx} className="flex gap-3 text-sm text-gray-600 dark:text-gray-300 items-start">
-                                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${iconColor}`}>
-                                                <Icon path={IconComp} size={14} />
+                                        <li key={idx} className="flex gap-4 text-sm text-gray-600 dark:text-gray-300 items-start bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                            <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${iconColor}`}>
+                                                <Icon path={IconComp} size={18} />
                                             </div>
-                                             <div className="pt-1.5">
-                                                <span className="font-semibold block text-gray-800 dark:text-gray-200 text-xs uppercase tracking-wide mb-0.5 opacity-75">{type}</span>
-                                                <span className="leading-relaxed">{text || change}</span>
+                                             <div className="pt-0.5">
+                                                <span className="font-extrabold block text-gray-900 dark:text-gray-100 text-xs uppercase tracking-widest mb-1 opacity-90">{type}</span>
+                                                <span className="leading-relaxed font-medium">{text || change}</span>
                                             </div>
                                         </li>
                                     );
@@ -4163,7 +4182,7 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             {tourSteps && tourSteps[onboardingStep] && (
                 <Modal isOpen={showOnboarding} onClose={() => {}} title={`Rondleiding (${onboardingStep + 1}/${tourSteps.length})`} color={tourSteps[onboardingStep].colorName || 'blue'} position={showWhatsNew ? "right" : "center"} hideBackdrop={showWhatsNew} hideCloseButton={true}>
                     <div 
-                        className="flex flex-col items-center text-center py-4 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 select-none touch-pan-y cursor-grab active:cursor-grabbing"
+                        className="flex flex-col items-center text-center py-6 space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300 select-none touch-pan-y cursor-grab active:cursor-grabbing"
                         onTouchStart={handleSwipeStart}
                         onTouchMove={handleSwipeMove}
                         onTouchEnd={handleSwipeEnd}
@@ -4172,32 +4191,32 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                         onMouseUp={handleSwipeEnd}
                         onMouseLeave={handleSwipeEnd}
                     >
-                        <div className={`w-20 h-20 flex items-center justify-center rounded-full bg-${tourSteps[onboardingStep].colorName || 'blue'}-100 dark:bg-${tourSteps[onboardingStep].colorName || 'blue'}-900/30 text-${tourSteps[onboardingStep].colorName || 'blue'}-600 dark:text-${tourSteps[onboardingStep].colorName || 'blue'}-400 mb-2 pointer-events-none`}>
-                            <Icon path={Icons[tourSteps[onboardingStep].icon] || Icons.Box} size={40} />
+                        <div className={`w-24 h-24 flex items-center justify-center rounded-3xl bg-gradient-to-br from-${tourSteps[onboardingStep].colorName || 'blue'}-100 to-${tourSteps[onboardingStep].colorName || 'blue'}-50 dark:from-${tourSteps[onboardingStep].colorName || 'blue'}-900/40 dark:to-${tourSteps[onboardingStep].colorName || 'blue'}-900/20 text-${tourSteps[onboardingStep].colorName || 'blue'}-600 dark:text-${tourSteps[onboardingStep].colorName || 'blue'}-400 mb-2 pointer-events-none shadow-lg border border-white/50 dark:border-gray-700/50 rotate-3 transform transition-transform`}>
+                            <Icon path={Icons[tourSteps[onboardingStep].icon] || Icons.Box} size={48} className="-rotate-3 drop-shadow-sm"/>
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800 dark:text-white pointer-events-none">{tourSteps[onboardingStep].title}</h3>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm whitespace-pre-line pointer-events-none">{tourSteps[onboardingStep].content}</p>
+                        <h3 className="text-2xl font-black text-gray-900 dark:text-white pointer-events-none tracking-tight leading-tight">{tourSteps[onboardingStep].title}</h3>
+                        <p className="text-gray-500 dark:text-gray-300 leading-relaxed max-w-sm whitespace-pre-line pointer-events-none font-medium text-[15px]">{tourSteps[onboardingStep].content}</p>
 
-                        <div className="flex gap-2 py-4 pointer-events-none">
+                        <div className="flex gap-2.5 py-5 pointer-events-none">
                             {tourSteps.map((_, i) => (
-                                <div key={i} className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${i === onboardingStep ? 'bg-blue-600 dark:bg-blue-500 scale-110' : 'bg-gray-200 dark:bg-gray-600'}`}></div>
+                                <div key={i} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === onboardingStep ? `bg-${tourSteps[onboardingStep].colorName || 'blue'}-600 dark:bg-${tourSteps[onboardingStep].colorName || 'blue'}-500 w-6 shadow-sm` : 'bg-gray-200 dark:bg-gray-700'}`}></div>
                             ))}
                         </div>
 
-                        <div className="flex flex-col w-full items-center gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <p className="text-xs text-gray-400 italic flex items-center gap-2 mb-2 animate-pulse">
+                        <div className="flex flex-col w-full items-center gap-3 pt-5 border-t border-gray-100 dark:border-gray-800">
+                            <p className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 flex items-center gap-2 mb-3 animate-pulse bg-gray-50 dark:bg-gray-800 px-4 py-1.5 rounded-full">
                                 <Icon path={Icons.ChevronRight} className="rotate-180" size={14} /> 
-                                Swipe om verder te gaan 
+                                Swipe 
                                 <Icon path={Icons.ChevronRight} size={14} />
                             </p>
 
                             {onboardingStep === tourSteps.length - 1 && (
-                                <button onClick={finishTutorial} className={`w-full py-3 text-white rounded-xl font-bold transition shadow-md bg-${tourSteps[onboardingStep].colorName || 'blue'}-600 hover:bg-${tourSteps[onboardingStep].colorName || 'blue'}-700`}>
+                                <button onClick={finishTutorial} className={`w-full py-4 text-white rounded-2xl font-extrabold text-lg transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 bg-gradient-to-r from-${tourSteps[onboardingStep].colorName || 'blue'}-500 to-${tourSteps[onboardingStep].colorName || 'blue'}-600 shadow-${tourSteps[onboardingStep].colorName || 'blue'}-500/30`}>
                                     Aan de slag!
                                 </button>
                             )}
 
-                            <button onClick={finishTutorial} className="mt-2 text-[10px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition opacity-50 hover:opacity-100 uppercase tracking-widest cursor-pointer">
+                            <button onClick={finishTutorial} className="mt-3 text-[11px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors opacity-50 hover:opacity-100 uppercase tracking-widest cursor-pointer bg-transparent border-none">
                                 Overslaan
                             </button>
                         </div>
@@ -4207,54 +4226,55 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
 
             {/* Versiegeschiedenis Modal (Los) */}
             <Modal isOpen={showVersionHistory} onClose={() => setShowVersionHistory(false)} title="Nieuws." color="blue">
-                <div className="mb-8 text-center px-4">
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">
-                        Ontdek alle updates en verbeteringen aan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Voorraad.</span>
+                <div className="mb-10 text-center px-4">
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-3 tracking-tight leading-tight">
+                        Ontdek alle updates en verbeteringen aan <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 text-2xl">Voorraad.</span>
                     </h3>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800">
-                        <span className="text-xs font-medium text-blue-600 dark:text-blue-300">Huidige versie {APP_VERSION}</span>
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-800/50 shadow-sm">
+                        <span className="text-xs font-extrabold uppercase tracking-widest text-blue-700 dark:text-blue-300">Huidige versie {APP_VERSION}</span>
                     </div>
                 </div>
 
-                <div className="space-y-8 relative pl-2">
-                    <div className="absolute left-[19px] top-2 bottom-4 w-0.5 bg-gray-100 dark:bg-gray-700"></div>
+                <div className="space-y-10 relative pl-3">
+                    <div className="absolute left-[21px] top-3 bottom-6 w-0.5 bg-gradient-to-b from-blue-200 via-gray-200 to-transparent dark:from-blue-800/50 dark:via-gray-700/50"></div>
 
                     {VERSION_HISTORY.map((v, i) => (
-                        <div key={v.version} className="relative pl-10">
-                            <div className={`absolute left-[13px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-gray-800 z-10 ${i === 0 ? 'bg-blue-500 shadow-md shadow-blue-200' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+                        <div key={v.version} className="relative pl-12 group">
+                            <div className={`absolute left-[13px] top-1.5 w-4 h-4 rounded-full border-[3px] border-white dark:border-gray-800 z-10 transition-transform group-hover:scale-125 ${i === 0 ? 'bg-blue-500 shadow-md shadow-blue-300/50 dark:shadow-blue-900/50' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
 
-                            <div className="mb-3">
-                                <span className={`text-lg font-bold ${i === 0 ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>v{v.version}</span>
+                            <div className="mb-4 flex items-center gap-3">
+                                <span className={`text-2xl font-black tracking-tight ${i === 0 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>v{v.version}</span>
+                                {i === 0 && <span className="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-md shadow-sm">Nieuw</span>}
                             </div>
                             
-                            <ul className="space-y-3">
+                            <ul className="space-y-4">
                                 {v.changes.map((change, idx) => {
                                     const parts = change.split(': ');
                                     const type = parts[0];
                                     const text = parts.slice(1).join(': ');
                                     
                                     let IconComp = Icons.Zap;
-                                    let iconColor = "text-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300";
+                                    let iconColor = "text-blue-500 bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-300";
 
-                                    if (type.includes('Feature') || type.includes('Nieuw')) {
+                                    if (type.includes('Feature') || type.includes('Nieuw') || type.includes('Mega')) {
                                         IconComp = Icons.Star;
-                                        iconColor = "text-yellow-500 bg-yellow-50 dark:bg-yellow-900/30 dark:text-yellow-300";
+                                        iconColor = "text-yellow-600 bg-yellow-50 border-yellow-100 dark:bg-yellow-900/30 dark:border-yellow-800/50 dark:text-yellow-400";
                                     } else if (type.includes('Fix') || type.includes('Opgelost') || type.includes('Hersteld')) {
                                         IconComp = Icons.Wrench;
-                                        iconColor = "text-green-500 bg-green-50 dark:bg-green-900/30 dark:text-green-300";
+                                        iconColor = "text-green-600 bg-green-50 border-green-100 dark:bg-green-900/30 dark:border-green-800/50 dark:text-green-400";
                                     } else if (type.includes('Update')) {
                                          IconComp = Icons.Zap;
-                                         iconColor = "text-blue-500 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300";
+                                         iconColor = "text-blue-500 bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-300";
                                     }
 
                                     return (
-                                        <li key={idx} className="flex gap-3 text-sm text-gray-600 dark:text-gray-300 items-start">
-                                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${iconColor}`}>
-                                                <Icon path={IconComp} size={14} />
+                                        <li key={idx} className="flex gap-4 text-sm text-gray-600 dark:text-gray-300 items-start bg-white dark:bg-gray-800/50 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 transition-colors hover:border-gray-300 dark:hover:border-gray-600">
+                                            <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${iconColor}`}>
+                                                <Icon path={IconComp} size={18} />
                                             </div>
-                                            <div className="pt-1.5">
-                                                <span className="font-semibold block text-gray-800 dark:text-gray-200 text-xs uppercase tracking-wide mb-0.5 opacity-75">{type}</span>
-                                                <span className="leading-relaxed">{text || change}</span>
+                                            <div className="pt-0.5">
+                                                <span className="font-extrabold block text-gray-900 dark:text-gray-100 text-[11px] uppercase tracking-widest mb-1.5 opacity-90">{type}</span>
+                                                <span className="leading-relaxed font-medium">{text || change}</span>
                                             </div>
                                         </li>
                                     );
@@ -4266,30 +4286,34 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             </Modal>
 
             <Modal isOpen={showDashboardModal} onClose={() => setShowDashboardModal(false)} title="Dashboard." color="blue" size="xl">
-                <div className="space-y-4 min-h-[50vh]">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Selecteer een gebruiker om direct in hun voorraad te kijken zonder in te loggen op hun account.</p>
-                    <select 
-                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                        value={dashboardUser} 
-                        onChange={e => setDashboardUser(e.target.value)}
-                    >
-                        <option value="">Kies een gebruiker...</option>
-                        {usersList.map(u => (
-                            <option key={u.id} value={u.id}>{u.email || u.displayName} ({u.id.substring(0,6)}...)</option>
-                        ))}
-                    </select>
+                <div className="space-y-6 min-h-[50vh]">
+                    <div className="bg-blue-50/50 dark:bg-blue-900/10 p-5 rounded-2xl border border-blue-100/50 dark:border-blue-800/30">
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-3">Selecteer een gebruiker om direct in hun voorraad te kijken zonder in te loggen op hun account.</p>
+                        <select 
+                            className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 dark:text-white font-bold focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm"
+                            value={dashboardUser} 
+                            onChange={e => setDashboardUser(e.target.value)}
+                        >
+                            <option value="">Kies een gebruiker...</option>
+                            {usersList.map(u => (
+                                <option key={u.id} value={u.id}>{u.email || u.displayName} ({u.id.substring(0,6)}...)</option>
+                            ))}
+                        </select>
+                    </div>
 
                     {dashboardData.loading ? (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400 flex flex-col items-center">
-                            <Icon path={Icons.Box} className="animate-bounce mb-2" size={32} />
-                            Laden van voorraad...
+                        <div className="text-center py-16 text-blue-500 dark:text-blue-400 flex flex-col items-center justify-center bg-gray-50/50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-700/50">
+                            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
+                                <Icon path={Icons.Box} className="animate-bounce drop-shadow-sm" size={32} />
+                            </div>
+                            <span className="font-extrabold tracking-wide text-lg text-gray-700 dark:text-gray-300">Laden van voorraad...</span>
                         </div>
                     ) : dashboardUser && dashboardData.vriezers.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="text-center py-16 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-700/50 font-medium text-lg">
                             Deze gebruiker heeft nog geen locaties aangemaakt.
                         </div>
                     ) : (
-                        <div className="space-y-8 mt-4">
+                        <div className="space-y-10 mt-6">
                             {['vriezer', 'frig', 'voorraad'].map(type => {
                                 const typeLocaties = sortLocaties(dashboardData.vriezers.filter(v => (v.type || 'vriezer') === type));
                                 if (typeLocaties.length === 0) return null;
@@ -4297,27 +4321,27 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                 const typeNames = { vriezer: 'Vriezer', frig: 'Koelkast', voorraad: 'Voorraad' };
 
                                 return (
-                                    <div key={type} className="animate-in fade-in duration-300">
-                                        <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                                    <div key={type} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                        <h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-5 border-b-2 border-gray-100 dark:border-gray-800 pb-3">
                                             {typeNames[type]}
                                         </h3>
                                         
                                         <div className="flex flex-col gap-6">
                                             {typeLocaties.map(v => (
-                                                <div key={v.id} className="bg-gray-50 dark:bg-gray-800/80 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                                                    <h4 className="font-bold text-lg mb-3 text-blue-600 dark:text-blue-400 flex items-center gap-2">
-                                                        <span className={`w-3 h-3 rounded-full bg-${v.color || 'blue'}-500 inline-block`}></span>
+                                                <div key={v.id} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-5 sm:p-6 border border-gray-200/60 dark:border-gray-700/60 shadow-sm overflow-hidden">
+                                                    <h4 className="font-extrabold text-xl mb-4 text-gray-900 dark:text-white flex items-center gap-3">
+                                                        <span className={`w-4 h-4 rounded-full bg-gradient-to-br from-${v.color || 'blue'}-400 to-${v.color || 'blue'}-600 inline-block shadow-sm border border-white dark:border-gray-800`}></span>
                                                         {v.naam}
                                                     </h4>
                                                     
                                                     {/* Lades in een grid (max 3 naast elkaar), klikken om te openen */}
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start mt-2">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-start mt-2">
                                                         {dashboardData.lades.filter(l => l.vriezerId === v.id).sort((a,b) => a.naam.localeCompare(b.naam)).map(l => {
                                                             const ladeItems = dashboardData.items.filter(i => i.ladeId === l.id).sort((a,b) => a.naam.localeCompare(b.naam));
                                                             const isLadeOpen = openDashboardLades.has(l.id);
                                                             
                                                             return (
-                                                                <div key={l.id} className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 flex flex-col transition-all">
+                                                                <div key={l.id} className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl shadow-inner border border-gray-200/50 dark:border-gray-700/50 flex flex-col transition-all overflow-hidden">
                                                                     <button 
                                                                         onClick={() => {
                                                                             const newSet = new Set(openDashboardLades);
@@ -4325,35 +4349,35 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                                                             else newSet.add(l.id);
                                                                             setOpenDashboardLades(newSet);
                                                                         }}
-                                                                        className="w-full text-left font-semibold text-sm text-gray-700 dark:text-gray-300 p-3 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-700 z-10 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                                                        className={`w-full text-left font-extrabold text-sm p-4 flex justify-between items-center sticky top-0 z-10 transition-colors ${isLadeOpen ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 shadow-sm' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                                                                     >
                                                                         <span className="flex items-center gap-2">
-                                                                            <Icon path={isLadeOpen ? Icons.ChevronDown : Icons.ChevronRight} size={16}/>
+                                                                            <Icon path={isLadeOpen ? Icons.ChevronDown : Icons.ChevronRight} size={18} className="text-gray-400"/>
                                                                             {l.naam}
                                                                         </span>
-                                                                        <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-gray-600 px-2 py-0.5 rounded-full">{ladeItems.length} items</span>
+                                                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md ${isLadeOpen ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>{ladeItems.length} items</span>
                                                                     </button>
                                                                     
                                                                     {isLadeOpen && (
-                                                                        <ul className="p-2 space-y-2 overflow-y-auto flex-grow max-h-[50vh] border-t border-gray-100 dark:border-gray-600">
+                                                                        <ul className="p-2 space-y-2 overflow-y-auto flex-grow max-h-[50vh] bg-white dark:bg-gray-800 custom-scrollbar">
                                                                             {ladeItems.length === 0 ? (
-                                                                                <li className="text-xs italic text-gray-400 text-center py-4">Lade is leeg</li>
+                                                                                <li className="text-xs italic font-medium text-gray-400 text-center py-6">Lade is leeg</li>
                                                                             ) : (
                                                                                 ladeItems.map(i => (
-                                                                                    <li key={i.id} className="text-sm flex justify-between items-center bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-100 dark:border-gray-600 shadow-sm transition-colors hover:border-blue-300 dark:hover:border-blue-700 group">
-                                                                                        <span className="truncate mr-2 flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                                                                                            <span className="text-lg">{i.emoji}</span>
+                                                                                    <li key={i.id} className="text-sm flex justify-between items-center bg-gray-50/80 dark:bg-gray-700/50 px-3.5 py-3 rounded-xl border border-gray-100 dark:border-gray-600 shadow-sm transition-all hover:border-blue-300 hover:shadow-md dark:hover:border-blue-600 group">
+                                                                                        <span className="truncate mr-3 flex items-center gap-3 text-gray-900 dark:text-gray-100">
+                                                                                            <span className="text-2xl drop-shadow-sm">{i.emoji}</span>
                                                                                             <div className="truncate">
-                                                                                                <span>{i.naam}</span>
-                                                                                                {i.notitie && <span className="block text-xs italic text-gray-500 mt-0.5">{i.notitie}</span>}
+                                                                                                <span className="font-bold block tracking-tight">{i.naam}</span>
+                                                                                                {i.notitie && <span className="block text-[10px] font-medium italic text-gray-500 mt-0.5 truncate">{i.notitie}</span>}
                                                                                             </div>
                                                                                         </span>
                                                                                         <div className="flex items-center gap-3">
-                                                                                            <span className="font-bold text-gray-600 dark:text-gray-300 flex-shrink-0 whitespace-nowrap">
-                                                                                                {formatAantal(i.aantal)} <span className="text-xs font-normal">{i.eenheid}</span>
+                                                                                            <span className="font-black text-gray-800 dark:text-gray-200 flex-shrink-0 whitespace-nowrap bg-white dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                                                                                                {formatAantal(i.aantal)} <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase ml-0.5">{i.eenheid}</span>
                                                                                             </span>
-                                                                                            <button onClick={() => openEditFromDashboard(i)} className="p-1.5 text-blue-500 bg-blue-50 dark:bg-blue-900/30 rounded flex-shrink-0 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity" title="Bewerken">
-                                                                                                <Icon path={Icons.Edit2} size={14}/>
+                                                                                            <button onClick={() => openEditFromDashboard(i)} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-lg flex-shrink-0 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all active:scale-95 shadow-sm" title="Bewerken">
+                                                                                                <Icon path={Icons.Edit2} size={16}/>
                                                                                             </button>
                                                                                         </div>
                                                                                     </li>
@@ -4377,35 +4401,36 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
             </Modal>
             {/* Voorraad-Balans (Audit) Modal */}
             <Modal isOpen={!!auditLade} onClose={() => setAuditLade(null)} title={`Balans: ${auditLade?.naam}`} color="blue" size="lg">
-                <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800 text-sm text-blue-800 dark:text-blue-300">
-                        <strong>Instructie:</strong> Sta je voor de vriezer? Controleer de aantallen in deze lade. Klik op 'Klopt!' als het item klopt. Zo werk je razendsnel je voorraad bij!
+                <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-5 rounded-2xl border border-blue-200/60 dark:border-blue-800/50 text-sm text-blue-900 dark:text-blue-200 shadow-sm">
+                        <strong className="font-black uppercase tracking-widest text-xs flex items-center gap-2 mb-1.5"><Icon path={Icons.Info} size={16}/> Instructie</strong> 
+                        <span className="font-medium leading-relaxed">Sta je voor de vriezer? Controleer de aantallen in deze lade. Klik op 'Klopt!' als het item klopt. Zo werk je razendsnel je voorraad bij!</span>
                     </div>
 
                     {auditLade && items.filter(i => i.ladeId === auditLade.id).sort((a,b)=>a.naam.localeCompare(b.naam)).map(item => {
                         const isChecked = auditedItems.has(item.id);
                         return (
-                            <div key={item.id} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${isChecked ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm'}`}>
-                                <div className="flex items-center gap-3 truncate">
-                                    <span className="text-2xl">{item.emoji || '📦'}</span>
+                            <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${isChecked ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md'}`}>
+                                <div className="flex items-center gap-4 truncate">
+                                    <span className="text-3xl drop-shadow-sm">{item.emoji || '📦'}</span>
                                     <div className="truncate">
-                                        <p className={`font-bold text-sm ${isChecked ? 'text-green-800 dark:text-green-400' : 'text-gray-800 dark:text-gray-200'}`}>{item.naam}</p>
-                                        <p className="text-[10px] text-gray-500">Huidig: {formatAantal(item.aantal)} {item.eenheid}</p>
+                                        <p className={`font-extrabold text-base tracking-tight ${isChecked ? 'text-green-800 dark:text-green-400 line-through decoration-green-500/50' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
+                                        <p className="text-xs font-bold text-gray-500 mt-0.5">Huidig: <span className="text-gray-700 dark:text-gray-300">{formatAantal(item.aantal)} {item.eenheid}</span></p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
+                                <div className="flex items-center gap-3 flex-shrink-0">
                                     {/* Snelle + en - knoppen voor correcties */}
                                     {!isChecked && (
-                                        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mr-2 border border-gray-200 dark:border-gray-600">
+                                        <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-xl p-1.5 mr-2 border border-gray-200/80 dark:border-gray-700 shadow-inner">
                                             <button onClick={async () => {
                                                 const nw = Math.max(0.25, parseFloat(item.aantal) - 0.25);
                                                 await db.collection('items').doc(item.id).update({ aantal: nw });
-                                            }} className="px-2 text-gray-600 dark:text-gray-300 hover:text-red-500 font-bold">-</button>
-                                            <span className="px-2 text-xs font-bold text-gray-800 dark:text-white flex items-center justify-center w-8">{formatAantal(item.aantal)}</span>
+                                            }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-black shadow-sm transition-all active:scale-95">-</button>
+                                            <span className="px-2 text-sm font-black text-gray-900 dark:text-white flex items-center justify-center w-12">{formatAantal(item.aantal)}</span>
                                             <button onClick={async () => {
                                                 const nw = parseFloat(item.aantal) + 0.25;
                                                 await db.collection('items').doc(item.id).update({ aantal: nw });
-                                            }} className="px-2 text-gray-600 dark:text-gray-300 hover:text-green-500 font-bold">+</button>
+                                            }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-black shadow-sm transition-all active:scale-95">+</button>
                                         </div>
                                     )}
                                     
@@ -4415,17 +4440,17 @@ const dateColorClass = getDateTextColor(dagenOud, vriezer.type, dagenTotTHT, ite
                                             if (isChecked) newSet.delete(item.id); else newSet.add(item.id);
                                             setAuditedItems(newSet);
                                         }}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${isChecked ? 'bg-green-500 text-white shadow-inner' : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-green-900/40 dark:hover:text-green-400'}`}
+                                        className={`px-4 py-2.5 rounded-xl text-sm font-extrabold flex items-center gap-2 transition-all active:scale-95 shadow-sm ${isChecked ? 'bg-green-500 text-white shadow-inner shadow-green-700/30' : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-green-100 hover:text-green-700 hover:border-green-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-green-900/40 dark:hover:text-green-400 dark:hover:border-green-800'}`}
                                     >
-                                        <Icon path={Icons.Check} size={14}/> {isChecked ? 'Gecontroleerd' : 'Klopt!'}
+                                        <Icon path={Icons.Check} size={16}/> <span className="hidden sm:inline">{isChecked ? 'Gecontroleerd' : 'Klopt!'}</span>
                                     </button>
                                 </div>
                             </div>
                         )
                     })}
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
-                    <button onClick={() => setAuditLade(null)} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:bg-blue-700 transition">
+                <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                    <button onClick={() => setAuditLade(null)} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-extrabold text-lg shadow-lg shadow-blue-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">
                         Klaar met controleren
                     </button>
                 </div>
