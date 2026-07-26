@@ -2657,8 +2657,8 @@ onKeyDown={async (e) => {
                                                             )}
                                                         </div>
 
-                                                        {!isCollapsed && (
-                                                            <ul className="block divide-y divide-gray-50 dark:divide-gray-700/50"> 
+{!isCollapsed && (
+                                                            <ul className="block"> 
                                                                 {ladeItems.length === 0 ? <li className="p-6 text-center text-gray-400 text-sm font-medium italic">Leeg</li> : 
                                                                 ladeItems.map(item => {
                                                                     const dagenOud = getDagenOud(item.ingevrorenOp);
@@ -2677,7 +2677,7 @@ onKeyDown={async (e) => {
                                                                         <li 
                                                                             key={item.id} 
                                                                             onClick={() => isBulkMode ? toggleBulkSelection(item.id) : setTappedItemId(tappedItemId === item.id ? null : item.id)}
-                                                                            className={`flex items-center justify-between p-4 ${bgClass} ${colorClass} group transition-all duration-200 ${isBulkMode ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30' : 'cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30'}`}
+                                                                            className={`flex items-center justify-between p-4 border-b border-gray-100/50 dark:border-gray-700/50 last:border-b-0 ${bgClass} ${colorClass} group transition-all duration-200 ${isBulkMode ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30' : 'cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30'}`}
                                                                         >
                                                                             <div className="flex items-center gap-4 overflow-hidden min-w-0">
                                                                                 {isBulkMode && (
