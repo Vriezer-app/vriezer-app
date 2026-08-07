@@ -508,20 +508,21 @@ function App() {
     const [auditItemsToDelete, setAuditItemsToDelete] = useState(new Set());
     // Het "geheugen" voor de Balans functie
     const auditOriginals = useRef({});
-    
-    useEffect(() => {
-        if (auditLade) {
-            // Sla de originele waardes op als de lade wordt geopend
-            const originals = {};
-            items.filter(i => i.ladeId === auditLade.id).forEach(i => {
-                originals[i.id] = { aantal: parseFloat(i.aantal), eenheid: i.eenheid };
-            });
-            auditOriginals.current = originals;
-        } else {
-            // Maak het geheugen weer leeg als het scherm sluit
-            auditOriginals.current = {};
-        }
-    }, [auditLade]);
+    const previousAuditLade = useRef(null);
+
+    // Grijp de originele waardes EXACT op het moment dat het scherm opent (niet pas na het inladen)
+    if (auditLade && auditLade.id !== previousAuditLade.current) {
+        const originals = {};
+        items.filter(i => i.ladeId === auditLade.id).forEach(i => {
+            originals[i.id] = { aantal: parseFloat(i.aantal), eenheid: i.eenheid };
+        });
+        auditOriginals.current = originals;
+        previousAuditLade.current = auditLade.id;
+    } else if (!auditLade && previousAuditLade.current) {
+        // Maak het geheugen weer leeg als het scherm sluit
+        auditOriginals.current = {};
+        previousAuditLade.current = null;
+    }
     
     const [draggedLocId, setDraggedLocId] = useState(null); 
     
