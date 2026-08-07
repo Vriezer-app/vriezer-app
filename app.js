@@ -538,6 +538,80 @@ function App() {
     }
     
     const [draggedLocId, setDraggedLocId] = useState(null); 
+
+// -- NIEUWE STATE VOOR DND CATEGORIEËN EN EENHEDEN --
+    const [draggedCatName, setDraggedCatName] = useState(null);
+    const [draggedUnitName, setDraggedUnitName] = useState(null);
+
+    const handleDragStartCat = (e, name) => {
+        setDraggedCatName(name);
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDropCat = async (e, targetName) => {
+        e.preventDefault();
+        if (!draggedCatName || draggedCatName === targetName) {
+            setDraggedCatName(null);
+            return;
+        }
+
+        const list = [...actieveCategorieen];
+        const draggedIdx = list.findIndex(c => (c.name || c) === draggedCatName);
+        const targetIdx = list.findIndex(c => (c.name || c) === targetName);
+
+        if (draggedIdx === -1 || targetIdx === -1) return;
+
+        const [draggedItem] = list.splice(draggedIdx, 1);
+        list.splice(targetIdx, 0, draggedItem);
+
+        setDraggedCatName(null);
+        
+        // Sla op als correct object-formaat in Firestore
+        const formattedList = list.map(c => typeof c === 'string' ? { name: c, color: 'gray' } : c);
+        await db.collection('users').doc(beheerdeUserId).set({ customCategories: formattedList }, { merge: true });
+    };
+
+    const handleDragStartUnit = (e, name) => {
+        setDraggedUnitName(name);
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDropUnit = async (e, targetName) => {
+        e.preventDefault();
+        if (!draggedUnitName || draggedUnitName === targetName) {
+            setDraggedUnitName(null);
+            return;
+        }
+
+        let standardList = EENHEDEN_VRIES;
+        let currentCustom = customUnitsVries;
+        let dbField = 'customUnitsVries';
+
+        if (eenheidFilter === 'voorraad') {
+            standardList = EENHEDEN_VOORRAAD;
+            currentCustom = customUnitsVoorraad;
+            dbField = 'customUnitsVoorraad';
+        } else if (eenheidFilter === 'frig') {
+            standardList = EENHEDEN_FRIG;
+            currentCustom = customUnitsFrig;
+            dbField = 'customUnitsFrig';
+        }
+
+        const alleEenhedenList = currentCustom.length > 0 
+            ? [...new Set([...currentCustom, ...standardList])]
+            : [...standardList];
+
+        const draggedIdx = alleEenhedenList.indexOf(draggedUnitName);
+        const targetIdx = alleEenhedenList.indexOf(targetName);
+
+        if (draggedIdx === -1 || targetIdx === -1) return;
+
+        const [draggedItem] = alleEenhedenList.splice(draggedIdx, 1);
+        alleEenhedenList.splice(targetIdx, 0, draggedItem);
+
+        setDraggedUnitName(null);
+        await db.collection('users').doc(beheerdeUserId).set({ [dbField]: alleEenhedenList }, { merge: true });
+    };
     
     // TAPPED ITEM STATE VOOR SMARTPHONE ANIMATIE
     const [tappedItemId, setTappedItemId] = useState(null);
@@ -892,15 +966,13 @@ function App() {
         activeCustomUnits = customUnitsFrig;
     }
     
-    const alleEenheden = [...new Set([...contextEenheden, ...activeCustomUnits])].sort();
+const alleEenheden = activeCustomUnits.length > 0 
+        ? [...new Set([...activeCustomUnits, ...contextEenheden])] 
+        : contextEenheden;
 
-    const actieveCategorieen = [
-        ...contextCategorieen, 
-        ...customCategories.filter(cc => {
-            const inHuidig = contextCategorieen.some(c => c.name === cc.name);
-            return !inHuidig;
-        })
-    ];
+    const actieveCategorieen = customCategories.length > 0
+        ? [...customCategories, ...contextCategorieen.filter(cc => !customCategories.some(c => c.name === cc.name))]
+        : contextCategorieen;
 
     let tabCategorieen = CATEGORIEEN_VRIES;
     if (activeTab === 'voorraad') tabCategorieen = CATEGORIEEN_VOORRAAD;
@@ -4022,26 +4094,39 @@ const toggleMaintenanceMode = async () => {
                 {beheerTab === 'categorieen' && (
                     <div className="animate-in fade-in slide-in-from-left-2">
                         <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 mb-3">Categorieën</h4>
-                        <ul className="space-y-2 mb-4">
+                        <ul className="space-y-2 mb-4 relative">
                             {actieveCategorieen.map(cat => (
-                                <li key={cat.name} className="flex justify-between p-2.5 bg-white dark:bg-gray-800 rounded-lg items-center border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:border-purple-200">
-                                    {editingCatName === cat.name ?
-                                        <div className="flex gap-2 w-full items-center">
-                                            <input className="flex-grow border border-purple-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputName} onChange={e=>setEditCatInputName(e.target.value)} />
-                                            <select className="border border-purple-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputColor} onChange={e=>setEditCatInputColor(e.target.value)}>
-                                                {Object.keys(BADGE_COLORS).map(c => <option key={c} value={c}>{c}</option>)}
-                                            </select>
-                                            <button onClick={saveCat} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button>
+                                <li 
+                                    key={cat.name} 
+                                    draggable
+                                    onDragStart={(e) => handleDragStartCat(e, cat.name)}
+                                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
+                                    onDrop={(e) => handleDropCat(e, cat.name)}
+                                    onDragEnd={() => setDraggedCatName(null)}
+                                    className={`flex justify-between p-2.5 bg-white dark:bg-gray-800 rounded-lg items-center border shadow-sm transition-all ${draggedCatName === cat.name ? 'opacity-40 border-purple-400 border-dashed' : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'}`}
+                                >
+                                    <div className="flex items-center gap-2.5 w-full">
+                                        <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500" title="Sleep om volgorde aan te passen">
+                                            <Icon path={Icons.GripVertical} size={16}/>
                                         </div>
-                                        :
-                                        <>
-                                            <div className="flex items-center gap-2.5"><div className={`w-3 h-3 rounded-full bg-${cat.color}-500 shadow-sm border border-white dark:border-gray-800`}></div><span className="font-medium text-sm text-gray-700 dark:text-gray-200">{cat.name}</span></div>
-                                            <div className="flex gap-1.5">
-                                                <button onClick={()=>startEditCat(cat)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button>
-                                                <button onClick={() => handleDeleteCat(cat.name)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button>
+                                        {editingCatName === cat.name ?
+                                            <div className="flex gap-2 w-full items-center">
+                                                <input className="flex-grow border border-purple-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputName} onChange={e=>setEditCatInputName(e.target.value)} />
+                                                <select className="border border-purple-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputColor} onChange={e=>setEditCatInputColor(e.target.value)}>
+                                                    {Object.keys(BADGE_COLORS).map(c => <option key={c} value={c}>{c}</option>)}
+                                                </select>
+                                                <button onClick={saveCat} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button>
                                             </div>
-                                        </>
-                                    }
+                                            :
+                                            <>
+                                                <div className="flex items-center gap-2.5 flex-grow"><div className={`w-3 h-3 rounded-full bg-${cat.color}-500 shadow-sm border border-white dark:border-gray-800`}></div><span className="font-medium text-sm text-gray-700 dark:text-gray-200">{cat.name}</span></div>
+                                                <div className="flex gap-1.5">
+                                                    <button onClick={()=>startEditCat(cat)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button>
+                                                    <button onClick={() => handleDeleteCat(cat.name)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button>
+                                                </div>
+                                            </>
+                                        }
+                                    </div>
                                 </li>
                             ))}
                         </ul>
@@ -4056,43 +4141,63 @@ const toggleMaintenanceMode = async () => {
                 )}
                 {beheerTab === 'eenheden' && (
                     <div className="animate-in fade-in slide-in-from-right-2">
-                        <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 mb-3">Mijn eenheden</h4>
+                        <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">Mijn eenheden</h4>
+                            <span className="text-[9px] uppercase text-gray-400 font-bold tracking-widest bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
+                        </div>
+                        
                         <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-lg mb-4 border border-gray-200/50 dark:border-gray-700/50">
-                            <button onClick={() => setEenheidFilter('vries')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'vries' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                                Vriezer.
-                            </button>
+                            {/* Filter knoppen blijven hetzelfde */}
+                            <button onClick={() => setEenheidFilter('vries')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'vries' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Vriezer.</button>
                             {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                                <button onClick={() => setEenheidFilter('frig')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'frig' ? 'bg-white dark:bg-gray-700 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                                    Frig.
-                                </button>
+                                <button onClick={() => setEenheidFilter('frig')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'frig' ? 'bg-white dark:bg-gray-700 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Frig.</button>
                             )}
                             {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                                <button onClick={() => setEenheidFilter('voorraad')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'voorraad' ? 'bg-white dark:bg-gray-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                                    Stock.
-                                </button>
+                                <button onClick={() => setEenheidFilter('voorraad')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'voorraad' ? 'bg-white dark:bg-gray-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Stock.</button>
                             )}
                         </div>
 
-                        <ul className="space-y-2 mb-4">
-                            {(
-                                eenheidFilter === 'voorraad' ? customUnitsVoorraad : 
-                                eenheidFilter === 'frig' ? customUnitsFrig :
-                                customUnitsVries
-                            ).length === 0 ? <li className="text-gray-400 font-medium italic text-center py-4 text-xs bg-gray-50 dark:bg-gray-800/50 rounded-lg">Geen eigen eenheden voor {eenheidFilter}.</li> : 
-                            (
-                                eenheidFilter === 'voorraad' ? customUnitsVoorraad : 
-                                eenheidFilter === 'frig' ? customUnitsFrig :
-                                customUnitsVries
-                            ).map(u => (
-                                <li key={u} className="flex justify-between p-2.5 bg-white dark:bg-gray-800 rounded-lg items-center border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:border-gray-300">
-                                    {editingUnitName === u ? 
-                                        <div className="flex gap-2 w-full"><input className="flex-grow border border-blue-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editUnitInput} onChange={e=>setEditUnitInput(e.target.value)} /><button onClick={saveUnitName} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button></div>
-                                        :
-                                        <><span className="font-medium text-sm text-gray-700 dark:text-gray-200">{u}</span><div className="flex gap-1.5"><button onClick={()=>startEditUnit(u)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button><button onClick={() => handleDeleteUnit(u)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button></div></>
-                                    }
-                                </li>
-                            ))}
-                        </ul>
+                        {(() => {
+                            const actieveEenhedenLijst = (
+                                eenheidFilter === 'voorraad' ? (customUnitsVoorraad.length > 0 ? [...new Set([...customUnitsVoorraad, ...EENHEDEN_VOORRAAD])] : EENHEDEN_VOORRAAD) : 
+                                eenheidFilter === 'frig' ? (customUnitsFrig.length > 0 ? [...new Set([...customUnitsFrig, ...EENHEDEN_FRIG])] : EENHEDEN_FRIG) :
+                                (customUnitsVries.length > 0 ? [...new Set([...customUnitsVries, ...EENHEDEN_VRIES])] : EENHEDEN_VRIES)
+                            );
+
+                            return (
+                                <ul className="space-y-2 mb-4 relative">
+                                    {actieveEenhedenLijst.length === 0 ? <li className="text-gray-400 font-medium italic text-center py-4 text-xs bg-gray-50 dark:bg-gray-800/50 rounded-lg">Geen eigen eenheden voor {eenheidFilter}.</li> : 
+                                    actieveEenhedenLijst.map(u => (
+                                        <li 
+                                            key={u} 
+                                            draggable
+                                            onDragStart={(e) => handleDragStartUnit(e, u)}
+                                            onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
+                                            onDrop={(e) => handleDropUnit(e, u)}
+                                            onDragEnd={() => setDraggedUnitName(null)}
+                                            className={`flex justify-between p-2.5 bg-white dark:bg-gray-800 rounded-lg items-center border shadow-sm transition-all hover:border-gray-300 ${draggedUnitName === u ? 'opacity-40 border-orange-400 border-dashed' : 'border-gray-200 dark:border-gray-700'}`}
+                                        >
+                                            <div className="flex items-center gap-2.5 w-full">
+                                                <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500" title="Sleep om volgorde aan te passen">
+                                                    <Icon path={Icons.GripVertical} size={16}/>
+                                                </div>
+                                                {editingUnitName === u ? 
+                                                    <div className="flex gap-2 w-full"><input className="flex-grow border border-blue-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editUnitInput} onChange={e=>setEditUnitInput(e.target.value)} /><button onClick={saveUnitName} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button></div>
+                                                    :
+                                                    <>
+                                                        <span className="flex-grow font-medium text-sm text-gray-700 dark:text-gray-200">{u}</span>
+                                                        <div className="flex gap-1.5 flex-shrink-0">
+                                                            <button onClick={()=>startEditUnit(u)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button>
+                                                            <button onClick={() => handleDeleteUnit(u)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button>
+                                                        </div>
+                                                    </>
+                                                }
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            );
+                        })()}
                         <form onSubmit={handleAddUnit} className="flex gap-2"><input className="flex-grow border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white text-xs font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe eenheid" value={newUnitNaam} onChange={e=>setNewUnitNaam(e.target.value)} required /><button className={`text-white font-bold px-4 rounded-lg shadow-sm active:scale-95 transition-all ${eenheidFilter === 'voorraad' ? 'bg-orange-500 hover:bg-orange-600' : eenheidFilter === 'frig' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}>+</button></form>
                     </div>
                 )}
