@@ -4176,7 +4176,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         </form>
                     </div>
                 )}
-                )}
+
                 {beheerTab === 'eenheden' && (
                     <div className="animate-in fade-in slide-in-from-right-2">
                         <div className="flex justify-between items-center mb-3">
@@ -4185,7 +4185,6 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         </div>
                         
                         <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-lg mb-4 border border-gray-200/50 dark:border-gray-700/50">
-                            {/* Filter knoppen blijven hetzelfde */}
                             <button onClick={() => setEenheidFilter('vries')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'vries' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Vriezer.</button>
                             {(!myHiddenTabs.includes('frig') || isAdmin) && (
                                 <button onClick={() => setEenheidFilter('frig')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'frig' ? 'bg-white dark:bg-gray-700 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Frig.</button>
