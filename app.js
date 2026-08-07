@@ -326,6 +326,12 @@ const logAction = async (action, itemNaam, details, actorUser, targetUserId) => 
         console.error("Kon log niet opslaan", e);
     }
 };
+const markLadeAsChanged = async (ladeId) => {
+    if (!ladeId) return;
+    try {
+        await db.collection('lades').doc(ladeId).update({ laatstGewijzigd: new Date() });
+    } catch (e) { console.error("Kon lade datum niet updaten", e); }
+};
 const analyzeProductName = (name) => {
     const n = name.toLowerCase();
     let cat = null, emoji = null, dagenHoudbaar = null;
@@ -1102,7 +1108,7 @@ const handleSaveItem = async (e) => {
             altijdGoed: formData.altijdGoed || false
         };
 
-        try {
+try {
             if(editingItem) {
                 let changes = [];
                 if (editingItem.naam !== data.naam) changes.push(`Naam: ${editingItem.naam} ➔ ${data.naam}`);
@@ -1115,11 +1121,13 @@ const handleSaveItem = async (e) => {
                 if ((editingItem.notitie || '') !== (data.notitie || '')) changes.push(`Notitie aangepast`);
                 
                 const detailsString = changes.length > 0 ? changes.join(', ') : 'Geen velden gewijzigd';
-                
-                // Check of het via balans ging
                 const logToevoeging = formData.viaBalans ? ' (via Balans)' : '';
 
                 await db.collection('items').doc(editingItem.id).update(data);
+                
+                markLadeAsChanged(data.ladeId); // Slaat datum laatste wijziging op
+                if (editingItem.ladeId && editingItem.ladeId !== data.ladeId) markLadeAsChanged(editingItem.ladeId);
+
                 await logAction('Bewerkt', data.naam, detailsString + logToevoeging, user, beheerdeUserId);
                 showNotification(`${data.naam} is bijgewerkt!`, 'success');
                 setEditingItem(null);
@@ -1127,17 +1135,13 @@ const handleSaveItem = async (e) => {
             } else {
                 const aantalKeerToevoegen = parseInt(formData.bulkAanmaak) || 1;
                 const batchPromises = [];
-                
-                for(let i = 0; i < aantalKeerToevoegen; i++) {
-                    batchPromises.push(db.collection('items').add(data));
-                }
-                
+                for(let i = 0; i < aantalKeerToevoegen; i++) batchPromises.push(db.collection('items').add(data));
                 await Promise.all(batchPromises);
                 
+                markLadeAsChanged(data.ladeId); // Slaat datum laatste wijziging op
+
                 const locNaam = loc ? loc.naam : 'Onbekende locatie';
                 const ladeNaam = lade ? lade.naam : 'Onbekende lade';
-                
-                // Check of het via balans ging
                 const logToevoeging = formData.viaBalans ? ' (via Balans)' : '';
                 
                 if (aantalKeerToevoegen > 1) {
@@ -1150,10 +1154,7 @@ const handleSaveItem = async (e) => {
                 
                 if (rememberLocation) {
                     setFormData(prev => ({
-                        ...prev, 
-                        naam: '', aantal: 1, minimumVoorraad: '', prijs: '', notitie: '', emoji: '', 
-                        ingevrorenOp: new Date().toISOString().split('T')[0],
-                        houdbaarheidsDatum: '', bulkAanmaak: 1, viaBalans: false // Reset de flag
+                        ...prev, naam: '', aantal: 1, minimumVoorraad: '', prijs: '', notitie: '', emoji: '', ingevrorenOp: new Date().toISOString().split('T')[0], houdbaarheidsDatum: '', bulkAanmaak: 1, viaBalans: false
                     }));
                 } else {
                     const defaultCat = activeTab === 'voorraad' ? 'Pasta' : 'Vlees';
@@ -1161,6 +1162,7 @@ const handleSaveItem = async (e) => {
                 }
                 setShowAddModal(false);
             }
+        }
         } catch(err) { 
             showNotification("Er ging iets mis: " + err.message, 'error'); 
         }
@@ -2690,7 +2692,7 @@ const toggleMaintenanceMode = async () => {
                                                 
                                                 return (
                                                     <div key={lade.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 dark:border-gray-700/50 overflow-hidden page-break-inside-avoid transition-all duration-200">
-                                                        <div className="bg-gray-50/80 dark:bg-gray-800/80 px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-100/80 dark:hover:bg-gray-700 transition-colors print:bg-white" onClick={() => toggleLade(lade.id)}>
+                                                        <div className="bg-white dark:bg-gray-800 px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors print:bg-white" onClick={() => toggleLade(lade.id)}>
                                                             <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm flex items-center gap-2">
                                                                 {isCollapsed ? <Icon path={Icons.ChevronRight} size={18} className="print:hidden text-gray-400"/> : <Icon path={Icons.ChevronDown} size={18} className="print:hidden text-gray-400"/>} 
                                                                 {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
@@ -2698,16 +2700,40 @@ const toggleMaintenanceMode = async () => {
                                                             {(!myHiddenTabs.includes('balans') || isAdmin) && (
                                                                 <div className="flex items-center gap-3">
                                                                     
-                                                                    {/* NIEUW: Datum weergave op het hoofdscherm */}
-                                                                    {lade.laatstGecontroleerd && (
-                                                                        <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
-                                                                            Check: {formatDate(lade.laatstGecontroleerd)}
-                                                                        </span>
-                                                                    )}
+                                                                    {/* Dynamische Datum weergave (Laatste wijziging vs Check) */}
+                                                                    {(() => {
+                                                                        const checkDate = lade.laatstGecontroleerd ? (lade.laatstGecontroleerd.toDate ? lade.laatstGecontroleerd.toDate() : new Date(lade.laatstGecontroleerd)) : null;
+                                                                        const modDate = lade.laatstGewijzigd ? (lade.laatstGewijzigd.toDate ? lade.laatstGewijzigd.toDate() : new Date(lade.laatstGewijzigd)) : null;
+                                                                        
+                                                                        let displayDate = null;
+                                                                        let isCheck = true;
+
+                                                                        if (checkDate && (!modDate || checkDate >= modDate)) {
+                                                                            displayDate = checkDate;
+                                                                            isCheck = true;
+                                                                        } else if (modDate && (!checkDate || modDate > checkDate)) {
+                                                                            displayDate = modDate;
+                                                                            isCheck = false;
+                                                                        } else if (checkDate) {
+                                                                            displayDate = checkDate;
+                                                                            isCheck = true;
+                                                                        } else if (modDate) {
+                                                                            displayDate = modDate;
+                                                                            isCheck = false;
+                                                                        }
+
+                                                                        if (!displayDate) return null;
+
+                                                                        return (
+                                                                            <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
+                                                                                {isCheck ? 'Check: ' : 'Laatste wijziging: '} {formatDate(displayDate)}
+                                                                            </span>
+                                                                        );
+                                                                    })()}
 
                                                                     <button 
                                                                         onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
-                                                                        className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-all active:scale-95 print:hidden"
+                                                                        className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
                                                                         title="Voorraad-Balans (Snel aftikken)"
                                                                     >
                                                                         <Icon path={Icons.CheckSquare} size={14} /> Balans
@@ -2858,7 +2884,6 @@ const toggleMaintenanceMode = async () => {
                         const originalData = auditOriginals.current[item.id];
                         const isNew = !originalData; 
                         
-                        // NIEUW: Nu checkt hij op alle mogelijke wijzigingen (naam, aantal, eenheid, emoji, categorie, notitie)
                         const isChanged = originalData && (
                             parseFloat(item.aantal || 0) !== originalData.aantal || 
                             item.eenheid !== originalData.eenheid ||
@@ -2880,7 +2905,6 @@ const toggleMaintenanceMode = async () => {
                         }
                         const localAlleEenheden = [...new Set([...contextEenheden, ...activeCustomUnits])].sort();
 
-                        // Achtergrond en randkleur bepalen obv prioriteit
                         const borderColor = isMarkedForDelete 
                             ? 'bg-red-50/50 border-red-200 dark:bg-red-900/10 dark:border-red-800/50 opacity-60 grayscale-[50%]' 
                             : isChecked 
@@ -2902,13 +2926,11 @@ const toggleMaintenanceMode = async () => {
                                         {isChecked && !isMarkedForDelete && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
                                         {isMarkedForDelete && <p className="text-[10px] font-bold text-red-500 mt-0.5">Wordt verwijderd bij opslaan</p>}
                                         
-                                        {/* Blauw label */}
                                         {!isChecked && !isMarkedForDelete && isNew && (
                                             <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mt-0.5 flex items-center gap-1">
                                                 <Icon path={Icons.Plus} size={10}/> Nieuw toegevoegd
                                             </p>
                                         )}
-                                        {/* Oranje "Gewijzigd" label met slimme tekst */}
                                         {!isChecked && !isMarkedForDelete && isChanged && !isNew && (
                                             <p className="text-[10px] font-bold text-orange-600 dark:text-orange-400 mt-0.5 flex items-center gap-1">
                                                 <Icon path={Icons.Edit2} size={10}/> Gewijzigd 
@@ -2929,6 +2951,7 @@ const toggleMaintenanceMode = async () => {
                                                     const nw = Math.max(0.25, huidig - 0.25);
                                                     if (nw !== huidig) {
                                                         await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                        markLadeAsChanged(auditLade.id); // NIEUW
                                                         await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
                                                     }
                                                 }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
@@ -2942,6 +2965,7 @@ const toggleMaintenanceMode = async () => {
                                                             const huidig = parseFloat(item.aantal);
                                                             if (!isNaN(nw) && nw >= 0 && nw !== huidig) {
                                                                 await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                                markLadeAsChanged(auditLade.id); // NIEUW
                                                                 await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
                                                             }
                                                         }
@@ -2953,6 +2977,7 @@ const toggleMaintenanceMode = async () => {
                                                     const huidig = parseFloat(item.aantal);
                                                     const nw = huidig + 0.25;
                                                     await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                    markLadeAsChanged(auditLade.id); // NIEUW
                                                     await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
                                                 }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-bold shadow-sm transition-all active:scale-95">+</button>
                                             </div>
@@ -2962,6 +2987,7 @@ const toggleMaintenanceMode = async () => {
                                                 onChange={async (e) => {
                                                     const nieuweEenheid = e.target.value;
                                                     await db.collection('items').doc(item.id).update({ eenheid: nieuweEenheid });
+                                                    markLadeAsChanged(auditLade.id); // NIEUW
                                                     await logAction('Bewerkt', item.naam, `Eenheid: ${item.eenheid} ➔ ${nieuweEenheid} (Balans)`, user, beheerdeUserId);
                                                 }}
                                                 className="h-10 px-2 text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer transition-all"
@@ -3055,7 +3081,8 @@ const toggleMaintenanceMode = async () => {
                             if (auditLade) {
                                 try {
                                     await db.collection('lades').doc(auditLade.id).update({
-                                        laatstGecontroleerd: new Date()
+                                        laatstGecontroleerd: new Date(),
+                                        laatstGewijzigd: new Date() // Synchroniseer wijzigingsdatum
                                     });
                                 } catch(e) {
                                     console.error("Fout bij opslaan controle datum", e);
