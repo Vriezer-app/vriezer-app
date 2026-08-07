@@ -4125,11 +4125,12 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         )}
                     </div>
                 )}
-                {beheerTab === 'categorieen' && (
+{beheerTab === 'categorieen' && (
                     <div className="animate-in fade-in slide-in-from-left-2">
-                        <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 mb-3">Categorieën</h4>
-                    <span className="text-[9px] uppercase text-gray-400 font-bold tracking-widest bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
-                    </div>
+                        <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">Categorieën</h4>
+                            <span className="text-[9px] uppercase text-gray-400 font-bold tracking-widest bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
+                        </div>
                         <ul className="space-y-2 mb-4 relative">
                             {actieveCategorieen.map(cat => (
                                 <li 
@@ -4174,6 +4175,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             <button className="bg-purple-600 text-white px-4 rounded-lg font-bold shadow-sm hover:bg-purple-700 active:scale-95 transition-all">+</button>
                         </form>
                     </div>
+                )}
                 )}
                 {beheerTab === 'eenheden' && (
                     <div className="animate-in fade-in slide-in-from-right-2">
