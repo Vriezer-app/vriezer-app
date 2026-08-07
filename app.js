@@ -2797,7 +2797,7 @@ const toggleMaintenanceMode = async () => {
                             }}
                             className="mt-3 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95"
                         >
-                            <Icon path={Icons.Plus} size={16} /> Direct een nieuw product toevoegen in deze lade
+                            <Icon path={Icons.Plus} size={16} /> Product toevoegen in deze lade
                         </button>
                     </div>
 
