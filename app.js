@@ -561,7 +561,6 @@ function App() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [showStatsModal, setShowStatsModal] = useState(false);
-    const [showSuggestionModal, setShowSuggestionModal] = useState(false);
     const [showShoppingModal, setShowShoppingModal] = useState(false); 
     const [beheerTab, setBeheerTab] = useState('locaties');
 
@@ -2167,11 +2166,6 @@ const toggleMaintenanceMode = async () => {
                             <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 ${viewMode === 'calendar' ? 'bg-blue-100 border-blue-300 text-blue-600 dark:bg-blue-900/50 dark:border-blue-500 dark:text-blue-300' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`} title={viewMode === 'list' ? 'Wissel naar Kalender' : 'Wissel naar Lijst'}>
                                 <Icon path={viewMode === 'list' ? Icons.Calendar : Icons.LayoutDashboard} size={18} />
                                 <span className="hidden sm:inline font-medium text-sm">{viewMode === 'list' ? 'Kalender' : 'Lijst'}</span>
-                            </button>
-                                    
-                            <button onClick={() => setShowSuggestionModal(true)} className="flex-none w-10 sm:w-auto sm:px-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/40 dark:to-amber-900/40 text-amber-700 dark:text-amber-300 rounded-xl border border-yellow-200/60 dark:border-yellow-700/50 hover:shadow-md transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95" title="Wat eten we vandaag?">
-                                <Icon path={Icons.Utensils} size={18}/>
-                                <span className="hidden sm:inline font-medium text-sm pr-1">Idee</span>
                             </button>
                                     
                             <button onClick={() => setShowRapidEntry(!showRapidEntry)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 ${showRapidEntry ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300 text-amber-600 dark:from-yellow-900/50 dark:to-amber-900/50 dark:border-yellow-500 dark:text-yellow-300' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`} title="Snelle Invoer">
@@ -3906,26 +3900,6 @@ const toggleMaintenanceMode = async () => {
                         <p className="text-[10px] text-center text-gray-400 dark:text-gray-500 font-medium italic mt-1">Gebaseerd op handmatige invoer bij verwijderen.</p>
                     </div>
                 ) : <p className="text-center text-gray-400 font-medium text-xs">Nog geen verbruiksdata beschikbaar.</p>}
-            </Modal>
-            
-            <Modal isOpen={showSuggestionModal} onClose={() => setShowSuggestionModal(false)} title="Wat eten we vandaag?" color="yellow">
-                <p className="text-gray-600 dark:text-gray-300 mb-4 font-medium text-sm">Deze producten hebben prioriteit op basis van houdbaarheid:</p>
-                <div className="space-y-3">
-                    {getSuggestions().length === 0 ? <p className="italic font-medium text-gray-400 text-center py-6 text-sm">Alles lijkt vers! Je bent goed bezig.</p> : getSuggestions().map(item => (
-                        <div key={item.id} className="flex items-center justify-between p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-yellow-200/60 dark:border-yellow-700/50 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-3">
-                                <span className="text-2xl drop-shadow-sm">{item.emoji}</span>
-                                <div>
-                                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm tracking-tight">{item.naam}</p>
-                                    <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">
-                                        {item.type === 'vriezer' ? `${item.daysOld} dgn in vriezer` : `THT: ${formatDate(item.houdbaarheidsDatum)}`}
-                                    </p>
-                                </div>
-                            </div>
-                            <Badge type="yellow" text="Eet mij!" />
-                        </div>
-                    ))}
-                </div>
             </Modal>
 
             <Modal isOpen={showLogModal} onClose={() => setShowLogModal(false)} title="Logboek." color="teal">
