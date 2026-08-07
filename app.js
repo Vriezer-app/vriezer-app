@@ -1108,7 +1108,7 @@ const handleSaveItem = async (e) => {
             altijdGoed: formData.altijdGoed || false
         };
 
-try {
+        try {
             if(editingItem) {
                 let changes = [];
                 if (editingItem.naam !== data.naam) changes.push(`Naam: ${editingItem.naam} ➔ ${data.naam}`);
@@ -1162,7 +1162,6 @@ try {
                 }
                 setShowAddModal(false);
             }
-        }
         } catch(err) { 
             showNotification("Er ging iets mis: " + err.message, 'error'); 
         }
