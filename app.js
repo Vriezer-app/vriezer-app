@@ -942,7 +942,17 @@ function App() {
         return () => { isMounted = false; };
     }, [dashboardUser]);
 
-    const filteredLocaties = sortLocaties(vriezers.filter(l => l.type === activeTab));
+    const filteredLocaties = sortLocaties(vriezers.filter(l => {
+        if (l.type !== activeTab) return false;
+        
+        // Verberg de locatie 'Ongesorteerd' als er geen producten in zitten
+        if (l.naam.toLowerCase() === 'ongesorteerd') {
+            const heeftItems = items.some(i => i.vriezerId === l.id);
+            return heeftItems;
+        }
+        return true;
+    }));
+    
     const activeItems = items.filter(i => filteredLocaties.some(l => l.id === i.vriezerId));
     const modalLocaties = sortLocaties(vriezers.filter(l => l.type === modalType));
 
@@ -2263,15 +2273,10 @@ const toggleMaintenanceMode = async () => {
                             value={rapidEntryText}
                             onChange={(e) => setRapidEntryText(e.target.value)}
                             onKeyDown={async (e) => {
-                                if (e.key === 'Enter' && rapidEntryText.trim()) {
+if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     e.preventDefault();
                                     
                                     const info = analyzeProductName(rapidEntryText.trim()) || { cat: null, emoji: null, dagenHoudbaar: null };
-                                    
-                                    const defaultLoc = filteredLocaties.length > 0 ? filteredLocaties[0].id : '';
-                                    const availableLades = lades.filter(l => l.vriezerId === defaultLoc).sort((a,b) => a.naam.localeCompare(b.naam));
-                                    const defaultLadeId = availableLades.length > 0 ? availableLades[0].id : '';
-                                    const defaultLadeNaam = availableLades.length > 0 ? availableLades[0].naam : '';
                                     const fallbackCat = activeTab === 'voorraad' ? 'Pasta' : 'Vlees';
                                     
                                     let tht = null;
@@ -2282,15 +2287,46 @@ const toggleMaintenanceMode = async () => {
                                     }
 
                                     try {
+                                        // 1. Zoek of maak "Ongesorteerd" locatie (binnen de huidige tab)
+                                        let ongesorteerdLoc = vriezers.find(v => v.naam.toLowerCase() === 'ongesorteerd' && v.type === activeTab);
+                                        let locId = ongesorteerdLoc ? ongesorteerdLoc.id : null;
+                                        let locNaam = 'Ongesorteerd';
+
+                                        if (!locId) {
+                                            const newLocRef = await db.collection('vriezers').add({
+                                                naam: 'Ongesorteerd',
+                                                type: activeTab,
+                                                userId: beheerdeUserId,
+                                                color: 'gray',
+                                                order: -1 // Zet hem bovenaan de lijst
+                                            });
+                                            locId = newLocRef.id;
+                                        }
+
+                                        // 2. Zoek of maak "Ongesorteerd" lade in deze locatie
+                                        let ongesorteerdLade = lades.find(l => l.vriezerId === locId && l.naam.toLowerCase() === 'ongesorteerd');
+                                        let ladeId = ongesorteerdLade ? ongesorteerdLade.id : null;
+                                        let ladeNaam = 'Ongesorteerd';
+
+                                        if (!ladeId) {
+                                            const newLadeRef = await db.collection('lades').add({
+                                                naam: 'Ongesorteerd',
+                                                vriezerId: locId,
+                                                userId: beheerdeUserId
+                                            });
+                                            ladeId = newLadeRef.id;
+                                        }
+
+                                        // 3. Voeg het product toe aan de "Ongesorteerd" locatie en lade
                                         await db.collection('items').add({
                                             naam: rapidEntryText.trim(),
                                             aantal: 1,
                                             eenheid: 'stuks',
                                             categorie: info.cat || fallbackCat,
                                             emoji: info.emoji || '📦',
-                                            vriezerId: defaultLoc,
-                                            ladeId: defaultLadeId,
-                                            ladeNaam: defaultLadeNaam,
+                                            vriezerId: locId,
+                                            ladeId: ladeId,
+                                            ladeNaam: ladeNaam,
                                             minimumVoorraad: null,
                                             prijs: null,
                                             ingevrorenOp: new Date(),
@@ -2299,11 +2335,9 @@ const toggleMaintenanceMode = async () => {
                                             userId: beheerdeUserId
                                         });
                                         
-                                        const loc = vriezers.find(v => v.id === defaultLoc);
-                                        const locNaam = loc ? loc.naam : 'Onbekende locatie';
-                                        await logAction('Toevoegen', rapidEntryText.trim(), `Snel ingevoerd in ${locNaam} (${defaultLadeNaam || 'Geen lade'})`, user, beheerdeUserId);
+                                        await logAction('Toevoegen', rapidEntryText.trim(), `Snel ingevoerd in ${locNaam} (${ladeNaam})`, user, beheerdeUserId);
                                         
-                                        showNotification(`${rapidEntryText.trim()} razendsnel toegevoegd!`, 'success');
+                                        showNotification(`${rapidEntryText.trim()} razendsnel toegevoegd aan Ongesorteerd!`, 'success');
                                         setRapidEntryText('');
                                     } catch (err) {
                                         showNotification("Fout bij snel toevoegen: " + err.message, "error");
