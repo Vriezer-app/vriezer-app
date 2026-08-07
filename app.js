@@ -506,6 +506,23 @@ function App() {
     const [auditLade, setAuditLade] = useState(null);
     const [auditedItems, setAuditedItems] = useState(new Set()); 
     const [auditItemsToDelete, setAuditItemsToDelete] = useState(new Set());
+    // Het "geheugen" voor de Balans functie
+    const auditOriginals = useRef({});
+    
+    useEffect(() => {
+        if (auditLade) {
+            // Sla de originele waardes op als de lade wordt geopend
+            const originals = {};
+            items.filter(i => i.ladeId === auditLade.id).forEach(i => {
+                originals[i.id] = { aantal: parseFloat(i.aantal), eenheid: i.eenheid };
+            });
+            auditOriginals.current = originals;
+        } else {
+            // Maak het geheugen weer leeg als het scherm sluit
+            auditOriginals.current = {};
+        }
+    }, [auditLade]);
+    
     const [draggedLocId, setDraggedLocId] = useState(null); 
     
     // TAPPED ITEM STATE VOOR SMARTPHONE ANIMATIE
@@ -2785,7 +2802,7 @@ const toggleMaintenanceMode = async () => {
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200 shadow-sm flex flex-col">
                         <div>
                             <strong className="font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 mb-1"><Icon path={Icons.Info} size={14}/> Instructie</strong> 
-                            <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Pas het aantal aan en klik op <strong>'Klopt!'</strong>. Klik op <strong>'Klopt niet'</strong> om ze door te strepen. Ze worden pas definitief verwijderd als je onderaan op opslaan klikt.</span>
+                            <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Pas het aantal aan (typen of met + / -). Een gemaakte wijziging kleurt direct <strong>oranje</strong>. Klik op <strong>'Klopt niet'</strong> om items door te strepen. Verwijderingen worden pas definitief als je op opslaan klikt.</span>
                         </div>
 
                         {auditLade?.laatstGecontroleerd && (
@@ -2831,6 +2848,10 @@ const toggleMaintenanceMode = async () => {
                         const isChecked = auditedItems.has(item.id);
                         const isMarkedForDelete = auditItemsToDelete.has(item.id);
                         
+                        // NIEUW: Check of dit item gewijzigd is ten opzichte van het begin van de sessie
+                        const originalData = auditOriginals.current[item.id];
+                        const isChanged = originalData && (parseFloat(item.aantal || 0) !== originalData.aantal || item.eenheid !== originalData.eenheid);
+                        
                         const ladeLoc = vriezers.find(v => v.id === auditLade.vriezerId);
                         const locType = ladeLoc ? ladeLoc.type : 'vriezer';
                         let contextEenheden = EENHEDEN_VRIES;
@@ -2843,18 +2864,32 @@ const toggleMaintenanceMode = async () => {
                         }
                         const localAlleEenheden = [...new Set([...contextEenheden, ...activeCustomUnits])].sort();
 
+                        // NIEUW: Achtergrond en randkleur bepalen obv prioriteit
+                        const borderColor = isMarkedForDelete 
+                            ? 'bg-red-50/50 border-red-200 dark:bg-red-900/10 dark:border-red-800/50 opacity-60 grayscale-[50%]' 
+                            : isChecked 
+                                ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' 
+                                : isChanged 
+                                    ? 'bg-orange-50 border-orange-300 dark:bg-orange-900/20 dark:border-orange-800/80 shadow-sm' 
+                                    : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md';
+
                         return (
-                            <div key={item.id} className={`flex flex-col xl:flex-row xl:items-center justify-between p-4 rounded-xl border transition-all duration-300 gap-3 
-                                ${isMarkedForDelete ? 'bg-red-50/50 border-red-200 dark:bg-red-900/10 dark:border-red-800/50 opacity-60 grayscale-[50%]' : 
-                                  isChecked ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' : 
-                                  'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md'}`}>
+                            <div key={item.id} className={`flex flex-col xl:flex-row xl:items-center justify-between p-4 rounded-xl border transition-all duration-300 gap-3 ${borderColor}`}>
                                 
                                 <div className="flex items-center gap-3 truncate">
                                     <span className={`text-2xl drop-shadow-sm ${isMarkedForDelete ? 'opacity-50' : ''}`}>{item.emoji || '📦'}</span>
                                     <div className="truncate">
-                                        <p className={`font-bold text-sm tracking-tight ${isChecked || isMarkedForDelete ? 'line-through' : ''} ${isMarkedForDelete ? 'text-red-800 dark:text-red-400 decoration-red-500/50' : isChecked ? 'text-green-800 dark:text-green-400 decoration-green-500/50' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
+                                        <p className={`font-bold text-sm tracking-tight ${isChecked || isMarkedForDelete ? 'line-through' : ''} ${isMarkedForDelete ? 'text-red-800 dark:text-red-400 decoration-red-500/50' : isChecked ? 'text-green-800 dark:text-green-400 decoration-green-500/50' : isChanged ? 'text-orange-900 dark:text-orange-100' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
+                                        
                                         {isChecked && !isMarkedForDelete && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
                                         {isMarkedForDelete && <p className="text-[10px] font-bold text-red-500 mt-0.5">Wordt verwijderd bij opslaan</p>}
+                                        
+                                        {/* NIEUW: Oranje "Gewijzigd" label */}
+                                        {!isChecked && !isMarkedForDelete && isChanged && (
+                                            <p className="text-[10px] font-bold text-orange-600 dark:text-orange-400 mt-0.5 flex items-center gap-1">
+                                                <Icon path={Icons.Edit2} size={10}/> Gewijzigd (was {originalData.aantal} {originalData.eenheid})
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                                 
@@ -2940,7 +2975,6 @@ const toggleMaintenanceMode = async () => {
                                                         newSet.add(item.id);
                                                         setAuditItemsToDelete(newSet);
                                                         
-                                                        // Haal het ook van de groene afvinklijst af (voor de zekerheid)
                                                         const newAudit = new Set(auditedItems);
                                                         newAudit.delete(item.id);
                                                         setAuditedItems(newAudit);
@@ -2975,7 +3009,6 @@ const toggleMaintenanceMode = async () => {
                 <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                     <button 
                         onClick={async () => {
-                            // 1. Verwijder alle doorgestreepte items als een batch
                             if (auditItemsToDelete.size > 0) {
                                 const batch = db.batch();
                                 const itemsToRemove = items.filter(i => auditItemsToDelete.has(i.id));
@@ -2992,7 +3025,6 @@ const toggleMaintenanceMode = async () => {
                                 }
                             }
 
-                            // 2. Sla de datum van controle op
                             if (auditLade) {
                                 try {
                                     await db.collection('lades').doc(auditLade.id).update({
@@ -3003,7 +3035,6 @@ const toggleMaintenanceMode = async () => {
                                 }
                             }
                             
-                            // 3. Reset alles en sluit
                             setAuditLade(null);
                             setAuditItemsToDelete(new Set());
                             setAuditedItems(new Set());
