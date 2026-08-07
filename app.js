@@ -4281,13 +4281,12 @@ const toggleMaintenanceMode = async () => {
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200 shadow-sm">
                         <strong className="font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 mb-1"><Icon path={Icons.Info} size={14}/> Instructie</strong> 
-                        <span className="font-medium leading-relaxed">Sta je voor de vriezer? Controleer de aantallen in deze lade. Pas eventueel het aantal en de eenheid aan. Klik op <strong>'Klopt!'</strong> als het item klopt, of op de <strong>rode knop</strong> om het product uit je voorraad te verwijderen als het er niet meer ligt.</span>
+                        <span className="font-medium leading-relaxed">Sta je voor de vriezer? Controleer de aantallen in deze lade. Pas het aantal aan (typen of met + / -) en de eenheid. Klik op <strong>'Klopt!'</strong> als het item klopt, of op <strong>'Klopt niet'</strong> om het product uit je voorraad te verwijderen.</span>
                     </div>
 
                     {auditLade && items.filter(i => i.ladeId === auditLade.id).sort((a,b)=>a.naam.localeCompare(b.naam)).map(item => {
                         const isChecked = auditedItems.has(item.id);
                         
-                        // Zoek de juiste eenheden lijst op basis van het type locatie (voorraad, frig, of vriezer)
                         const ladeLoc = vriezers.find(v => v.id === auditLade.vriezerId);
                         const locType = ladeLoc ? ladeLoc.type : 'vriezer';
                         let contextEenheden = EENHEDEN_VRIES;
@@ -4308,21 +4307,35 @@ const toggleMaintenanceMode = async () => {
                                     <span className="text-2xl drop-shadow-sm">{item.emoji || '📦'}</span>
                                     <div className="truncate">
                                         <p className={`font-bold text-sm tracking-tight ${isChecked ? 'text-green-800 dark:text-green-400 line-through decoration-green-500/50' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
-                                        {isChecked && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{formatAantal(item.aantal)} {item.eenheid}</span></p>}
+                                        {isChecked && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
                                     </div>
                                 </div>
                                 
                                 <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                                     {!isChecked && (
                                         <div className="flex items-center gap-2">
-                                            {/* PLus/Min (geen typveld) */}
                                             <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-lg p-1 border border-gray-200/80 dark:border-gray-700 shadow-inner">
                                                 <button onClick={async () => {
                                                     const nw = Math.max(0.25, parseFloat(item.aantal) - 0.25);
                                                     await db.collection('items').doc(item.id).update({ aantal: nw });
                                                 }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
                                                 
-                                                <span className="px-2 text-sm font-bold text-gray-900 dark:text-white flex items-center justify-center min-w-[3rem] cursor-default">{formatAantal(item.aantal)}</span>
+                                                <input 
+                                                    type="number"
+                                                    step="0.25"
+                                                    min="0"
+                                                    value={item.aantal}
+                                                    onChange={async (e) => {
+                                                        const val = e.target.value;
+                                                        if (val !== "") {
+                                                            const nw = parseFloat(val);
+                                                            if (!isNaN(nw) && nw >= 0) {
+                                                                await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="w-14 text-center bg-transparent text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
                                                 
                                                 <button onClick={async () => {
                                                     const nw = parseFloat(item.aantal) + 0.25;
@@ -4330,7 +4343,6 @@ const toggleMaintenanceMode = async () => {
                                                 }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-bold shadow-sm transition-all active:scale-95">+</button>
                                             </div>
 
-                                            {/* Eenheid Dropdown */}
                                             <select 
                                                 value={item.eenheid}
                                                 onChange={async (e) => {
