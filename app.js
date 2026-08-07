@@ -1074,7 +1074,7 @@ const handleOpenAdd = () => {
             emoji: formData.emoji || getEmojiForCategory(formData.categorie),
             altijdGoed: formData.altijdGoed || false
         };
-        try {
+try {
             if(editingItem) {
                 let changes = [];
                 if (editingItem.naam !== data.naam) changes.push(`Naam: ${editingItem.naam} ➔ ${data.naam}`);
@@ -1087,13 +1087,16 @@ const handleOpenAdd = () => {
                 if ((editingItem.notitie || '') !== (data.notitie || '')) changes.push(`Notitie aangepast`);
                 
                 const detailsString = changes.length > 0 ? changes.join(', ') : 'Geen velden gewijzigd';
+                
+                // NIEUW: Check of het via balans ging
+                const logToevoeging = formData.viaBalans ? ' (via Balans)' : '';
 
                 await db.collection('items').doc(editingItem.id).update(data);
-                await logAction('Bewerkt', data.naam, detailsString, user, beheerdeUserId);
+                await logAction('Bewerkt', data.naam, detailsString + logToevoeging, user, beheerdeUserId);
                 showNotification(`${data.naam} is bijgewerkt!`, 'success');
                 setEditingItem(null);
                 setShowAddModal(false);
-} else {
+            } else {
                 const aantalKeerToevoegen = parseInt(formData.bulkAanmaak) || 1;
                 const batchPromises = [];
                 
@@ -1106,11 +1109,14 @@ const handleOpenAdd = () => {
                 const locNaam = loc ? loc.naam : 'Onbekende locatie';
                 const ladeNaam = lade ? lade.naam : 'Onbekende lade';
                 
+                // NIEUW: Check of het via balans ging
+                const logToevoeging = formData.viaBalans ? ' (via Balans)' : '';
+                
                 if (aantalKeerToevoegen > 1) {
-                    await logAction('Toevoegen', data.naam, `${aantalKeerToevoegen} losse items in ${locNaam} (${ladeNaam})`, user, beheerdeUserId);
+                    await logAction('Toevoegen', data.naam, `${aantalKeerToevoegen} losse items in ${locNaam} (${ladeNaam})${logToevoeging}`, user, beheerdeUserId);
                     showNotification(`${aantalKeerToevoegen} keer ${data.naam} apart toegevoegd!`, 'success');
                 } else {
-                    await logAction('Toevoegen', data.naam, `${data.aantal} ${data.eenheid} in ${locNaam} (${ladeNaam})`, user, beheerdeUserId);
+                    await logAction('Toevoegen', data.naam, `${data.aantal} ${data.eenheid} in ${locNaam} (${ladeNaam})${logToevoeging}`, user, beheerdeUserId);
                     showNotification(`${data.naam} is toegevoegd!`, 'success');
                 }
                 
@@ -1119,14 +1125,15 @@ const handleOpenAdd = () => {
                         ...prev, 
                         naam: '', aantal: 1, minimumVoorraad: '', prijs: '', notitie: '', emoji: '', 
                         ingevrorenOp: new Date().toISOString().split('T')[0],
-                        houdbaarheidsDatum: '', bulkAanmaak: 1
+                        houdbaarheidsDatum: '', bulkAanmaak: 1, viaBalans: false // Reset de flag
                     }));
                 } else {
                     const defaultCat = activeTab === 'voorraad' ? 'Pasta' : 'Vlees';
-                    setFormData(prev => ({...prev, naam: '', aantal: 1, minimumVoorraad: '', prijs: '', notitie: '', emoji: '', categorie: defaultCat, bulkAanmaak: 1})); 
+                    setFormData(prev => ({...prev, naam: '', aantal: 1, minimumVoorraad: '', prijs: '', notitie: '', emoji: '', categorie: defaultCat, bulkAanmaak: 1, viaBalans: false})); 
                 }
                 setShowAddModal(false);
             }
+        }
         } catch(err) { showNotification("Er ging iets mis: " + err.message, 'error'); }
     };
 
@@ -2781,7 +2788,8 @@ const toggleMaintenanceMode = async () => {
                                     categorie: defaultCat, 
                                     minimumVoorraad: '', prijs: '', 
                                     ingevrorenOp: new Date().toISOString().split('T')[0], 
-                                    houdbaarheidsDatum: '', notitie: '', emoji: '', geplandeDatum: '', bulkAanmaak: 1, tags: [], altijdGoed: false
+                                    houdbaarheidsDatum: '', notitie: '', emoji: '', geplandeDatum: '', bulkAanmaak: 1, tags: [], altijdGoed: false,
+                                    viaBalans: true // Zorgt voor de unieke log-entry
                                 });
                                 setShowAddModal(true);
                             }}
@@ -2823,8 +2831,12 @@ const toggleMaintenanceMode = async () => {
                                         <div className="flex items-center gap-2 flex-grow sm:flex-grow-0">
                                             <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-lg p-1 border border-gray-200/80 dark:border-gray-700 shadow-inner">
                                                 <button onClick={async () => {
-                                                    const nw = Math.max(0.25, parseFloat(item.aantal) - 0.25);
-                                                    await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                    const huidig = parseFloat(item.aantal);
+                                                    const nw = Math.max(0.25, huidig - 0.25);
+                                                    if (nw !== huidig) {
+                                                        await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                        await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
+                                                    }
                                                 }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
                                                 
                                                 <input 
@@ -2836,8 +2848,10 @@ const toggleMaintenanceMode = async () => {
                                                         const val = e.target.value;
                                                         if (val !== "") {
                                                             const nw = parseFloat(val);
-                                                            if (!isNaN(nw) && nw >= 0) {
+                                                            const huidig = parseFloat(item.aantal);
+                                                            if (!isNaN(nw) && nw >= 0 && nw !== huidig) {
                                                                 await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                                await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
                                                             }
                                                         }
                                                     }}
@@ -2845,15 +2859,19 @@ const toggleMaintenanceMode = async () => {
                                                 />
                                                 
                                                 <button onClick={async () => {
-                                                    const nw = parseFloat(item.aantal) + 0.25;
+                                                    const huidig = parseFloat(item.aantal);
+                                                    const nw = huidig + 0.25;
                                                     await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                    await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
                                                 }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-bold shadow-sm transition-all active:scale-95">+</button>
                                             </div>
 
                                             <select 
                                                 value={item.eenheid}
                                                 onChange={async (e) => {
-                                                    await db.collection('items').doc(item.id).update({ eenheid: e.target.value });
+                                                    const nieuweEenheid = e.target.value;
+                                                    await db.collection('items').doc(item.id).update({ eenheid: nieuweEenheid });
+                                                    await logAction('Bewerkt', item.naam, `Eenheid: ${item.eenheid} ➔ ${nieuweEenheid} (Balans)`, user, beheerdeUserId);
                                                 }}
                                                 className="h-10 px-2 text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer transition-all"
                                             >
@@ -2868,7 +2886,10 @@ const toggleMaintenanceMode = async () => {
                                         {!isChecked && (
                                             <>
                                                 <button 
-                                                    onClick={() => openEdit(item)}
+                                                    onClick={() => {
+                                                        openEdit(item);
+                                                        setFormData(prev => ({...prev, viaBalans: true})); // Zorgt voor de unieke log-entry
+                                                    }}
                                                     className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-900/20 dark:border-blue-800/50 dark:text-blue-400 dark:hover:bg-blue-900/40"
                                                     title="Product bewerken"
                                                 >
@@ -2879,6 +2900,7 @@ const toggleMaintenanceMode = async () => {
                                                     onClick={async () => {
                                                         if(window.confirm(`Weet je zeker dat je ${item.naam} wilt verwijderen uit je voorraad?`)) {
                                                             await db.collection('items').doc(item.id).delete();
+                                                            await logAction('Verwijderd', item.naam, 'Ligt niet meer in lade (via Balans)', user, beheerdeUserId);
                                                         }
                                                     }}
                                                     className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 hover:text-red-700 dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 dark:hover:bg-red-900/40"
