@@ -2830,7 +2830,7 @@ const toggleMaintenanceMode = async () => {
                     )
                 )}
             </main>
-<Modal isOpen={!!auditLade} onClose={() => { setAuditLade(null); setAuditItemsToDelete(new Set()); }} title={`Balans: ${auditLade?.naam}`} color="blue" size="lg">
+<Modal isOpen={!!auditLade} onClose={() => { setAuditLade(null); setAuditItemsToDelete(new Set()); }} title={`Controle: ${auditLade?.naam}`} color="blue" size="lg">
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200 shadow-sm flex flex-col">
                         <div>
