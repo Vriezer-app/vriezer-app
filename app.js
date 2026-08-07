@@ -506,7 +506,7 @@ function App() {
     const [auditLade, setAuditLade] = useState(null);
     const [auditedItems, setAuditedItems] = useState(new Set()); 
     const [auditItemsToDelete, setAuditItemsToDelete] = useState(new Set());
-    // Het "geheugen" voor de Balans functie
+// Het "geheugen" voor de Balans functie
     const auditOriginals = useRef({});
     const previousAuditLade = useRef(null);
 
@@ -514,7 +514,14 @@ function App() {
     if (auditLade && auditLade.id !== previousAuditLade.current) {
         const originals = {};
         items.filter(i => i.ladeId === auditLade.id).forEach(i => {
-            originals[i.id] = { aantal: parseFloat(i.aantal), eenheid: i.eenheid };
+            originals[i.id] = { 
+                aantal: parseFloat(i.aantal), 
+                eenheid: i.eenheid,
+                naam: i.naam,
+                categorie: i.categorie,
+                emoji: i.emoji,
+                notitie: i.notitie || ''
+            };
         });
         auditOriginals.current = originals;
         previousAuditLade.current = auditLade.id;
@@ -2849,8 +2856,17 @@ const toggleMaintenanceMode = async () => {
                         const isMarkedForDelete = auditItemsToDelete.has(item.id);
                         
                         const originalData = auditOriginals.current[item.id];
-                        const isNew = !originalData; // NIEUW: Bepaalt of item ontbrak bij openen van de balans
-                        const isChanged = originalData && (parseFloat(item.aantal || 0) !== originalData.aantal || item.eenheid !== originalData.eenheid);
+                        const isNew = !originalData; 
+                        
+                        // NIEUW: Nu checkt hij op alle mogelijke wijzigingen (naam, aantal, eenheid, emoji, categorie, notitie)
+                        const isChanged = originalData && (
+                            parseFloat(item.aantal || 0) !== originalData.aantal || 
+                            item.eenheid !== originalData.eenheid ||
+                            item.naam !== originalData.naam ||
+                            item.categorie !== originalData.categorie ||
+                            item.emoji !== originalData.emoji ||
+                            (item.notitie || '') !== originalData.notitie
+                        );
                         
                         const ladeLoc = vriezers.find(v => v.id === auditLade.vriezerId);
                         const locType = ladeLoc ? ladeLoc.type : 'vriezer';
@@ -2886,16 +2902,19 @@ const toggleMaintenanceMode = async () => {
                                         {isChecked && !isMarkedForDelete && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
                                         {isMarkedForDelete && <p className="text-[10px] font-bold text-red-500 mt-0.5">Wordt verwijderd bij opslaan</p>}
                                         
-                                        {/* NIEUW: Blauw label */}
+                                        {/* Blauw label */}
                                         {!isChecked && !isMarkedForDelete && isNew && (
                                             <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mt-0.5 flex items-center gap-1">
                                                 <Icon path={Icons.Plus} size={10}/> Nieuw toegevoegd
                                             </p>
                                         )}
-                                        {/* Oranje "Gewijzigd" label */}
+                                        {/* Oranje "Gewijzigd" label met slimme tekst */}
                                         {!isChecked && !isMarkedForDelete && isChanged && !isNew && (
                                             <p className="text-[10px] font-bold text-orange-600 dark:text-orange-400 mt-0.5 flex items-center gap-1">
-                                                <Icon path={Icons.Edit2} size={10}/> Gewijzigd (was {originalData.aantal} {originalData.eenheid})
+                                                <Icon path={Icons.Edit2} size={10}/> Gewijzigd 
+                                                {(parseFloat(item.aantal || 0) !== originalData.aantal || item.eenheid !== originalData.eenheid) && 
+                                                    ` (was ${originalData.aantal} ${originalData.eenheid})`
+                                                }
                                             </p>
                                         )}
                                     </div>
