@@ -1047,7 +1047,7 @@ const handleOpenAdd = () => {
         }));
     };
 
-    const handleSaveItem = async (e) => {
+const handleSaveItem = async (e) => {
         e.preventDefault();
         const lade = lades.find(l => l.id === formData.ladeId);
         const loc = vriezers.find(v => v.id === formData.vriezerId);
@@ -1074,7 +1074,8 @@ const handleOpenAdd = () => {
             emoji: formData.emoji || getEmojiForCategory(formData.categorie),
             altijdGoed: formData.altijdGoed || false
         };
-try {
+
+        try {
             if(editingItem) {
                 let changes = [];
                 if (editingItem.naam !== data.naam) changes.push(`Naam: ${editingItem.naam} ➔ ${data.naam}`);
@@ -1088,7 +1089,7 @@ try {
                 
                 const detailsString = changes.length > 0 ? changes.join(', ') : 'Geen velden gewijzigd';
                 
-                // NIEUW: Check of het via balans ging
+                // Check of het via balans ging
                 const logToevoeging = formData.viaBalans ? ' (via Balans)' : '';
 
                 await db.collection('items').doc(editingItem.id).update(data);
@@ -1109,7 +1110,7 @@ try {
                 const locNaam = loc ? loc.naam : 'Onbekende locatie';
                 const ladeNaam = lade ? lade.naam : 'Onbekende lade';
                 
-                // NIEUW: Check of het via balans ging
+                // Check of het via balans ging
                 const logToevoeging = formData.viaBalans ? ' (via Balans)' : '';
                 
                 if (aantalKeerToevoegen > 1) {
@@ -1133,8 +1134,9 @@ try {
                 }
                 setShowAddModal(false);
             }
+        } catch(err) { 
+            showNotification("Er ging iets mis: " + err.message, 'error'); 
         }
-        } catch(err) { showNotification("Er ging iets mis: " + err.message, 'error'); }
     };
 
     const checkMinimumStock = async (item, newAantal) => {
