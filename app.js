@@ -505,6 +505,7 @@ function App() {
     const [notification, setNotification] = useState(null);
     const [auditLade, setAuditLade] = useState(null);
     const [auditedItems, setAuditedItems] = useState(new Set()); 
+    const [auditItemsToDelete, setAuditItemsToDelete] = useState(new Set());
     const [draggedLocId, setDraggedLocId] = useState(null); 
     
     // TAPPED ITEM STATE VOOR SMARTPHONE ANIMATIE
@@ -587,6 +588,7 @@ function App() {
     const [editingCatName, setEditingCatName] = useState(null);
     const [editCatInputName, setEditCatInputName] = useState('');
     const [editCatInputColor, setEditCatInputColor] = useState('gray');
+    
 
     const hasCheckedAlerts = useRef(false);
 
@@ -2679,7 +2681,7 @@ const toggleMaintenanceMode = async () => {
                                                                     )}
 
                                                                     <button 
-                                                                        onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); }} 
+                                                                        onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
                                                                         className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-all active:scale-95 print:hidden"
                                                                         title="Voorraad-Balans (Snel aftikken)"
                                                                     >
@@ -2778,15 +2780,14 @@ const toggleMaintenanceMode = async () => {
                     )
                 )}
             </main>
-<Modal isOpen={!!auditLade} onClose={() => setAuditLade(null)} title={`Balans: ${auditLade?.naam}`} color="blue" size="lg">
+<Modal isOpen={!!auditLade} onClose={() => { setAuditLade(null); setAuditItemsToDelete(new Set()); }} title={`Balans: ${auditLade?.naam}`} color="blue" size="lg">
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200 shadow-sm flex flex-col">
                         <div>
                             <strong className="font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 mb-1"><Icon path={Icons.Info} size={14}/> Instructie</strong> 
-                            <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Pas het aantal aan (typen of met + / -) en de eenheid. Klik op <strong>'Klopt!'</strong> als het item klopt, of gebruik de knoppen om te bewerken of verwijderen.</span>
+                            <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Pas het aantal aan en klik op <strong>'Klopt!'</strong>. Klik op <strong>'Klopt niet'</strong> om ze door te strepen. Ze worden pas definitief verwijderd als je onderaan op opslaan klikt.</span>
                         </div>
 
-                        {/* NIEUW: Toont wanneer de lade voor het laatst gecontroleerd is */}
                         {auditLade?.laatstGecontroleerd && (
                             <div className="mt-3 pt-2 border-t border-blue-200/60 dark:border-blue-800/60 flex items-center gap-1.5 text-[10px] uppercase font-bold text-blue-800/80 dark:text-blue-300/80 tracking-wider">
                                 <Icon path={Icons.CheckSquare} size={14}/>
@@ -2803,13 +2804,11 @@ const toggleMaintenanceMode = async () => {
 
                                 setFormData({
                                     naam: '', aantal: 1, eenheid: 'stuks', 
-                                    vriezerId: auditLade.vriezerId, 
-                                    ladeId: auditLade.id, 
-                                    categorie: defaultCat, 
-                                    minimumVoorraad: '', prijs: '', 
+                                    vriezerId: auditLade.vriezerId, ladeId: auditLade.id, 
+                                    categorie: defaultCat, minimumVoorraad: '', prijs: '', 
                                     ingevrorenOp: new Date().toISOString().split('T')[0], 
                                     houdbaarheidsDatum: '', notitie: '', emoji: '', geplandeDatum: '', bulkAanmaak: 1, tags: [], altijdGoed: false,
-                                    viaBalans: true // Zorgt voor de unieke log-entry
+                                    viaBalans: true 
                                 });
                                 setShowAddModal(true);
                             }}
@@ -2819,8 +2818,18 @@ const toggleMaintenanceMode = async () => {
                         </button>
                     </div>
 
-                    {auditLade && items.filter(i => i.ladeId === auditLade.id).sort((a,b)=>a.naam.localeCompare(b.naam)).map(item => {
+                    {auditLade && items.filter(i => i.ladeId === auditLade.id)
+                        .sort((a,b) => {
+                            // Sorteer: te verwijderen items altijd onderaan
+                            const aDel = auditItemsToDelete.has(a.id);
+                            const bDel = auditItemsToDelete.has(b.id);
+                            if (aDel && !bDel) return 1;
+                            if (!aDel && bDel) return -1;
+                            return a.naam.localeCompare(b.naam);
+                        })
+                        .map(item => {
                         const isChecked = auditedItems.has(item.id);
+                        const isMarkedForDelete = auditItemsToDelete.has(item.id);
                         
                         const ladeLoc = vriezers.find(v => v.id === auditLade.vriezerId);
                         const locType = ladeLoc ? ladeLoc.type : 'vriezer';
@@ -2828,26 +2837,29 @@ const toggleMaintenanceMode = async () => {
                         let activeCustomUnits = customUnitsVries;
                         
                         if (locType === 'voorraad') { 
-                            contextEenheden = EENHEDEN_VOORRAAD; 
-                            activeCustomUnits = customUnitsVoorraad; 
+                            contextEenheden = EENHEDEN_VOORRAAD; activeCustomUnits = customUnitsVoorraad; 
                         } else if (locType === 'frig') { 
-                            contextEenheden = EENHEDEN_FRIG; 
-                            activeCustomUnits = customUnitsFrig; 
+                            contextEenheden = EENHEDEN_FRIG; activeCustomUnits = customUnitsFrig; 
                         }
                         const localAlleEenheden = [...new Set([...contextEenheden, ...activeCustomUnits])].sort();
 
                         return (
-                            <div key={item.id} className={`flex flex-col xl:flex-row xl:items-center justify-between p-4 rounded-xl border transition-all duration-300 gap-3 ${isChecked ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md'}`}>
+                            <div key={item.id} className={`flex flex-col xl:flex-row xl:items-center justify-between p-4 rounded-xl border transition-all duration-300 gap-3 
+                                ${isMarkedForDelete ? 'bg-red-50/50 border-red-200 dark:bg-red-900/10 dark:border-red-800/50 opacity-60 grayscale-[50%]' : 
+                                  isChecked ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' : 
+                                  'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md'}`}>
+                                
                                 <div className="flex items-center gap-3 truncate">
-                                    <span className="text-2xl drop-shadow-sm">{item.emoji || '📦'}</span>
+                                    <span className={`text-2xl drop-shadow-sm ${isMarkedForDelete ? 'opacity-50' : ''}`}>{item.emoji || '📦'}</span>
                                     <div className="truncate">
-                                        <p className={`font-bold text-sm tracking-tight ${isChecked ? 'text-green-800 dark:text-green-400 line-through decoration-green-500/50' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
-                                        {isChecked && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
+                                        <p className={`font-bold text-sm tracking-tight ${isChecked || isMarkedForDelete ? 'line-through' : ''} ${isMarkedForDelete ? 'text-red-800 dark:text-red-400 decoration-red-500/50' : isChecked ? 'text-green-800 dark:text-green-400 decoration-green-500/50' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
+                                        {isChecked && !isMarkedForDelete && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
+                                        {isMarkedForDelete && <p className="text-[10px] font-bold text-red-500 mt-0.5">Wordt verwijderd bij opslaan</p>}
                                     </div>
                                 </div>
                                 
                                 <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                                    {!isChecked && (
+                                    {!isChecked && !isMarkedForDelete && (
                                         <div className="flex items-center gap-2 flex-grow sm:flex-grow-0">
                                             <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-lg p-1 border border-gray-200/80 dark:border-gray-700 shadow-inner">
                                                 <button onClick={async () => {
@@ -2860,10 +2872,7 @@ const toggleMaintenanceMode = async () => {
                                                 }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
                                                 
                                                 <input 
-                                                    type="number"
-                                                    step="0.25"
-                                                    min="0"
-                                                    value={item.aantal}
+                                                    type="number" step="0.25" min="0" value={item.aantal}
                                                     onChange={async (e) => {
                                                         const val = e.target.value;
                                                         if (val !== "") {
@@ -2895,20 +2904,29 @@ const toggleMaintenanceMode = async () => {
                                                 }}
                                                 className="h-10 px-2 text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer transition-all"
                                             >
-                                                {localAlleEenheden.map(eenheid => (
-                                                    <option key={eenheid} value={eenheid}>{eenheid}</option>
-                                                ))}
+                                                {localAlleEenheden.map(eenheid => <option key={eenheid} value={eenheid}>{eenheid}</option>)}
                                             </select>
                                         </div>
                                     )}
                                     
                                     <div className="flex gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
-                                        {!isChecked && (
+                                        {isMarkedForDelete ? (
+                                            <button 
+                                                onClick={() => {
+                                                    const newSet = new Set(auditItemsToDelete);
+                                                    newSet.delete(item.id);
+                                                    setAuditItemsToDelete(newSet);
+                                                }}
+                                                className="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                            >
+                                                <span>Herstellen</span>
+                                            </button>
+                                        ) : !isChecked && (
                                             <>
                                                 <button 
                                                     onClick={() => {
                                                         openEdit(item);
-                                                        setFormData(prev => ({...prev, viaBalans: true})); // Zorgt voor de unieke log-entry
+                                                        setFormData(prev => ({...prev, viaBalans: true})); 
                                                     }}
                                                     className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-900/20 dark:border-blue-800/50 dark:text-blue-400 dark:hover:bg-blue-900/40"
                                                     title="Product bewerken"
@@ -2917,11 +2935,15 @@ const toggleMaintenanceMode = async () => {
                                                 </button>
 
                                                 <button 
-                                                    onClick={async () => {
-                                                        if(window.confirm(`Weet je zeker dat je ${item.naam} wilt verwijderen uit je voorraad?`)) {
-                                                            await db.collection('items').doc(item.id).delete();
-                                                            await logAction('Verwijderd', item.naam, 'Ligt niet meer in lade (via Balans)', user, beheerdeUserId);
-                                                        }
+                                                    onClick={() => {
+                                                        const newSet = new Set(auditItemsToDelete);
+                                                        newSet.add(item.id);
+                                                        setAuditItemsToDelete(newSet);
+                                                        
+                                                        // Haal het ook van de groene afvinklijst af (voor de zekerheid)
+                                                        const newAudit = new Set(auditedItems);
+                                                        newAudit.delete(item.id);
+                                                        setAuditedItems(newAudit);
                                                     }}
                                                     className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 hover:text-red-700 dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 dark:hover:bg-red-900/40"
                                                     title="Ligt niet meer in de lade"
@@ -2932,16 +2954,18 @@ const toggleMaintenanceMode = async () => {
                                             </>
                                         )}
                                         
-                                        <button 
-                                            onClick={() => {
-                                                const newSet = new Set(auditedItems);
-                                                if (isChecked) newSet.delete(item.id); else newSet.add(item.id);
-                                                setAuditedItems(newSet);
-                                            }}
-                                            className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center min-w-[100px] gap-1.5 transition-all active:scale-95 shadow-sm ${isChecked ? 'bg-green-500 text-white shadow-inner shadow-green-700/30' : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-green-100 hover:text-green-700 hover:border-green-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-green-900/40 dark:hover:text-green-400 dark:hover:border-green-800'}`}
-                                        >
-                                            <Icon path={Icons.Check} size={14}/> <span>{isChecked ? 'Gecontroleerd' : 'Klopt!'}</span>
-                                        </button>
+                                        {!isMarkedForDelete && (
+                                            <button 
+                                                onClick={() => {
+                                                    const newSet = new Set(auditedItems);
+                                                    if (isChecked) newSet.delete(item.id); else newSet.add(item.id);
+                                                    setAuditedItems(newSet);
+                                                }}
+                                                className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center min-w-[100px] gap-1.5 transition-all active:scale-95 shadow-sm ${isChecked ? 'bg-green-500 text-white shadow-inner shadow-green-700/30' : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-green-100 hover:text-green-700 hover:border-green-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-green-900/40 dark:hover:text-green-400 dark:hover:border-green-800'}`}
+                                            >
+                                                <Icon path={Icons.Check} size={14}/> <span>{isChecked ? 'Gecontroleerd' : 'Klopt!'}</span>
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -2949,10 +2973,26 @@ const toggleMaintenanceMode = async () => {
                     })}
                 </div>
                 <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
-                    
-                    {/* NIEUW: Het opslaan van de datum gebeurt in deze knop */}
                     <button 
                         onClick={async () => {
+                            // 1. Verwijder alle doorgestreepte items als een batch
+                            if (auditItemsToDelete.size > 0) {
+                                const batch = db.batch();
+                                const itemsToRemove = items.filter(i => auditItemsToDelete.has(i.id));
+                                
+                                for (const item of itemsToRemove) {
+                                    batch.delete(db.collection('items').doc(item.id));
+                                    await logAction('Verwijderd', item.naam, 'Ligt niet meer in lade (via Balans)', user, beheerdeUserId);
+                                }
+                                
+                                try {
+                                    await batch.commit();
+                                } catch(e) {
+                                    console.error("Fout bij verwijderen via balans", e);
+                                }
+                            }
+
+                            // 2. Sla de datum van controle op
                             if (auditLade) {
                                 try {
                                     await db.collection('lades').doc(auditLade.id).update({
@@ -2962,7 +3002,11 @@ const toggleMaintenanceMode = async () => {
                                     console.error("Fout bij opslaan controle datum", e);
                                 }
                             }
+                            
+                            // 3. Reset alles en sluit
                             setAuditLade(null);
+                            setAuditItemsToDelete(new Set());
+                            setAuditedItems(new Set());
                         }} 
                         className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md shadow-blue-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
                     >
