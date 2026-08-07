@@ -4226,7 +4226,7 @@ const toggleMaintenanceMode = async () => {
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
                                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
                                     />
-                                    <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Balans' knop</span>
+                                    <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Controle' knop</span>
                                 </div>
 
                                 <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 border-t border-gray-200/60 dark:border-gray-700/60 pt-2 mt-1">
