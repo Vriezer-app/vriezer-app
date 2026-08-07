@@ -2735,7 +2735,7 @@ const toggleMaintenanceMode = async () => {
                                                                         className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
                                                                         title="Voorraad-Balans (Snel aftikken)"
                                                                     >
-                                                                        <Icon path={Icons.CheckSquare} size={14} /> Balans
+                                                                        <Icon path={Icons.CheckSquare} size={14} /> Controle
                                                                     </button>
                                                                 </div>
                                                             )}
