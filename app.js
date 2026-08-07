@@ -2759,7 +2759,159 @@ const toggleMaintenanceMode = async () => {
                     )
                 )}
             </main>
+<Modal isOpen={!!auditLade} onClose={() => setAuditLade(null)} title={`Balans: ${auditLade?.naam}`} color="blue" size="lg">
+                <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200 shadow-sm flex flex-col">
+                        <div>
+                            <strong className="font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 mb-1"><Icon path={Icons.Info} size={14}/> Instructie</strong> 
+                            <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Pas het aantal aan (typen of met + / -) en de eenheid. Klik op <strong>'Klopt!'</strong> als het item klopt, of gebruik de knoppen om te bewerken of verwijderen.</span>
+                        </div>
+                        
+                        <button 
+                            onClick={() => {
+                                const loc = vriezers.find(v => v.id === auditLade.vriezerId);
+                                const locType = loc ? loc.type : 'vriezer';
+                                setModalType(locType);
+                                const defaultCat = locType === 'voorraad' ? 'Pasta' : 'Vlees';
 
+                                setFormData({
+                                    naam: '', aantal: 1, eenheid: 'stuks', 
+                                    vriezerId: auditLade.vriezerId, 
+                                    ladeId: auditLade.id, 
+                                    categorie: defaultCat, 
+                                    minimumVoorraad: '', prijs: '', 
+                                    ingevrorenOp: new Date().toISOString().split('T')[0], 
+                                    houdbaarheidsDatum: '', notitie: '', emoji: '', geplandeDatum: '', bulkAanmaak: 1, tags: [], altijdGoed: false
+                                });
+                                setShowAddModal(true);
+                            }}
+                            className="mt-3 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95"
+                        >
+                            <Icon path={Icons.Plus} size={16} /> Direct een nieuw product toevoegen in deze lade
+                        </button>
+                    </div>
+
+                    {auditLade && items.filter(i => i.ladeId === auditLade.id).sort((a,b)=>a.naam.localeCompare(b.naam)).map(item => {
+                        const isChecked = auditedItems.has(item.id);
+                        
+                        const ladeLoc = vriezers.find(v => v.id === auditLade.vriezerId);
+                        const locType = ladeLoc ? ladeLoc.type : 'vriezer';
+                        let contextEenheden = EENHEDEN_VRIES;
+                        let activeCustomUnits = customUnitsVries;
+                        
+                        if (locType === 'voorraad') { 
+                            contextEenheden = EENHEDEN_VOORRAAD; 
+                            activeCustomUnits = customUnitsVoorraad; 
+                        } else if (locType === 'frig') { 
+                            contextEenheden = EENHEDEN_FRIG; 
+                            activeCustomUnits = customUnitsFrig; 
+                        }
+                        const localAlleEenheden = [...new Set([...contextEenheden, ...activeCustomUnits])].sort();
+
+                        return (
+                            <div key={item.id} className={`flex flex-col xl:flex-row xl:items-center justify-between p-4 rounded-xl border transition-all duration-300 gap-3 ${isChecked ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md'}`}>
+                                <div className="flex items-center gap-3 truncate">
+                                    <span className="text-2xl drop-shadow-sm">{item.emoji || '📦'}</span>
+                                    <div className="truncate">
+                                        <p className={`font-bold text-sm tracking-tight ${isChecked ? 'text-green-800 dark:text-green-400 line-through decoration-green-500/50' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
+                                        {isChecked && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                                    {!isChecked && (
+                                        <div className="flex items-center gap-2 flex-grow sm:flex-grow-0">
+                                            <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-lg p-1 border border-gray-200/80 dark:border-gray-700 shadow-inner">
+                                                <button onClick={async () => {
+                                                    const nw = Math.max(0.25, parseFloat(item.aantal) - 0.25);
+                                                    await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
+                                                
+                                                <input 
+                                                    type="number"
+                                                    step="0.25"
+                                                    min="0"
+                                                    value={item.aantal}
+                                                    onChange={async (e) => {
+                                                        const val = e.target.value;
+                                                        if (val !== "") {
+                                                            const nw = parseFloat(val);
+                                                            if (!isNaN(nw) && nw >= 0) {
+                                                                await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="w-14 text-center bg-transparent text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                                
+                                                <button onClick={async () => {
+                                                    const nw = parseFloat(item.aantal) + 0.25;
+                                                    await db.collection('items').doc(item.id).update({ aantal: nw });
+                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-bold shadow-sm transition-all active:scale-95">+</button>
+                                            </div>
+
+                                            <select 
+                                                value={item.eenheid}
+                                                onChange={async (e) => {
+                                                    await db.collection('items').doc(item.id).update({ eenheid: e.target.value });
+                                                }}
+                                                className="h-10 px-2 text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer transition-all"
+                                            >
+                                                {localAlleEenheden.map(eenheid => (
+                                                    <option key={eenheid} value={eenheid}>{eenheid}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="flex gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
+                                        {!isChecked && (
+                                            <>
+                                                <button 
+                                                    onClick={() => openEdit(item)}
+                                                    className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-900/20 dark:border-blue-800/50 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                                                    title="Product bewerken"
+                                                >
+                                                    <Icon path={Icons.Edit2} size={14}/>
+                                                </button>
+
+                                                <button 
+                                                    onClick={async () => {
+                                                        if(window.confirm(`Weet je zeker dat je ${item.naam} wilt verwijderen uit je voorraad?`)) {
+                                                            await db.collection('items').doc(item.id).delete();
+                                                        }
+                                                    }}
+                                                    className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 hover:text-red-700 dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 dark:hover:bg-red-900/40"
+                                                    title="Ligt niet meer in de lade"
+                                                >
+                                                    <Icon path={Icons.Trash2} size={14}/>
+                                                    <span className="hidden sm:inline">Klopt niet</span>
+                                                </button>
+                                            </>
+                                        )}
+                                        
+                                        <button 
+                                            onClick={() => {
+                                                const newSet = new Set(auditedItems);
+                                                if (isChecked) newSet.delete(item.id); else newSet.add(item.id);
+                                                setAuditedItems(newSet);
+                                            }}
+                                            className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center min-w-[100px] gap-1.5 transition-all active:scale-95 shadow-sm ${isChecked ? 'bg-green-500 text-white shadow-inner shadow-green-700/30' : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-green-100 hover:text-green-700 hover:border-green-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-green-900/40 dark:hover:text-green-400 dark:hover:border-green-800'}`}
+                                        >
+                                            <Icon path={Icons.Check} size={14}/> <span>{isChecked ? 'Gecontroleerd' : 'Klopt!'}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+                <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                    <button onClick={() => setAuditLade(null)} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md shadow-blue-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
+                        Klaar met controleren
+                    </button>
+                </div>
+            </Modal>
             <Modal isOpen={showBulkMoveModal} onClose={() => setShowBulkMoveModal(false)} title="Verplaats Items." color="indigo">
                 <form onSubmit={handleBulkMove} className="space-y-4">
                     <p className="text-gray-700 dark:text-gray-300 font-medium text-sm">Naar welke locatie wil je deze <strong>{selectedBulkItems.size}</strong> items verplaatsen?</p>
@@ -4277,159 +4429,7 @@ const toggleMaintenanceMode = async () => {
                     )}
                 </div>
             </Modal>
-<Modal isOpen={!!auditLade} onClose={() => setAuditLade(null)} title={`Balans: ${auditLade?.naam}`} color="blue" size="lg">
-                <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200 shadow-sm flex flex-col">
-                        <div>
-                            <strong className="font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 mb-1"><Icon path={Icons.Info} size={14}/> Instructie</strong> 
-                            <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Pas het aantal aan (typen of met + / -) en de eenheid. Klik op <strong>'Klopt!'</strong> als het item klopt, of gebruik de knoppen om te bewerken of verwijderen.</span>
-                        </div>
-                        
-                        <button 
-                            onClick={() => {
-                                const loc = vriezers.find(v => v.id === auditLade.vriezerId);
-                                const locType = loc ? loc.type : 'vriezer';
-                                setModalType(locType);
-                                const defaultCat = locType === 'voorraad' ? 'Pasta' : 'Vlees';
 
-                                setFormData({
-                                    naam: '', aantal: 1, eenheid: 'stuks', 
-                                    vriezerId: auditLade.vriezerId, 
-                                    ladeId: auditLade.id, 
-                                    categorie: defaultCat, 
-                                    minimumVoorraad: '', prijs: '', 
-                                    ingevrorenOp: new Date().toISOString().split('T')[0], 
-                                    houdbaarheidsDatum: '', notitie: '', emoji: '', geplandeDatum: '', bulkAanmaak: 1, tags: [], altijdGoed: false
-                                });
-                                setShowAddModal(true);
-                            }}
-                            className="mt-3 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95"
-                        >
-                            <Icon path={Icons.Plus} size={16} /> Direct een nieuw product toevoegen in deze lade
-                        </button>
-                    </div>
-
-                    {auditLade && items.filter(i => i.ladeId === auditLade.id).sort((a,b)=>a.naam.localeCompare(b.naam)).map(item => {
-                        const isChecked = auditedItems.has(item.id);
-                        
-                        const ladeLoc = vriezers.find(v => v.id === auditLade.vriezerId);
-                        const locType = ladeLoc ? ladeLoc.type : 'vriezer';
-                        let contextEenheden = EENHEDEN_VRIES;
-                        let activeCustomUnits = customUnitsVries;
-                        
-                        if (locType === 'voorraad') { 
-                            contextEenheden = EENHEDEN_VOORRAAD; 
-                            activeCustomUnits = customUnitsVoorraad; 
-                        } else if (locType === 'frig') { 
-                            contextEenheden = EENHEDEN_FRIG; 
-                            activeCustomUnits = customUnitsFrig; 
-                        }
-                        const localAlleEenheden = [...new Set([...contextEenheden, ...activeCustomUnits])].sort();
-
-                        return (
-                            <div key={item.id} className={`flex flex-col xl:flex-row xl:items-center justify-between p-4 rounded-xl border transition-all duration-300 gap-3 ${isChecked ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md'}`}>
-                                <div className="flex items-center gap-3 truncate">
-                                    <span className="text-2xl drop-shadow-sm">{item.emoji || '📦'}</span>
-                                    <div className="truncate">
-                                        <p className={`font-bold text-sm tracking-tight ${isChecked ? 'text-green-800 dark:text-green-400 line-through decoration-green-500/50' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
-                                        {isChecked && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
-                                    </div>
-                                </div>
-                                
-                                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                                    {!isChecked && (
-                                        <div className="flex items-center gap-2 flex-grow sm:flex-grow-0">
-                                            <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-lg p-1 border border-gray-200/80 dark:border-gray-700 shadow-inner">
-                                                <button onClick={async () => {
-                                                    const nw = Math.max(0.25, parseFloat(item.aantal) - 0.25);
-                                                    await db.collection('items').doc(item.id).update({ aantal: nw });
-                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
-                                                
-                                                <input 
-                                                    type="number"
-                                                    step="0.25"
-                                                    min="0"
-                                                    value={item.aantal}
-                                                    onChange={async (e) => {
-                                                        const val = e.target.value;
-                                                        if (val !== "") {
-                                                            const nw = parseFloat(val);
-                                                            if (!isNaN(nw) && nw >= 0) {
-                                                                await db.collection('items').doc(item.id).update({ aantal: nw });
-                                                            }
-                                                        }
-                                                    }}
-                                                    className="w-14 text-center bg-transparent text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                />
-                                                
-                                                <button onClick={async () => {
-                                                    const nw = parseFloat(item.aantal) + 0.25;
-                                                    await db.collection('items').doc(item.id).update({ aantal: nw });
-                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-bold shadow-sm transition-all active:scale-95">+</button>
-                                            </div>
-
-                                            <select 
-                                                value={item.eenheid}
-                                                onChange={async (e) => {
-                                                    await db.collection('items').doc(item.id).update({ eenheid: e.target.value });
-                                                }}
-                                                className="h-10 px-2 text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer transition-all"
-                                            >
-                                                {localAlleEenheden.map(eenheid => (
-                                                    <option key={eenheid} value={eenheid}>{eenheid}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    )}
-                                    
-                                    <div className="flex gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
-                                        {!isChecked && (
-                                            <>
-                                                <button 
-                                                    onClick={() => openEdit(item)}
-                                                    className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-900/20 dark:border-blue-800/50 dark:text-blue-400 dark:hover:bg-blue-900/40"
-                                                    title="Product bewerken"
-                                                >
-                                                    <Icon path={Icons.Edit2} size={14}/>
-                                                </button>
-
-                                                <button 
-                                                    onClick={async () => {
-                                                        if(window.confirm(`Weet je zeker dat je ${item.naam} wilt verwijderen uit je voorraad?`)) {
-                                                            await db.collection('items').doc(item.id).delete();
-                                                        }
-                                                    }}
-                                                    className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 hover:text-red-700 dark:bg-red-900/20 dark:border-red-800/50 dark:text-red-400 dark:hover:bg-red-900/40"
-                                                    title="Ligt niet meer in de lade"
-                                                >
-                                                    <Icon path={Icons.Trash2} size={14}/>
-                                                    <span className="hidden sm:inline">Klopt niet</span>
-                                                </button>
-                                            </>
-                                        )}
-                                        
-                                        <button 
-                                            onClick={() => {
-                                                const newSet = new Set(auditedItems);
-                                                if (isChecked) newSet.delete(item.id); else newSet.add(item.id);
-                                                setAuditedItems(newSet);
-                                            }}
-                                            className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center min-w-[100px] gap-1.5 transition-all active:scale-95 shadow-sm ${isChecked ? 'bg-green-500 text-white shadow-inner shadow-green-700/30' : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-green-100 hover:text-green-700 hover:border-green-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-green-900/40 dark:hover:text-green-400 dark:hover:border-green-800'}`}
-                                        >
-                                            <Icon path={Icons.Check} size={14}/> <span>{isChecked ? 'Gecontroleerd' : 'Klopt!'}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-                <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
-                    <button onClick={() => setAuditLade(null)} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md shadow-blue-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
-                        Klaar met controleren
-                    </button>
-                </div>
-            </Modal>
 
         </div>
     );
