@@ -2669,13 +2669,23 @@ const toggleMaintenanceMode = async () => {
                                                                 {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
                                                             </h3>
                                                             {(!myHiddenTabs.includes('balans') || isAdmin) && (
-                                                                <button 
-                                                                    onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); }} 
-                                                                    className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-all active:scale-95 print:hidden"
-                                                                    title="Voorraad-Balans (Snel aftikken)"
-                                                                >
-                                                                    <Icon path={Icons.CheckSquare} size={14} /> Balans
-                                                                </button>
+                                                                <div className="flex items-center gap-3">
+                                                                    
+                                                                    {/* NIEUW: Datum weergave op het hoofdscherm */}
+                                                                    {lade.laatstGecontroleerd && (
+                                                                        <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
+                                                                            Check: {formatDate(lade.laatstGecontroleerd)}
+                                                                        </span>
+                                                                    )}
+
+                                                                    <button 
+                                                                        onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); }} 
+                                                                        className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition-all active:scale-95 print:hidden"
+                                                                        title="Voorraad-Balans (Snel aftikken)"
+                                                                    >
+                                                                        <Icon path={Icons.CheckSquare} size={14} /> Balans
+                                                                    </button>
+                                                                </div>
                                                             )}
                                                         </div>
 
@@ -2775,6 +2785,14 @@ const toggleMaintenanceMode = async () => {
                             <strong className="font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 mb-1"><Icon path={Icons.Info} size={14}/> Instructie</strong> 
                             <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Pas het aantal aan (typen of met + / -) en de eenheid. Klik op <strong>'Klopt!'</strong> als het item klopt, of gebruik de knoppen om te bewerken of verwijderen.</span>
                         </div>
+
+                        {/* NIEUW: Toont wanneer de lade voor het laatst gecontroleerd is */}
+                        {auditLade?.laatstGecontroleerd && (
+                            <div className="mt-3 pt-2 border-t border-blue-200/60 dark:border-blue-800/60 flex items-center gap-1.5 text-[10px] uppercase font-bold text-blue-800/80 dark:text-blue-300/80 tracking-wider">
+                                <Icon path={Icons.CheckSquare} size={14}/>
+                                Laatst gecontroleerd: {formatDateTime(auditLade.laatstGecontroleerd)}
+                            </div>
+                        )}
                         
                         <button 
                             onClick={() => {
@@ -2797,7 +2815,7 @@ const toggleMaintenanceMode = async () => {
                             }}
                             className="mt-3 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95"
                         >
-                            <Icon path={Icons.Plus} size={16} /> Product toevoegen in deze lade
+                            <Icon path={Icons.Plus} size={16} /> Direct een nieuw product toevoegen in deze lade
                         </button>
                     </div>
 
@@ -2931,7 +2949,23 @@ const toggleMaintenanceMode = async () => {
                     })}
                 </div>
                 <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
-                    <button onClick={() => setAuditLade(null)} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md shadow-blue-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95">
+                    
+                    {/* NIEUW: Het opslaan van de datum gebeurt in deze knop */}
+                    <button 
+                        onClick={async () => {
+                            if (auditLade) {
+                                try {
+                                    await db.collection('lades').doc(auditLade.id).update({
+                                        laatstGecontroleerd: new Date()
+                                    });
+                                } catch(e) {
+                                    console.error("Fout bij opslaan controle datum", e);
+                                }
+                            }
+                            setAuditLade(null);
+                        }} 
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md shadow-blue-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
+                    >
                         Klaar met controleren
                     </button>
                 </div>
