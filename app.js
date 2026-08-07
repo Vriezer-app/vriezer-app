@@ -624,6 +624,7 @@ function App() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [showWhatsNew, setShowWhatsNew] = useState(false);
+    const [alertsExpanded, setAlertsExpanded] = useState(false);
     const [showVersionHistory, setShowVersionHistory] = useState(false);
     const [showDashboardModal, setShowDashboardModal] = useState(false);
     const [showBeheerModal, setShowBeheerModal] = useState(false);
@@ -4442,31 +4443,42 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             </Modal>
 
             <Modal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} title="Meldingen." color="red" position={showOnboarding && tourSteps.length > 0 ? "left" : "center"}>
-                {alerts.length > 0 && (
-                    <div className="bg-gradient-to-r from-red-50 to-rose-50 border-l-[4px] border-red-500 p-4 rounded-r-xl mb-5 dark:from-red-900/20 dark:to-rose-900/20 dark:border-red-600 shadow-sm animate-pulse">
-                        <h4 className="font-bold text-red-800 dark:text-red-300 text-sm mb-1.5 flex items-center gap-1.5">
-                            <Icon path={Icons.Alert} size={16}/> Let op!
-                        </h4>
-                        <ul className="space-y-1 pl-0.5">
-                            {alerts.map(i => {
-                                const loc = vriezers.find(v => v.id === i.vriezerId);
-                                const type = loc ? (loc.type || 'vriezer') : 'vriezer';
-                                const isStock = type === 'voorraad' || type === 'frig';
-                                
-                                return (
-                                    <li key={i.id} className="text-red-700 dark:text-red-300 font-medium text-sm flex items-center gap-1.5">
-                                        <span className="w-1 h-1 rounded-full bg-red-500"></span>
-                                        {i.naam} 
-                                        <span className="text-[9px] font-bold opacity-80 uppercase tracking-wide bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800/50">
-                                            {isStock 
-                                                ? `Verlopen: ${formatDate(i.houdbaarheidsDatum)}` 
-                                                : `${getDagenOud(i.ingevrorenOp)} dagen oud`
-                                            }
-                                        </span>
-                                    </li>
-                                );
-                            })}
-                        </ul>
+{alerts.length > 0 && (
+                    <div className="bg-gradient-to-r from-red-50 to-rose-50 border-l-[4px] border-red-500 p-4 rounded-r-xl mb-5 dark:from-red-900/20 dark:to-rose-900/20 dark:border-red-600 shadow-sm">
+                        <div 
+                            className={`flex justify-between items-center ${alerts.length >= 10 ? 'cursor-pointer select-none' : ''}`}
+                            onClick={() => alerts.length >= 10 && setAlertsExpanded(!alertsExpanded)}
+                        >
+                            <h4 className="font-bold text-red-800 dark:text-red-300 text-sm flex items-center gap-1.5">
+                                <Icon path={Icons.Alert} size={16}/> Let op! {alerts.length >= 10 && <span className="opacity-80 font-medium ml-1">({alerts.length} producten)</span>}
+                            </h4>
+                            {alerts.length >= 10 && (
+                                <Icon path={alertsExpanded ? Icons.ChevronDown : Icons.ChevronRight} size={16} className="text-red-700 dark:text-red-400 transition-transform" />
+                            )}
+                        </div>
+                        
+                        {(alerts.length < 10 || alertsExpanded) && (
+                            <ul className="space-y-1 pl-0.5 mt-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                                {alerts.map(i => {
+                                    const loc = vriezers.find(v => v.id === i.vriezerId);
+                                    const type = loc ? (loc.type || 'vriezer') : 'vriezer';
+                                    const isStock = type === 'voorraad' || type === 'frig';
+                                    
+                                    return (
+                                        <li key={i.id} className="text-red-700 dark:text-red-300 font-medium text-sm flex items-center gap-1.5">
+                                            <span className="w-1 h-1 rounded-full bg-red-500 flex-shrink-0"></span>
+                                            <span className="truncate">{i.naam}</span>
+                                            <span className="text-[9px] font-bold opacity-80 uppercase tracking-wide bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800/50 flex-shrink-0">
+                                                {isStock 
+                                                    ? `Verlopen: ${formatDate(i.houdbaarheidsDatum)}` 
+                                                    : `${getDagenOud(i.ingevrorenOp)} dagen oud`
+                                                }
+                                            </span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
                     </div>
                 )}
                 <div className="space-y-3">
