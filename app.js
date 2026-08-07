@@ -2252,6 +2252,7 @@ const toggleMaintenanceMode = async () => {
                                     
                             <button onClick={() => setShowRapidEntry(!showRapidEntry)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 ${showRapidEntry ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300 text-amber-600 dark:from-yellow-900/50 dark:to-amber-900/50 dark:border-yellow-500 dark:text-yellow-300' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`} title="Snelle Invoer">
                                 <Icon path={Icons.Lightning} size={18} />
+                                    <span className="hidden sm:inline font-medium text-sm">Snelle invoer</span>
                             </button>        
                         </div>
                         
