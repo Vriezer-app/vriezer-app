@@ -2785,7 +2785,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 );
                             })()}
                         </div>
-                    ) : (
+) : (
                         <div className={`grid gap-5 items-start ${gridClass}`}>
                             {filteredLocaties.map(vriezer => {
                                 const gradientKeys = Object.keys(GRADIENTS);
@@ -2874,7 +2874,6 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                     </button>
                                                                 )}
                                                             </div>
-                                                            )}
                                                         </div>
 
                                                         {!isCollapsed && (
@@ -2963,8 +2962,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 );
                             })}
                         </div>
-                    )
-                )}
+                    )}
             </main>
 <Modal isOpen={!!auditLade} onClose={() => { setAuditLade(null); setAuditItemsToDelete(new Set()); }} title={`Controle: ${auditLade?.naam}`} color="blue" size="lg">
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
