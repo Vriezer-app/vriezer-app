@@ -1912,6 +1912,14 @@ const openEdit = (item) => {
             showNotification("Fout bij aanpassen van instelling.", "error");
         }
     };
+const toggleUserBalansMode = async (userId, currentStatus) => {
+    try {
+        await db.collection('users').doc(userId).set({ showBalans: !currentStatus }, { merge: true });
+        showNotification(`Controle modus is nu ${!currentStatus ? 'AAN' : 'UIT'} gezet voor deze gebruiker.`, "success");
+    } catch(e) {
+        showNotification("Fout bij aanpassen van instelling.", "error");
+    }
+};
 
     const toggleLade = async (id) => {
         const newSet = new Set(collapsedLades);
@@ -4370,14 +4378,25 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Recepten.' tabblad</span>
                                 </div>                                    
                                 <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={(u.hiddenTabs || []).includes('balans')} 
-                                        onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
-                                    />
-                                    <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Controle' knop</span>
-                                </div>
+    <input 
+        type="checkbox" 
+        checked={(u.hiddenTabs || []).includes('balans')} 
+        onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
+        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+    />
+    <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Controle' knop</span>
+</div>
+
+{/* NIEUW: Code voor het aanzetten van de controle modus */}
+<div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">
+    <input 
+        type="checkbox" 
+        checked={u.showBalans || false} 
+        onChange={() => toggleUserBalansMode(u.id, u.showBalans)}
+        className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-3.5 h-3.5"
+    />
+    <span className="font-bold text-green-700 dark:text-green-400">Zet 'Controle' modus actief AAN</span>
+</div>
 
                                 <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 border-t border-gray-200/60 dark:border-gray-700/60 pt-2 mt-1">
                                     <input 
