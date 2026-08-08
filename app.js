@@ -454,6 +454,7 @@ function App() {
     const [myHiddenTabs, setMyHiddenTabs] = useState([]);
     const [darkMode, setDarkMode] = useState(false);
     const [myShowHelpButton, setMyShowHelpButton] = useState(false);
+    const [myShowBalans, setMyShowBalans] = useState(false);
     const [myTourDisabled, setMyTourDisabled] = useState(false);
     const [myHasSeenTutorial, setMyHasSeenTutorial] = useState(true);
     const [savedOpenLades, setSavedOpenLades] = useState(null);
@@ -720,6 +721,20 @@ function App() {
     };
 
     useEffect(() => {
+const toggleBalansMode = async () => {
+        if (!user) return;
+        const newStatus = !myShowBalans;
+        setMyShowBalans(newStatus);
+        setShowProfileMenu(false); // sluit menuutje na klikken
+        
+        try {
+            await db.collection('users').doc(user.uid).set({
+                showBalans: newStatus
+            }, { merge: true });
+        } catch (e) {
+            console.error("Kon balans instelling niet opslaan", e);
+        }
+    };
         const unsubscribe = auth.onAuthStateChanged(async (u) => {
             if (u) {
                 setUser(u);
@@ -740,6 +755,7 @@ function App() {
                         }
                         setMyHiddenTabs(data.hiddenTabs || []);
                         setMyShowHelpButton(data.showHelpButton === true);
+                        setMyShowBalans(data.showBalans === true);
                         setMyTourDisabled(data.tourDisabled === true);
                         setMyHasSeenTutorial(data.hasSeenTutorial === true);
 
@@ -765,6 +781,7 @@ function App() {
                             hiddenTabs: [],
                             darkMode: false,
                             showHelpButton: false,
+                            showBalans: false,
                             tourDisabled: false,
                             hasSeenTutorial: false,
                             openLades: [],
@@ -773,6 +790,7 @@ function App() {
                         setSavedOpenLades([]);
                         setMyHiddenTabs([]);
                         setMyShowHelpButton(false);
+                        setMyShowBalans(false);
                         setMyTourDisabled(false);
                         setMyHasSeenTutorial(false);
                     }
@@ -2158,7 +2176,20 @@ const toggleMaintenanceMode = async () => {
                                             </>
                                         )}
                                     </button>
-
+{/* -- NIEUW: CONTROLE KNOPPEN TONEN/VERBERGEN -- */}
+                                    {(!myHiddenTabs.includes('balans') || isAdmin) && (
+                                        <button onClick={toggleBalansMode} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                            {myShowBalans ? (
+                                                <>
+                                                    <Icon path={Icons.CheckSquare} size={16} /> Controle uit.
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Icon path={Icons.CheckSquare} size={16} /> Controle aan.
+                                                </>
+                                            )}
+                                        </button>
+                                    )}
                                     {isAdmin && (
                                         <>
                                             <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
@@ -2798,7 +2829,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                 {isCollapsed ? <Icon path={Icons.ChevronRight} size={18} className="print:hidden text-gray-400"/> : <Icon path={Icons.ChevronDown} size={18} className="print:hidden text-gray-400"/>} 
                                                                 {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
                                                             </h3>
-                                                            {(!myHiddenTabs.includes('balans') || isAdmin) && (
+                                                            {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
                                                                 <div className="flex items-center gap-3">
                                                                     
                                                                     {/* Dynamische Datum weergave (Laatste wijziging vs Check) */}
