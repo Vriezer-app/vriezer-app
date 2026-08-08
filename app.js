@@ -445,6 +445,70 @@ const EmojiGrid = ({ onSelect }) => {
     );
 };
 
+// Toont de "Nieuws" / versiegeschiedenis-modal. Volledig zelfstandig: leunt alleen
+// op de statische VERSION_HISTORY / APP_VERSION data, geen App-state nodig buiten open/dicht.
+const VersionHistoryModal = ({ isOpen, onClose }) => (
+    <Modal isOpen={isOpen} onClose={onClose} title="Nieuws." color="blue">
+        <div className="mb-8 text-center px-4">
+            <h3 className="text-lg font-bold text-stone-900 dark:text-white mb-2 tracking-tight leading-tight">
+                Ontdek alle updates en verbeteringen aan <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-500 text-xl">Voorraad.</span>
+            </h3>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 rounded-full border border-teal-200 dark:border-teal-800/50 shadow-sm">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-teal-700 dark:text-teal-300">Huidige versie {APP_VERSION}</span>
+            </div>
+        </div>
+
+        <div className="space-y-8 relative pl-2">
+            <div className="absolute left-[19px] top-2 bottom-5 w-0.5 bg-gradient-to-b from-teal-200 via-stone-200 to-transparent dark:from-teal-800/50 dark:via-stone-700/50"></div>
+
+            {VERSION_HISTORY.map((v, i) => (
+                <div key={v.version} className="relative pl-10 group">
+                    <div className={`absolute left-[13px] top-1.5 w-3.5 h-3.5 rounded-full border-[2.5px] border-white dark:border-stone-800 z-10 transition-transform group-hover:scale-125 ${i === 0 ? 'bg-teal-500 shadow-sm shadow-teal-300/50 dark:shadow-teal-900/50' : 'bg-stone-300 dark:bg-stone-600'}`}></div>
+
+                    <div className="mb-3 flex items-center gap-2">
+                        <span className={`text-xl font-bold tracking-tight ${i === 0 ? 'text-stone-900 dark:text-white' : 'text-stone-400 dark:text-stone-500'}`}>v{v.version}</span>
+                        {i === 0 && <span className="bg-teal-600 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow-sm">Nieuw</span>}
+                    </div>
+                    
+                    <ul className="space-y-3">
+                        {v.changes.map((change, idx) => {
+                            const parts = change.split(': ');
+                            const type = parts[0];
+                            const text = parts.slice(1).join(': ');
+                            
+                            let IconComp = Icons.Zap;
+                            let iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
+
+                            if (type.includes('Feature') || type.includes('Nieuw') || type.includes('Mega')) {
+                                IconComp = Icons.Star;
+                                iconColor = "text-yellow-600 bg-yellow-50 border-yellow-100 dark:bg-yellow-900/30 dark:border-yellow-800/50 dark:text-yellow-400";
+                            } else if (type.includes('Fix') || type.includes('Opgelost') || type.includes('Hersteld')) {
+                                IconComp = Icons.Wrench;
+                                iconColor = "text-green-600 bg-green-50 border-green-100 dark:bg-green-900/30 dark:border-green-800/50 dark:text-green-400";
+                            } else if (type.includes('Update') || type.includes('Compact') || type.includes('Mobiele') || type.includes('Lijstweergave') || type.includes('Logboek')) {
+                                 IconComp = Icons.Zap;
+                                 iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
+                            }
+
+                            return (
+                                <li key={idx} className="flex gap-3 text-xs text-stone-600 dark:text-stone-300 items-start bg-white dark:bg-stone-800/50 p-3 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700/50 transition-colors hover:border-stone-300 dark:hover:border-stone-600">
+                                    <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${iconColor}`}>
+                                        <Icon path={IconComp} size={14} />
+                                    </div>
+                                    <div className="pt-0.5">
+                                        <span className="font-bold block text-stone-900 dark:text-stone-100 text-[10px] uppercase tracking-widest mb-1 opacity-90">{type}</span>
+                                        <span className="leading-relaxed font-medium">{text || change}</span>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </div>
+            ))}
+        </div>
+    </Modal>
+);
+
 // --- 6. APP ---
 function App() {
     // ===== STATE =====
@@ -4652,65 +4716,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 </Modal>
             )}
 
-            <Modal isOpen={showVersionHistory} onClose={() => setShowVersionHistory(false)} title="Nieuws." color="blue">
-                <div className="mb-8 text-center px-4">
-                    <h3 className="text-lg font-bold text-stone-900 dark:text-white mb-2 tracking-tight leading-tight">
-                        Ontdek alle updates en verbeteringen aan <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-500 text-xl">Voorraad.</span>
-                    </h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 rounded-full border border-teal-200 dark:border-teal-800/50 shadow-sm">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-teal-700 dark:text-teal-300">Huidige versie {APP_VERSION}</span>
-                    </div>
-                </div>
-
-                <div className="space-y-8 relative pl-2">
-                    <div className="absolute left-[19px] top-2 bottom-5 w-0.5 bg-gradient-to-b from-teal-200 via-stone-200 to-transparent dark:from-teal-800/50 dark:via-stone-700/50"></div>
-
-                    {VERSION_HISTORY.map((v, i) => (
-                        <div key={v.version} className="relative pl-10 group">
-                            <div className={`absolute left-[13px] top-1.5 w-3.5 h-3.5 rounded-full border-[2.5px] border-white dark:border-stone-800 z-10 transition-transform group-hover:scale-125 ${i === 0 ? 'bg-teal-500 shadow-sm shadow-teal-300/50 dark:shadow-teal-900/50' : 'bg-stone-300 dark:bg-stone-600'}`}></div>
-
-                            <div className="mb-3 flex items-center gap-2">
-                                <span className={`text-xl font-bold tracking-tight ${i === 0 ? 'text-stone-900 dark:text-white' : 'text-stone-400 dark:text-stone-500'}`}>v{v.version}</span>
-                                {i === 0 && <span className="bg-teal-600 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow-sm">Nieuw</span>}
-                            </div>
-                            
-                            <ul className="space-y-3">
-                                {v.changes.map((change, idx) => {
-                                    const parts = change.split(': ');
-                                    const type = parts[0];
-                                    const text = parts.slice(1).join(': ');
-                                    
-                                    let IconComp = Icons.Zap;
-                                    let iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
-
-                                    if (type.includes('Feature') || type.includes('Nieuw') || type.includes('Mega')) {
-                                        IconComp = Icons.Star;
-                                        iconColor = "text-yellow-600 bg-yellow-50 border-yellow-100 dark:bg-yellow-900/30 dark:border-yellow-800/50 dark:text-yellow-400";
-                                    } else if (type.includes('Fix') || type.includes('Opgelost') || type.includes('Hersteld')) {
-                                        IconComp = Icons.Wrench;
-                                        iconColor = "text-green-600 bg-green-50 border-green-100 dark:bg-green-900/30 dark:border-green-800/50 dark:text-green-400";
-                                    } else if (type.includes('Update') || type.includes('Compact') || type.includes('Mobiele') || type.includes('Lijstweergave') || type.includes('Logboek')) {
-                                         IconComp = Icons.Zap;
-                                         iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
-                                    }
-
-                                    return (
-                                        <li key={idx} className="flex gap-3 text-xs text-stone-600 dark:text-stone-300 items-start bg-white dark:bg-stone-800/50 p-3 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700/50 transition-colors hover:border-stone-300 dark:hover:border-stone-600">
-                                            <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${iconColor}`}>
-                                                <Icon path={IconComp} size={14} />
-                                            </div>
-                                            <div className="pt-0.5">
-                                                <span className="font-bold block text-stone-900 dark:text-stone-100 text-[10px] uppercase tracking-widest mb-1 opacity-90">{type}</span>
-                                                <span className="leading-relaxed font-medium">{text || change}</span>
-                                            </div>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    ))}
-                </div>
-            </Modal>
+            <VersionHistoryModal isOpen={showVersionHistory} onClose={() => setShowVersionHistory(false)} />
 
             <Modal isOpen={showDashboardModal} onClose={() => setShowDashboardModal(false)} title="Dashboard." color="blue" size="xl">
                 <div className="space-y-5 min-h-[50vh]">
