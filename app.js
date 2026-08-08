@@ -114,6 +114,11 @@ const GRADIENTS = {
 
 const TOUR_COLORS = ['blue', 'green', 'orange', 'yellow', 'purple', 'red', 'pink', 'indigo', 'gray'];
 
+// Herbruikbare className-constanten (voorkomen duplicatie van veelgebruikte stijlen)
+const CX_LABEL = "text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide";
+const CX_MENU_ITEM = "w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors";
+const CX_INPUT = "w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm";
+
 const WINKELS = [
     { name: "AH", color: "blue" },
     { name: "Colruyt", color: "orange" },
@@ -168,6 +173,7 @@ const EMOJI_CATEGORIES = {
     "Overig.": ["❄️", "🧊", "🏷️", "📦", "🛒", "🛍️", "🍽️", "🔪", "🥄", "👩🏼‍🍳", "👨🏼‍🍳", "👍🏼", "👎🏼", "🎆", "🎉", "🎊", "🎃", "🎄", "🎁", "👑"]
 };
 
+// --- 3. ICONEN ---
 const Icon = ({ path, size = 20, className = "" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         {path}
@@ -441,6 +447,7 @@ const EmojiGrid = ({ onSelect }) => {
 
 // --- 6. APP ---
 function App() {
+    // ===== STATE =====
     const [user, setUser] = useState(null);
     const [beheerdeUserId, setBeheerdeUserId] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -696,6 +703,7 @@ function App() {
     const [editCatInputColor, setEditCatInputColor] = useState('gray');
     
 
+    // ===== REFS & EFFECTEN =====
     const hasCheckedAlerts = useRef(false);
 
     useEffect(() => {
@@ -1047,6 +1055,7 @@ const alleEenheden = activeCustomUnits.length > 0
         }
     }, [isDataLoaded, alerts.length]); 
 
+    // ===== HANDLERS & BUSINESSLOGICA =====
     const handleGoogleLogin = async () => { 
         try { 
             const provider = new firebase.auth.GoogleAuthProvider();
@@ -2129,6 +2138,7 @@ const toggleMaintenanceMode = async () => {
         return acc;
     }, {});
 
+    // ===== RENDER =====
     return (
         <div className="min-h-screen flex flex-col bg-stone-50 dark:bg-[#1c1917] font-sans text-stone-800 dark:text-stone-100 transition-colors duration-300">
              {notification && (
@@ -2174,7 +2184,7 @@ const toggleMaintenanceMode = async () => {
                                         <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{user.email}</p>
                                     </div>
                                     
-                                    <button onClick={toggleDarkMode} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={toggleDarkMode} className={CX_MENU_ITEM}>
                                         {darkMode ? (
                                             <>
                                                 <Icon path={Icons.Sun} size={16} /> Licht.
@@ -2187,7 +2197,7 @@ const toggleMaintenanceMode = async () => {
                                     </button>
 {/* -- NIEUW: CONTROLE KNOPPEN TONEN/VERBERGEN -- */}
                                     {(!myHiddenTabs.includes('balans') || isAdmin) && (
-                                        <button onClick={toggleBalansMode} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                        <button onClick={toggleBalansMode} className={CX_MENU_ITEM}>
                                             {myShowBalans ? (
                                                 <>
                                                     <Icon path={Icons.CheckSquare} size={16} /> Controle uit.
@@ -2201,27 +2211,27 @@ const toggleMaintenanceMode = async () => {
                                     )}
                                     {isAdmin && (
                                         <>
-                                            <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                            <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
                                                 <Icon path={Icons.Users} size={16}/> Gebruikers & Wisselen.
                                             </button>
-                                            <button onClick={() => { openTourAdmin(); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                            <button onClick={() => { openTourAdmin(); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
                                                 <Icon path={Icons.Edit2} size={16}/> Tour Aanpassen.
                                             </button>
                                         </>
                                     )}
-                                    <button onClick={() => { setShowStatsModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={() => { setShowStatsModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
                                         <Icon path={Icons.PieChart} size={16}/> Statistieken.
                                     </button>
-                                    <button onClick={() => { setShowLogModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={() => { setShowLogModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
                                         <Icon path={Icons.LogBook} size={16}/> Logboek.
                                     </button>
-                                    <button onClick={() => { setShowShareModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={() => { setShowShareModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
                                         <Icon path={Icons.Share} size={16}/> Delen.
                                     </button>
-                                    <button onClick={exportToCSV} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={exportToCSV} className={CX_MENU_ITEM}>
                                         <Icon path={Icons.Download} size={16}/> Exporteer naar Excel.
                                     </button>
-                                    <button onClick={handlePrint} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={handlePrint} className={CX_MENU_ITEM}>
                                         <Icon path={Icons.Printer} size={16}/> Print.
                                     </button>
                                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 mt-1 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t border-stone-50 dark:border-stone-700 transition-colors">
@@ -3580,20 +3590,20 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Locatie.</label>
-                        <select className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.vriezerId} onChange={e => setFormData({...formData, vriezerId: e.target.value})} required>
+                        <div className="space-y-1"><label className={CX_LABEL}>Locatie.</label>
+                        <select className={CX_INPUT} value={formData.vriezerId} onChange={e => setFormData({...formData, vriezerId: e.target.value})} required>
                             <option value="" disabled>Kies...</option>
                             {modalLocaties.map(l => <option key={l.id} value={l.id}>{l.naam}</option>)}
                         </select></div>
-                        <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Lade.</label>
-                        <select className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.ladeId} onChange={e => setFormData({...formData, ladeId: e.target.value})} required>
+                        <div className="space-y-1"><label className={CX_LABEL}>Lade.</label>
+                        <select className={CX_INPUT} value={formData.ladeId} onChange={e => setFormData({...formData, ladeId: e.target.value})} required>
                             <option value="" disabled>Kies...</option>
                             {formLades.map(l => <option key={l.id} value={l.id}>{l.naam}</option>)}
                         </select></div>
                     </div>
                     <div className="flex flex-wrap gap-3 items-end">
                       <div className="space-y-1 flex-shrink-0 w-32 sm:w-36">
-                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Aantal.</label>
+                          <label className={CX_LABEL}>Aantal.</label>
                           <div className="relative">
                             <input 
                               type="number" 
@@ -3630,7 +3640,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                       </div>
                       
                       <div className="space-y-1 flex-1 min-w-[100px]">
-                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Eenheid.</label>
+                          <label className={CX_LABEL}>Eenheid.</label>
                           <select 
                             value={formData.eenheid} 
                             onChange={e => setFormData({...formData, eenheid: e.target.value})}
@@ -3645,7 +3655,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                       </div>
 
                       <div className="space-y-1 flex-shrink-0 w-[45%] sm:w-24 mt-1 sm:mt-0">
-                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Min.</label>
+                          <label className={CX_LABEL}>Min.</label>
                           <input 
                             type="number" 
                             placeholder="Minimaal"
@@ -3657,7 +3667,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                       </div>
 
                       <div className="space-y-1 flex-shrink-0 w-[45%] sm:w-28 mt-1 sm:mt-0">
-                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Prijs (€)</label>
+                          <label className={CX_LABEL}>Prijs (€)</label>
                           <input 
                             type="number" 
                             step="0.01"
@@ -3669,11 +3679,11 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                           />
                       </div>
                     <div className="space-y-1 flex-1 min-w-[100px]">
-                        <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Notitie (Optioneel).</label>
+                        <label className={CX_LABEL}>Notitie (Optioneel).</label>
                         <input type="text" className="w-full p-2.5 text-sm font-medium bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none shadow-sm transition-all" value={formData.notitie} onChange={e => setFormData({...formData, notitie: e.target.value})} placeholder="Bijv. Voor de BBQ..." />
                     </div>   
                     <div className="space-y-1.5 w-full pt-1">
-                        <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Labels (Tags).</label>
+                        <label className={CX_LABEL}>Labels (Tags).</label>
                         <div className="flex flex-wrap gap-2">
                             {AVAILABLE_TAGS.map(tag => {
                                 const isSelected = formData.tags?.includes(tag);
@@ -3718,19 +3728,19 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
                     {modalType === 'vriezer' && !formData.altijdGoed && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Invriesdatum.</label>
-                            <input type="date" className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.ingevrorenOp} onChange={e => setFormData({...formData, ingevrorenOp: e.target.value})} required /></div>
-                            <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">THT (Optioneel)</label>
-                            <input type="date" className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
+                            <div className="space-y-1"><label className={CX_LABEL}>Invriesdatum.</label>
+                            <input type="date" className={CX_INPUT} value={formData.ingevrorenOp} onChange={e => setFormData({...formData, ingevrorenOp: e.target.value})} required /></div>
+                            <div className="space-y-1"><label className={CX_LABEL}>THT (Optioneel)</label>
+                            <input type="date" className={CX_INPUT} value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
                         </div>
                     )}
                     {(modalType === 'voorraad' || modalType === 'frig') && !formData.altijdGoed && (
-                        <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Houdbaarheidsdatum (THT).</label>
-                        <input type="date" className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
+                        <div className="space-y-1"><label className={CX_LABEL}>Houdbaarheidsdatum (THT).</label>
+                        <input type="date" className={CX_INPUT} value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
                     )}
 
-                    <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Categorie.</label>
-                    <select className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.categorie} onChange={e => setFormData({...formData, categorie: e.target.value})}>
+                    <div className="space-y-1"><label className={CX_LABEL}>Categorie.</label>
+                    <select className={CX_INPUT} value={formData.categorie} onChange={e => setFormData({...formData, categorie: e.target.value})}>
                         {actieveCategorieen.map(c => <option key={c.name||c} value={c.name||c}>{c.name||c}</option>)}
                     </select></div>
 
