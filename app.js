@@ -89,11 +89,11 @@ const DEFAULT_TOUR_STEPS = [
 
 // Standaard kleuren voor badges
 const BADGE_COLORS = {
-    gray: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600",
+    gray: "bg-stone-100 text-stone-800 border-stone-200 dark:bg-stone-700 dark:text-stone-200 dark:border-stone-600",
     red: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-200 dark:border-red-800",
     yellow: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-200 dark:border-yellow-800",
     green: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-200 dark:border-green-800",
-    blue: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-200 dark:border-blue-800",
+    blue: "bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/50 dark:text-teal-200 dark:border-teal-800",
     indigo: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-200 dark:border-indigo-800",
     purple: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/50 dark:text-purple-200 dark:border-purple-800",
     pink: "bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/50 dark:text-pink-200 dark:border-pink-800",
@@ -101,15 +101,15 @@ const BADGE_COLORS = {
 };
 
 const GRADIENTS = {
-    blue: "from-blue-600 to-cyan-500",
+    blue: "from-teal-600 to-emerald-500",
     purple: "from-purple-600 to-indigo-500",
     pink: "from-pink-500 to-rose-500",
     orange: "from-orange-500 to-yellow-500",
     green: "from-emerald-600 to-teal-500",
     red: "from-red-600 to-orange-600",
-    gray: "from-gray-700 to-gray-500",
-    teal: "from-teal-600 to-emerald-400",
-    indigo: "from-indigo-600 to-blue-500"
+    gray: "from-stone-700 to-stone-500",
+    teal: "from-cyan-600 to-teal-400",
+    indigo: "from-indigo-600 to-teal-500"
 };
 
 const TOUR_COLORS = ['blue', 'green', 'orange', 'yellow', 'purple', 'red', 'pink', 'indigo', 'gray'];
@@ -391,14 +391,14 @@ const Modal = ({ isOpen, onClose, title, children, color = "blue", size = "md", 
 
     return (
         <div className={`fixed inset-0 z-50 flex ${alignmentClass} p-4 ${hideBackdrop ? 'pointer-events-none' : 'bg-black/40 backdrop-blur-sm'} print:hidden`} onClick={!hideBackdrop ? onClose : undefined}>
-            <div className={`bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 w-full ${sizeClass} max-h-[90vh] overflow-y-auto modal-animate flex flex-col pointer-events-auto transform transition-all`} onClick={e => e.stopPropagation()}>
-                <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700 sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md z-10 rounded-t-2xl">
+            <div className={`bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-stone-100 dark:border-stone-700 w-full ${sizeClass} max-h-[90vh] overflow-y-auto modal-animate flex flex-col pointer-events-auto transform transition-all`} onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center p-4 border-b border-stone-100 dark:border-stone-700 sticky top-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-md z-10 rounded-t-2xl">
                     <h3 className={`text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r ${gradientClass}`}>{title}</h3>
                     {!hideCloseButton && (
-                        <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all active:scale-95"><Icon path={Icons.X} className="text-gray-500 dark:text-gray-400" /></button>
+                        <button onClick={onClose} className="p-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-all active:scale-95"><Icon path={Icons.X} className="text-stone-500 dark:text-stone-400" /></button>
                     )}
                 </div>
-                <div className="p-4 space-y-4 flex-grow overflow-y-auto text-gray-800 dark:text-gray-200">{children}</div>
+                <div className="p-4 space-y-4 flex-grow overflow-y-auto text-stone-800 dark:text-stone-200">{children}</div>
             </div>
         </div>
     );
@@ -406,7 +406,7 @@ const Modal = ({ isOpen, onClose, title, children, color = "blue", size = "md", 
 
 const Badge = ({ type, text }) => {
     let colorClass = BADGE_COLORS[type];
-    if (!colorClass) colorClass = "bg-gray-200 text-gray-700 border-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600";
+    if (!colorClass) colorClass = "bg-stone-200 text-stone-700 border-stone-300 dark:bg-stone-700 dark:text-stone-300 dark:border-stone-600";
     
     return (
         <span className={`px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider flex-shrink-0 shadow-sm ${colorClass}`}>
@@ -420,13 +420,13 @@ const EmojiGrid = ({ onSelect }) => {
         <div className="p-2 max-h-96 overflow-y-auto">
             {Object.entries(EMOJI_CATEGORIES).map(([category, emojis]) => (
                 <div key={category} className="mb-4">
-                    <h4 className="font-bold text-sm text-gray-600 dark:text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">{category}</h4>
+                    <h4 className="font-bold text-sm text-stone-600 dark:text-stone-400 mb-2 border-b border-stone-100 dark:border-stone-700 pb-1">{category}</h4>
                     <div className="grid grid-cols-8 gap-2">
                         {emojis.map(emoji => (
                             <button 
                                 key={emoji} 
                                 onClick={() => onSelect(emoji)} 
-                                className="text-2xl hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-transform hover:scale-110 flex items-center justify-center active:scale-95"
+                                className="text-2xl hover:bg-stone-100 dark:hover:bg-stone-700 p-2 rounded-lg transition-transform hover:scale-110 flex items-center justify-center active:scale-95"
                                 type="button"
                             >
                                 {emoji}
@@ -2084,11 +2084,11 @@ const toggleMaintenanceMode = async () => {
     const totalStockValue = items.reduce((acc, item) => acc + (parseFloat(item.prijs) || 0), 0);
 
     if (!user) return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl shadow-xl max-w-sm w-full text-center border border-white/20">
-                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 mb-4">Voorraad.</h1>
-                <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">Log in om je voorraad te beheren.</p>
-                <button onClick={handleGoogleLogin} className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-3 rounded-xl font-medium hover:scale-105 hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 mb-3">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-stone-50 dark:bg-stone-900 p-4 transition-colors duration-300">
+            <div className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-md p-6 rounded-2xl shadow-xl max-w-sm w-full text-center border border-white/20">
+                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 mb-4">Voorraad.</h1>
+                <p className="text-stone-500 dark:text-stone-400 mb-6 text-sm">Log in om je voorraad te beheren.</p>
+                <button onClick={handleGoogleLogin} className="w-full bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-200 py-3 rounded-xl font-medium hover:scale-105 hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 mb-3">
                     <svg width="20" height="20" viewBox="0 0 24 24"><g><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></g></svg>
                     Inloggen met Google
                 </button>
@@ -2098,22 +2098,22 @@ const toggleMaintenanceMode = async () => {
 
     if (maintenanceMode && !isAdmin) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300 text-center">
-                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/20 max-w-sm w-full flex flex-col items-center animate-in fade-in zoom-in duration-500">
-                    <div className="w-20 h-20 bg-gradient-to-tr from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-5 relative shadow-inner border border-blue-100/50 dark:border-blue-800/50">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-stone-50 dark:bg-stone-900 p-4 transition-colors duration-300 text-center">
+                <div className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/20 max-w-sm w-full flex flex-col items-center animate-in fade-in zoom-in duration-500">
+                    <div className="w-20 h-20 bg-gradient-to-tr from-teal-50 to-indigo-50 dark:from-teal-900/20 dark:to-indigo-900/20 text-teal-600 dark:text-teal-400 rounded-full flex items-center justify-center mb-5 relative shadow-inner border border-teal-100/50 dark:border-teal-800/50">
                         <Icon className="animate-pulse" path={Icons.Box} size={32}/>
-                        <div className="absolute bottom-0 right-0 w-6 h-6 bg-yellow-400 text-yellow-900 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-800 shadow-sm translate-x-1 translate-y-1">
+                        <div className="absolute bottom-0 right-0 w-6 h-6 bg-yellow-400 text-yellow-900 rounded-full flex items-center justify-center border-4 border-white dark:border-stone-800 shadow-sm translate-x-1 translate-y-1">
                             <Icon path={Icons.Wrench} size={10}/>
                         </div>
                     </div>
 
-                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-400 mb-1">Voorraad.</h1>
-                    <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 mb-4 uppercase tracking-widest">In Onderhoud</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed px-2">
+                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-400 mb-1">Voorraad.</h1>
+                    <h2 className="text-xs font-bold text-stone-400 dark:text-stone-500 mb-4 uppercase tracking-widest">In Onderhoud</h2>
+                    <p className="text-sm text-stone-500 dark:text-stone-400 mb-6 leading-relaxed px-2">
                         We zijn achter de schermen bezig met een update. Nog heel even geduld, we zijn zo snel mogelijk weer online!
                     </p>
 
-                    <button onClick={handleLogout} className="px-4 py-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors text-xs flex items-center gap-1.5 active:scale-95">
+                    <button onClick={handleLogout} className="px-4 py-2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-700 rounded-lg font-medium transition-colors text-xs flex items-center gap-1.5 active:scale-95">
                         <Icon path={Icons.LogOut} size={14}/> Uitloggen
                     </button>
                 </div>
@@ -2130,7 +2130,7 @@ const toggleMaintenanceMode = async () => {
     }, {});
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0f172a] font-sans text-gray-800 dark:text-gray-100 transition-colors duration-300">
+        <div className="min-h-screen flex flex-col bg-stone-50 dark:bg-[#1c1917] font-sans text-stone-800 dark:text-stone-100 transition-colors duration-300">
              {notification && (
                 <Toast 
                     message={notification.msg} 
@@ -2140,16 +2140,16 @@ const toggleMaintenanceMode = async () => {
                 />
             )}
 
-            <header className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-30 shadow-sm border-b border-gray-200 dark:border-gray-800 print:hidden transition-colors duration-300">
+            <header className="bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-md sticky top-0 z-30 shadow-sm border-b border-stone-200 dark:border-stone-800 print:hidden transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
-                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 hover:scale-105 transition-transform cursor-default">Voorraad.</h1>
+                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 hover:scale-105 transition-transform cursor-default">Voorraad.</h1>
                     <div className="flex gap-2 relative">
-                        <button onClick={() => { setSelectedLocatieForBeheer(null); setBeheerdeUserId(beheerdeUserId); setShowBeheerModal(true); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:shadow-md active:scale-95" title="Instellingen"><Icon path={Icons.Settings}/></button>
+                        <button onClick={() => { setSelectedLocatieForBeheer(null); setBeheerdeUserId(beheerdeUserId); setShowBeheerModal(true); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Instellingen"><Icon path={Icons.Settings}/></button>
 
-                        <button onClick={() => setShowShoppingModal(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-50/50 dark:bg-gray-800 border dark:border-gray-700 relative hover:bg-blue-100 dark:hover:bg-gray-700 transition-all hover:shadow-md active:scale-95 text-blue-600 dark:text-blue-400" title="Boodschappenlijst">
+                        <button onClick={() => setShowShoppingModal(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-teal-50/50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-teal-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95 text-teal-600 dark:text-teal-400" title="Boodschappenlijst">
                             <Icon path={Icons.ShoppingCart}/>
                             {shoppingList.length > 0 && (
-                                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-gradient-to-tr from-red-500 to-pink-500 rounded-full text-[10px] text-white flex items-center justify-center border border-white dark:border-[#0f172a] font-bold shadow-sm animate-pulse">
+                                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-gradient-to-tr from-red-500 to-pink-500 rounded-full text-[10px] text-white flex items-center justify-center border border-white dark:border-[#1c1917] font-bold shadow-sm animate-pulse">
                                     {shoppingList.length}
                                 </span>
                             )}
@@ -2161,20 +2161,20 @@ const toggleMaintenanceMode = async () => {
                             </button>
                         )}
                         
-                        <button onClick={() => setShowWhatsNew(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 border dark:border-gray-700 relative hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:shadow-md active:scale-95" title="Meldingen"><Icon path={Icons.Info}/>{alerts.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-gray-800"></span>}</button>
+                        <button onClick={() => setShowWhatsNew(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-stone-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Meldingen"><Icon path={Icons.Info}/>{alerts.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-stone-800"></span>}</button>
                         
                         <div className="relative">
-                            <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all active:scale-95 shadow-sm">
-                                {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400"><Icon path={Icons.User} size={20}/></div>}
+                            <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all active:scale-95 shadow-sm">
+                                {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400"><Icon path={Icons.User} size={20}/></div>}
                             </button>
                             {showProfileMenu && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <div className="px-4 py-2 border-b border-gray-50 dark:border-gray-700 mb-1">
-                                        <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{user.displayName || 'Gebruiker'}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                                <div className="absolute right-0 mt-2 w-56 bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-xl shadow-xl border border-stone-100 dark:border-stone-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="px-4 py-2 border-b border-stone-50 dark:border-stone-700 mb-1">
+                                        <p className="text-sm font-bold text-stone-900 dark:text-stone-100 truncate">{user.displayName || 'Gebruiker'}</p>
+                                        <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{user.email}</p>
                                     </div>
                                     
-                                    <button onClick={toggleDarkMode} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={toggleDarkMode} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                         {darkMode ? (
                                             <>
                                                 <Icon path={Icons.Sun} size={16} /> Licht.
@@ -2187,7 +2187,7 @@ const toggleMaintenanceMode = async () => {
                                     </button>
 {/* -- NIEUW: CONTROLE KNOPPEN TONEN/VERBERGEN -- */}
                                     {(!myHiddenTabs.includes('balans') || isAdmin) && (
-                                        <button onClick={toggleBalansMode} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                        <button onClick={toggleBalansMode} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                             {myShowBalans ? (
                                                 <>
                                                     <Icon path={Icons.CheckSquare} size={16} /> Controle uit.
@@ -2201,30 +2201,30 @@ const toggleMaintenanceMode = async () => {
                                     )}
                                     {isAdmin && (
                                         <>
-                                            <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                            <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                                 <Icon path={Icons.Users} size={16}/> Gebruikers & Wisselen.
                                             </button>
-                                            <button onClick={() => { openTourAdmin(); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                            <button onClick={() => { openTourAdmin(); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                                 <Icon path={Icons.Edit2} size={16}/> Tour Aanpassen.
                                             </button>
                                         </>
                                     )}
-                                    <button onClick={() => { setShowStatsModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={() => { setShowStatsModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                         <Icon path={Icons.PieChart} size={16}/> Statistieken.
                                     </button>
-                                    <button onClick={() => { setShowLogModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={() => { setShowLogModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                         <Icon path={Icons.LogBook} size={16}/> Logboek.
                                     </button>
-                                    <button onClick={() => { setShowShareModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={() => { setShowShareModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                         <Icon path={Icons.Share} size={16}/> Delen.
                                     </button>
-                                    <button onClick={exportToCSV} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={exportToCSV} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                         <Icon path={Icons.Download} size={16}/> Exporteer naar Excel.
                                     </button>
-                                    <button onClick={handlePrint} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
+                                    <button onClick={handlePrint} className="w-full text-left px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 hover:bg-teal-50 dark:hover:bg-stone-700 flex items-center gap-2 transition-colors">
                                         <Icon path={Icons.Printer} size={16}/> Print.
                                     </button>
-                                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 mt-1 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t border-gray-50 dark:border-gray-700 transition-colors">
+                                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 mt-1 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t border-stone-50 dark:border-stone-700 transition-colors">
                                         <Icon path={Icons.LogOut} size={16}/> Uitloggen.
                                     </button>
                                 </div>
@@ -2232,28 +2232,28 @@ const toggleMaintenanceMode = async () => {
                         </div>
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto px-4 flex space-x-6 border-b border-gray-100 dark:border-gray-800 overflow-x-auto">
-                    <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='vriezer' ? 'border-purple-500 text-purple-600 dark:text-purple-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}`}><Icon path={Icons.Snowflake}/> Vriez.</button>
+                <div className="max-w-7xl mx-auto px-4 flex space-x-6 border-b border-stone-100 dark:border-stone-800 overflow-x-auto">
+                    <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='vriezer' ? 'border-purple-500 text-purple-600 dark:text-purple-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}><Icon path={Icons.Snowflake}/> Vriez.</button>
                     {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='frig' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}`}>
+                        <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='frig' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
                             <Icon path={Icons.Fridge}/> Frig.
-                            {isAdmin && managedUserHiddenTabs.includes('frig') && <span title="Verborgen voor gebruiker" className="ml-1 text-gray-400"><Icon path={Icons.Lock} size={14}/></span>}
+                            {isAdmin && managedUserHiddenTabs.includes('frig') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
                         </button>
                     )}
                     {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='voorraad' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}`}>
+                        <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='voorraad' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
                             <Icon path={Icons.Box}/> Stock.
-                            {isAdmin && managedUserHiddenTabs.includes('voorraad') && <span title="Verborgen voor gebruiker" className="ml-1 text-gray-400"><Icon path={Icons.Lock} size={14}/></span>}
+                            {isAdmin && managedUserHiddenTabs.includes('voorraad') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
                         </button>
                     )}
                     {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='weekmenu' ? 'border-pink-500 text-pink-600 dark:text-pink-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}`}>
+                        <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='weekmenu' ? 'border-pink-500 text-pink-600 dark:text-pink-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
                             <Icon path={Icons.Calendar}/> Week.
-                            {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <span title="Verborgen voor gebruiker" className="ml-1 text-gray-400"><Icon path={Icons.Lock} size={14}/></span>}
+                            {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
                         </button>
                     )}
                     {(!myHiddenTabs.includes('recepten') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='recepten' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}`}>
+                        <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='recepten' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
                             <Icon path={Icons.BookOpen}/> Recepten.
                         </button>
                     )}
@@ -2264,29 +2264,29 @@ const toggleMaintenanceMode = async () => {
                 {activeTab !== 'weekmenu' && activeTab !== 'recepten' && (
                 <div className="flex flex-col gap-3 print:hidden">
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide items-center">
-                        <div className="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm text-sm font-bold">{activeItems.length} items</div>
-                        {filteredLocaties.map(l => <div key={l.id} className="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm text-sm font-medium">{items.filter(i=>i.vriezerId===l.id).length} {l.naam}</div>)}
+                        <div className="flex-shrink-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 shadow-sm text-sm font-bold">{activeItems.length} items</div>
+                        {filteredLocaties.map(l => <div key={l.id} className="flex-shrink-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 shadow-sm text-sm font-medium">{items.filter(i=>i.vriezerId===l.id).length} {l.naam}</div>)}
                     </div>
                     
                     <div className="flex flex-col sm:flex-row gap-2 items-stretch">
                         <div className="flex gap-2 flex-grow">
                             <div className="relative group flex-grow">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Icon path={Icons.Search} size={18} className="text-gray-400"/></div>
-                                <input type="text" className="block w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 shadow-sm transition-all text-sm" placeholder="Zoek producten..." value={search} onChange={e=>setSearch(e.target.value)}/>
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Icon path={Icons.Search} size={18} className="text-stone-400"/></div>
+                                <input type="text" className="block w-full pl-9 pr-3 py-2 border border-stone-200 dark:border-stone-700 rounded-xl bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm focus:ring-2 focus:ring-teal-500 outline-none text-stone-900 dark:text-stone-100 placeholder-stone-400 shadow-sm transition-all text-sm" placeholder="Zoek producten..." value={search} onChange={e=>setSearch(e.target.value)}/>
                             </div>
                             
-                            <button onClick={() => setShowFilterModal(true)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 relative shadow-sm hover:shadow-md active:scale-95 ${activeCategoryFilter || sortBy !== 'name' ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-800 dark:text-blue-400' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`} title="Filter & Sorteer">
+                            <button onClick={() => setShowFilterModal(true)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 relative shadow-sm hover:shadow-md active:scale-95 ${activeCategoryFilter || sortBy !== 'name' ? 'bg-teal-50 border-teal-200 text-teal-600 dark:bg-teal-900/40 dark:border-teal-800 dark:text-teal-400' : 'bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700'}`} title="Filter & Sorteer">
                                 <Icon path={Icons.Filter} size={18} />
                                 <span className="hidden sm:inline font-medium text-sm">Filter</span>
-                                {(activeCategoryFilter || sortBy !== 'name') && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full border border-white dark:border-gray-800 sm:hidden translate-x-1 -translate-y-1"></span>}
+                                {(activeCategoryFilter || sortBy !== 'name') && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-gradient-to-r from-teal-500 to-indigo-500 rounded-full border border-white dark:border-stone-800 sm:hidden translate-x-1 -translate-y-1"></span>}
                             </button>
 
-                            <button onClick={() => setIsBulkMode(!isBulkMode)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 relative shadow-sm hover:shadow-md active:scale-95 ${isBulkMode ? 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-900/50 dark:border-indigo-500 dark:text-indigo-300' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`} title="Meerdere selecteren (Bulk Acties)">
+                            <button onClick={() => setIsBulkMode(!isBulkMode)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 relative shadow-sm hover:shadow-md active:scale-95 ${isBulkMode ? 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-900/50 dark:border-indigo-500 dark:text-indigo-300' : 'bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700'}`} title="Meerdere selecteren (Bulk Acties)">
                                 <Icon path={Icons.CheckSquare} size={18} />
                                 <span className="hidden sm:inline font-medium text-sm">Selecteer</span>
                             </button>
                                     
-                            <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 ${viewMode === 'calendar' ? 'bg-blue-100 border-blue-300 text-blue-600 dark:bg-blue-900/50 dark:border-blue-500 dark:text-blue-300' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`} title={viewMode === 'list' ? 'Wissel naar Kalender' : 'Wissel naar Lijst'}>
+                            <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 ${viewMode === 'calendar' ? 'bg-teal-100 border-teal-300 text-teal-600 dark:bg-teal-900/50 dark:border-teal-500 dark:text-teal-300' : 'bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700'}`} title={viewMode === 'list' ? 'Wissel naar Kalender' : 'Wissel naar Lijst'}>
                                 <Icon path={viewMode === 'list' ? Icons.Calendar : Icons.LayoutDashboard} size={18} />
                                 <span className="hidden sm:inline font-medium text-sm">{viewMode === 'list' ? 'Kalender' : 'Lijst'}</span>
                             </button>
@@ -2297,7 +2297,7 @@ const toggleMaintenanceMode = async () => {
                             </button>        
                         </div>
                         
-                        <button onClick={toggleAll} className="flex-none bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap text-center shadow-sm hover:shadow-md transition-all active:scale-95">
+                        <button onClick={toggleAll} className="flex-none bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border border-stone-200 dark:border-stone-700 px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700 whitespace-nowrap text-center shadow-sm hover:shadow-md transition-all active:scale-95">
                             {collapsedLades.size > 0 ? "Alles open" : "Alles dicht"}
                         </button>
                     </div>
@@ -2311,7 +2311,7 @@ const toggleMaintenanceMode = async () => {
                             autoFocus
                             type="text" 
                             placeholder="Typ een product en druk op Enter..." 
-                            className="flex-grow bg-transparent outline-none font-bold text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                            className="flex-grow bg-transparent outline-none font-bold text-stone-800 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 text-sm"
                             value={rapidEntryText}
                             onChange={(e) => setRapidEntryText(e.target.value)}
                             onKeyDown={async (e) => {
@@ -2396,7 +2396,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 )}
                 
                 {isBulkMode && (
-                    <div className="sticky top-[68px] z-20 bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-3 rounded-xl shadow-lg flex items-center justify-between flex-wrap gap-2 animate-in fade-in slide-in-from-top-4 border border-white/10 backdrop-blur-md">
+                    <div className="sticky top-[68px] z-20 bg-gradient-to-r from-indigo-600 to-teal-600 text-white p-3 rounded-xl shadow-lg flex items-center justify-between flex-wrap gap-2 animate-in fade-in slide-in-from-top-4 border border-white/10 backdrop-blur-md">
                         <div className="flex items-center gap-2">
                             <button onClick={() => { setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className="p-1.5 hover:bg-white/20 rounded-full transition-colors active:scale-95" title="Annuleren"><Icon path={Icons.X} size={18}/></button>
                             <span className="font-bold text-sm">{selectedBulkItems.size} geselecteerd</span>
@@ -2417,7 +2417,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
 {activeTab === 'recepten' ? (
     <div className="space-y-4 animate-in fade-in duration-300">
-        <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex justify-between items-center pb-3 border-b border-stone-200 dark:border-stone-800">
             <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-emerald-500">Mijn Recepten.</h2>
             <button onClick={() => {
                 setEditingRecipe(null);
@@ -2430,19 +2430,19 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
         {Object.entries(recepten.reduce((acc, r) => { (acc[r.categorie || 'Ander'] = acc[r.categorie || 'Ander'] || []).push(r); return acc; }, {})).map(([cat, recs]) => (
             <div key={cat} className="mb-6">
-                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">{cat}</h3>
+                <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 mb-3">{cat}</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {recs.map(r => (
-                        <div key={r.id} onClick={() => { setEditingRecipe(r); setViewRecipePersons(r.personen || 4); setShowRecipeViewModal(true); }} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-md hover:border-teal-400 dark:hover:border-teal-500 transition-all duration-300 flex flex-col aspect-square group relative">
+                        <div key={r.id} onClick={() => { setEditingRecipe(r); setViewRecipePersons(r.personen || 4); setShowRecipeViewModal(true); }} className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-stone-200/50 dark:border-stone-700/50 overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-md hover:border-teal-400 dark:hover:border-teal-500 transition-all duration-300 flex flex-col aspect-square group relative">
                             {r.fotoUrl ? (
                                 <div className="h-2/3 w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110" style={{backgroundImage: `url(${r.fotoUrl})`}}></div>
                             ) : (
-                                <div className="h-2/3 w-full bg-gray-100/50 dark:bg-gray-700/50 flex items-center justify-center text-gray-400 transition-transform duration-500 group-hover:scale-110">
+                                <div className="h-2/3 w-full bg-stone-100/50 dark:bg-stone-700/50 flex items-center justify-center text-stone-400 transition-transform duration-500 group-hover:scale-110">
                                     <Icon path={Icons.Utensils} size={24} />
                                 </div>
                             )}
-                            <div className="h-1/3 p-2 flex items-center justify-center text-center bg-white dark:bg-gray-800 z-10">
-                                <span className="font-medium text-xs text-gray-900 dark:text-gray-100 line-clamp-2 leading-tight">{r.naam}</span>
+                            <div className="h-1/3 p-2 flex items-center justify-center text-center bg-white dark:bg-stone-800 z-10">
+                                <span className="font-medium text-xs text-stone-900 dark:text-stone-100 line-clamp-2 leading-tight">{r.naam}</span>
                             </div>
                             <button onClick={(e) => { e.stopPropagation(); if(confirm('Recept verwijderen?')) db.collection('recepten').doc(r.id).delete(); }} className="absolute top-1.5 right-1.5 p-1.5 bg-red-500/90 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600 backdrop-blur-sm">
                                 <Icon path={Icons.Trash2} size={12}/>
@@ -2452,7 +2452,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 </div>
             </div>
         ))}
-{recepten.length === 0 && <p className="text-center text-gray-500 italic py-8 text-sm">Nog geen recepten toegevoegd...</p>}
+{recepten.length === 0 && <p className="text-center text-stone-500 italic py-8 text-sm">Nog geen recepten toegevoegd...</p>}
     </div>
 ) : activeTab === 'weekmenu' ? (() => {
                     const baseDate = new Date();
@@ -2469,25 +2469,25 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     return (
                         <div className="flex flex-col lg:flex-row gap-4 animate-in fade-in duration-300 print:block">
                             <div className="flex-1 space-y-3 print:w-full">
-                                <div className="flex items-center justify-between mb-2 border-b border-gray-200 dark:border-gray-800 pb-3">
+                                <div className="flex items-center justify-between mb-2 border-b border-stone-200 dark:border-stone-800 pb-3">
                                     <div>
                                         <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-500 print:text-black">
                                             {weekOffset === 0 ? 'Deze Week.' : weekOffset === 1 ? 'Volgende Week.' : `Week ${weekOffset}`}
                                         </h2>
-                                        <p className="text-gray-500 dark:text-gray-400 text-xs print:hidden">Sleep producten of voeg zelf gerechten toe.</p>
+                                        <p className="text-stone-500 dark:text-stone-400 text-xs print:hidden">Sleep producten of voeg zelf gerechten toe.</p>
                                     </div>
-                                    <div className="flex gap-1.5 print:hidden bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                                        <button onClick={() => window.print()} className="p-1.5 rounded-md bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 transition-colors flex items-center gap-1 mr-1 font-medium text-xs" title="Print Weekmenu">
+                                    <div className="flex gap-1.5 print:hidden bg-white/50 dark:bg-stone-800/50 backdrop-blur-sm p-1 rounded-lg shadow-sm border border-stone-100 dark:border-stone-700">
+                                        <button onClick={() => window.print()} className="p-1.5 rounded-md bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 transition-colors flex items-center gap-1 mr-1 font-medium text-xs" title="Print Weekmenu">
                                             <Icon path={Icons.Printer} size={14} /> <span className="hidden sm:inline">Print</span>
                                         </button>
-                                        <button onClick={() => setWeekOffset(weekOffset - 1)} className="p-1.5 rounded-md bg-gray-50 hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-600 transition-colors" title="Vorige Week">
-                                            <Icon path={Icons.ChevronRight} size={16} className="rotate-180 text-gray-600 dark:text-gray-300" />
+                                        <button onClick={() => setWeekOffset(weekOffset - 1)} className="p-1.5 rounded-md bg-stone-50 hover:bg-stone-100 dark:bg-stone-700/50 dark:hover:bg-stone-600 transition-colors" title="Vorige Week">
+                                            <Icon path={Icons.ChevronRight} size={16} className="rotate-180 text-stone-600 dark:text-stone-300" />
                                         </button>
                                         <button onClick={() => setWeekOffset(0)} className="px-3 rounded-md font-medium text-xs bg-gradient-to-r from-pink-50 to-rose-50 text-pink-600 dark:from-pink-900/30 dark:to-rose-900/30 dark:text-pink-300 hover:shadow-sm transition-all">
                                             Vandaag
                                         </button>
-                                        <button onClick={() => setWeekOffset(weekOffset + 1)} className="p-1.5 rounded-md bg-gray-50 hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-600 transition-colors" title="Volgende Week">
-                                            <Icon path={Icons.ChevronRight} size={16} className="text-gray-600 dark:text-gray-300" />
+                                        <button onClick={() => setWeekOffset(weekOffset + 1)} className="p-1.5 rounded-md bg-stone-50 hover:bg-stone-100 dark:bg-stone-700/50 dark:hover:bg-stone-600 transition-colors" title="Volgende Week">
+                                            <Icon path={Icons.ChevronRight} size={16} className="text-stone-600 dark:text-stone-300" />
                                         </button>
                                     </div>
                                 </div>
@@ -2513,13 +2513,13 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     setDraggedMenuItem(null);
                                                 }
                                             }}
-                                            className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-xl border-2 border-dashed ${isToday ? 'border-pink-400 dark:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 shadow-sm' : 'border-gray-200 dark:border-gray-700'} min-h-[100px] transition-all hover:border-pink-300 dark:hover:border-pink-600/50 print:border-gray-400 print:bg-transparent print:break-inside-avoid print:p-2 print:min-h-0`}
+                                            className={`bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm p-4 rounded-xl border-2 border-dashed ${isToday ? 'border-pink-400 dark:border-pink-500 bg-pink-50/40 dark:bg-pink-900/10 shadow-sm' : 'border-stone-200 dark:border-stone-700'} min-h-[100px] transition-all hover:border-pink-300 dark:hover:border-pink-600/50 print:border-stone-400 print:bg-transparent print:break-inside-avoid print:p-2 print:min-h-0`}
                                         >
-<div className="flex justify-between items-center mb-3 border-b border-gray-100 dark:border-gray-700 pb-2 print:mb-1 print:pb-1">
-                                                <h4 className={`text-base font-bold tracking-tight ${isToday ? 'text-pink-600 dark:text-pink-400 print:text-black' : 'text-gray-800 dark:text-gray-200 print:text-black'}`}>
+<div className="flex justify-between items-center mb-3 border-b border-stone-100 dark:border-stone-700 pb-2 print:mb-1 print:pb-1">
+                                                <h4 className={`text-base font-bold tracking-tight ${isToday ? 'text-pink-600 dark:text-pink-400 print:text-black' : 'text-stone-800 dark:text-stone-200 print:text-black'}`}>
                                                     {dayNameCap}
                                                 </h4>
-                                                <span className={`text-xs font-bold ${isToday ? 'bg-gradient-to-r from-pink-50 to-rose-50 text-pink-700 px-2.5 py-0.5 rounded-md dark:from-pink-900/30 dark:to-rose-900/30 dark:text-pink-300 print:bg-transparent print:text-gray-500' : 'text-gray-400 print:text-gray-500'}`}>
+                                                <span className={`text-xs font-bold ${isToday ? 'bg-gradient-to-r from-pink-50 to-rose-50 text-pink-700 px-2.5 py-0.5 rounded-md dark:from-pink-900/30 dark:to-rose-900/30 dark:text-pink-300 print:bg-transparent print:text-stone-500' : 'text-stone-400 print:text-stone-500'}`}>
                                                     {isToday ? (
                                                         <>
                                                             <span className="print:hidden">Vandaag ({visualDate})</span>
@@ -2532,16 +2532,16 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                             </div>
                                             <div className="space-y-2 print:space-y-1">
                                                 {itemsOpDag.length === 0 ? (
-                                                    <p className="text-xs text-gray-400 italic print:hidden">Niks gepland...</p>
+                                                    <p className="text-xs text-stone-400 italic print:hidden">Niks gepland...</p>
                                                 ) : (
                                                     itemsOpDag.map(item => (
-                                                        <div key={item.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-gray-700/80 rounded-lg border border-pink-100 dark:border-pink-800/50 shadow-sm hover:shadow-md transition-shadow print:bg-transparent print:shadow-none print:border-gray-300 print:p-1 group">
+                                                        <div key={item.id} className="flex items-center justify-between p-2.5 bg-white dark:bg-stone-700/80 rounded-lg border border-pink-100 dark:border-pink-800/50 shadow-sm hover:shadow-md transition-shadow print:bg-transparent print:shadow-none print:border-stone-300 print:p-1 group">
                                                             <div className="flex items-center gap-2.5 truncate">
                                                                 <span className="text-xl drop-shadow-sm">{item.emoji || '📦'}</span>
                                                                 <div>
-                                                                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate print:text-black">{item.naam}</p>
+                                                                    <p className="font-bold text-sm text-stone-900 dark:text-stone-100 truncate print:text-black">{item.naam}</p>
                                                                     {item.vriezerId !== 'custom_menu' && (
-                                                                        <p className="text-[10px] text-gray-500"><span className="font-medium">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span></p>
+                                                                        <p className="text-[10px] text-stone-500"><span className="font-medium">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span></p>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -2553,7 +2553,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                         await db.collection('items').doc(item.id).update({ geplandeDatum: null });
                                                                     }
                                                                 }} 
-                                                                className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-all print:hidden opacity-100 sm:opacity-0 group-hover:opacity-100"
+                                                                className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-all print:hidden opacity-100 sm:opacity-0 group-hover:opacity-100"
                                                                 title="Verwijder van planning"
                                                             >
                                                                 <Icon path={Icons.X} size={16}/>
@@ -2562,11 +2562,11 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     ))
                                                 )}
                                                 
-                                                <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700 print:hidden">
+                                                <div className="pt-2 mt-2 border-t border-stone-100 dark:border-stone-700 print:hidden">
                                                     <input 
                                                         type="text" 
                                                         placeholder="+ Typ gerecht en druk Enter..." 
-                                                        className="w-full text-xs font-medium p-2 rounded-lg bg-gray-50/50 dark:bg-gray-900/50 dark:text-white border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-pink-400 outline-none transition-all placeholder-gray-400"
+                                                        className="w-full text-xs font-medium p-2 rounded-lg bg-stone-50/50 dark:bg-stone-900/50 dark:text-white border border-stone-200 dark:border-stone-700 focus:ring-1 focus:ring-pink-400 outline-none transition-all placeholder-stone-400"
                                                         value={customMenuInput.date === dateString ? customMenuInput.text : ''}
                                                         onChange={(e) => setCustomMenuInput({ date: dateString, text: e.target.value })}
                                                         onKeyDown={async (e) => {
@@ -2599,23 +2599,23 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 })}
                             </div>
 
-                            <div className="w-full lg:w-1/3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-4 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 h-fit sticky top-[80px] shadow-sm print:hidden">
-                                <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100 mb-1 tracking-tight">Beschikbaar</h3>
-                                <p className="text-xs text-gray-500 mb-3">Vriezer & Koelkast</p>
+                            <div className="w-full lg:w-1/3 bg-white/80 dark:bg-stone-800/80 backdrop-blur-md p-4 rounded-2xl border border-stone-200/50 dark:border-stone-700/50 h-fit sticky top-[80px] shadow-sm print:hidden">
+                                <h3 className="font-bold text-lg text-stone-800 dark:text-stone-100 mb-1 tracking-tight">Beschikbaar</h3>
+                                <p className="text-xs text-stone-500 mb-3">Vriezer & Koelkast</p>
                                 
                                 <div className="relative mb-3">
                                     <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                                        <Icon path={Icons.Search} size={14} className="text-gray-400"/>
+                                        <Icon path={Icons.Search} size={14} className="text-stone-400"/>
                                     </div>
                                     <input 
                                         type="text" 
-                                        className="block w-full pl-8 pr-8 py-2 text-xs font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:ring-1 focus:ring-pink-500 transition-all" 
+                                        className="block w-full pl-8 pr-8 py-2 text-xs font-medium border border-stone-200 dark:border-stone-600 rounded-lg bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100 placeholder-stone-400 outline-none focus:ring-1 focus:ring-pink-500 transition-all" 
                                         placeholder="Zoek in beschikbare producten..." 
                                         value={menuSearch} 
                                         onChange={e => setMenuSearch(e.target.value)}
                                     />
                                     {menuSearch && (
-                                        <button type="button" onClick={() => setMenuSearch('')} className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600 active:scale-95 transition-transform">
+                                        <button type="button" onClick={() => setMenuSearch('')} className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-stone-400 hover:text-stone-600 active:scale-95 transition-transform">
                                             <Icon path={Icons.X} size={14} />
                                         </button>
                                     )}
@@ -2639,33 +2639,33 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     e.dataTransfer.effectAllowed = "move";
                                                 }}
                                                 onDragEnd={() => setDraggedMenuItem(null)}
-                                                className="flex items-center gap-2.5 p-2 bg-white dark:bg-gray-700/80 rounded-lg border border-gray-100 dark:border-gray-600 cursor-grab active:cursor-grabbing hover:border-pink-400 dark:hover:border-pink-500 hover:shadow-sm transition-all shadow-sm group"
+                                                className="flex items-center gap-2.5 p-2 bg-white dark:bg-stone-700/80 rounded-lg border border-stone-100 dark:border-stone-600 cursor-grab active:cursor-grabbing hover:border-pink-400 dark:hover:border-pink-500 hover:shadow-sm transition-all shadow-sm group"
                                             >
-                                                <div className="text-gray-300 group-hover:text-gray-400 transition-colors cursor-grab">
+                                                <div className="text-stone-300 group-hover:text-stone-400 transition-colors cursor-grab">
                                                     <Icon path={Icons.GripVertical} size={14}/>
                                                 </div>
                                                 <span className="text-xl drop-shadow-sm">{item.emoji || '📦'}</span>
                                                 <div className="truncate">
-                                                    <p className="font-medium text-xs text-gray-800 dark:text-gray-100 truncate">{item.naam}</p>
-                                                    <p className="text-[10px] text-gray-500"><span className="font-bold">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span></p>
+                                                    <p className="font-medium text-xs text-stone-800 dark:text-stone-100 truncate">{item.naam}</p>
+                                                    <p className="text-[10px] text-stone-500"><span className="font-bold">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span></p>
                                                 </div>
                                             </div>
                                     ))}
                                     {items.filter(i => !i.geplandeDatum && (vriezers.find(v => v.id === i.vriezerId)?.type === 'vriezer' || vriezers.find(v => v.id === i.vriezerId)?.type === 'frig') && i.naam.toLowerCase().includes(menuSearch.toLowerCase())).length === 0 && (
-                                        <p className="text-xs text-center text-gray-400 italic py-4">Geen resultaten gevonden...</p>
+                                        <p className="text-xs text-center text-stone-400 italic py-4">Geen resultaten gevonden...</p>
                                     )}
                                 </div>
                             </div>
                         </div>
                     );
                 })() : isSearching && totalFoundItemsInActiveTab === 0 ? (
-                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 text-center animate-in fade-in zoom-in duration-300">
-                        <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <div className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-sm border border-stone-200/50 dark:border-stone-700/50 text-center animate-in fade-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-teal-50 dark:bg-teal-900/30 text-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                             <Icon path={Icons.Search} size={32} />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 tracking-tight">Niks gevonden voor "{search}"</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
-                            Je hebt dit product niet meer op voorraad in de sectie <span className="font-bold text-gray-800 dark:text-gray-200 capitalize">{activeTab}</span>.
+                        <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100 mb-2 tracking-tight">Niks gevonden voor "{search}"</h3>
+                        <p className="text-sm text-stone-500 dark:text-stone-400 mb-6 font-medium">
+                            Je hebt dit product niet meer op voorraad in de sectie <span className="font-bold text-stone-800 dark:text-stone-200 capitalize">{activeTab}</span>.
                         </p>
                         <button onClick={async () => {
                             try {
@@ -2682,17 +2682,17 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             } catch(err) {
                                 showNotification("Kon product niet toevoegen.", "error");
                             }
-                        }} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 active:scale-95 text-sm">
+                        }} className="bg-gradient-to-r from-teal-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 active:scale-95 text-sm">
                             <Icon path={Icons.ShoppingCart} size={18} />
                             Zet "{search}" op het lijstje
                         </button>
                     </div>
 ) : (
                     viewMode === 'calendar' ? (
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-in fade-in duration-300">
-                            <div className="mb-6 border-b border-gray-100 dark:border-gray-700 pb-3">
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Vervaldatums & Planning</h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Chronologisch overzicht van producten binnen de huidige sectie (<span className="font-bold capitalize">{activeTab}</span>).</p>
+                        <div className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-stone-200/50 dark:border-stone-700/50 animate-in fade-in duration-300">
+                            <div className="mb-6 border-b border-stone-100 dark:border-stone-700 pb-3">
+                                <h3 className="text-xl font-bold text-stone-900 dark:text-white tracking-tight">Vervaldatums & Planning</h3>
+                                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">Chronologisch overzicht van producten binnen de huidige sectie (<span className="font-bold capitalize">{activeTab}</span>).</p>
                             </div>
 
                             {(() => {
@@ -2719,7 +2719,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
                                 if (calendarItems.length === 0) {
                                     return (
-                                        <div className="text-center py-12 text-gray-400 dark:text-gray-500 italic text-sm">
+                                        <div className="text-center py-12 text-stone-400 dark:text-stone-500 italic text-sm">
                                             Geen producten met een vervaldatum of invriesdatum gevonden in deze sectie.
                                         </div>
                                     );
@@ -2736,29 +2736,29 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                 else if (item.resterendeDagen <= 30) borderStyle = "border-l-[4px] border-yellow-400 bg-gradient-to-r from-yellow-50/50 to-transparent dark:from-yellow-950/20";
 
                                                 return (
-                                                    <div key={item.id} className={`flex items-center justify-between p-3 sm:p-4 rounded-xl border border-gray-100/50 dark:border-gray-700/50 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 ${borderStyle}`}>
+                                                    <div key={item.id} className={`flex items-center justify-between p-3 sm:p-4 rounded-xl border border-stone-100/50 dark:border-stone-700/50 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 ${borderStyle}`}>
                                                         <div className="flex items-center gap-3 min-w-0">
-                                                            <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200/80 dark:border-gray-700 flex flex-col items-center justify-center flex-shrink-0 shadow-sm">
+                                                            <div className="w-12 h-12 bg-white dark:bg-stone-800 rounded-lg border border-stone-200/80 dark:border-stone-700 flex flex-col items-center justify-center flex-shrink-0 shadow-sm">
                                                                 <span className="text-[9px] uppercase font-bold text-red-500 tracking-wider leading-none mt-0.5">
                                                                     {item.eventDate.toLocaleString('nl-BE', { month: 'short' })}
                                                                 </span>
-                                                                <span className="text-lg font-black text-gray-800 dark:text-white leading-none my-0.5">
+                                                                <span className="text-lg font-black text-stone-800 dark:text-white leading-none my-0.5">
                                                                     {item.eventDate.getDate()}
                                                                 </span>
-                                                                <span className="text-[8px] font-medium text-gray-400 dark:text-gray-500 leading-none mb-0.5">
+                                                                <span className="text-[8px] font-medium text-stone-400 dark:text-stone-500 leading-none mb-0.5">
                                                                     {item.eventDate.getFullYear()}
                                                                 </span>
                                                             </div>
 
                                                             <div className="min-w-0">
-                                                                <p className="font-bold text-sm sm:text-base text-gray-900 dark:text-white whitespace-normal sm:truncate leading-tight flex items-center gap-2">
+                                                                <p className="font-bold text-sm sm:text-base text-stone-900 dark:text-white whitespace-normal sm:truncate leading-tight flex items-center gap-2">
                                                                     <span className="text-xl flex-shrink-0 drop-shadow-sm">{item.emoji || '📦'}</span>
                                                                     <span>{item.naam}</span>
                                                                 </p>
-                                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                                    Aantal: <span className="font-bold text-gray-800 dark:text-gray-200">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span>
+                                                                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                                                                    Aantal: <span className="font-bold text-stone-800 dark:text-stone-200">{formatAantal(item.aantal)}</span> <span className="font-normal">{item.eenheid}</span>
                                                                     {item.ladeNaam && ` • ${item.ladeNaam}`}
-                                                                    {activeTab === 'vriezer' && <span className="text-gray-400 dark:text-gray-500 italic"> (Ingevroren: {formatDate(item.ingevrorenOp)})</span>}
+                                                                    {activeTab === 'vriezer' && <span className="text-stone-400 dark:text-stone-500 italic"> (Ingevroren: {formatDate(item.ingevrorenOp)})</span>}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -2773,15 +2773,15 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                     Vandaag!
                                                                 </span>
                                                             ) : (
-                                                                <span className="text-[10px] font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-600 shadow-sm">
+                                                                <span className="text-[10px] font-medium text-stone-600 dark:text-stone-300 bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded-md border border-stone-200 dark:border-stone-600 shadow-sm">
                                                                     Nog {item.resterendeDagen} {item.resterendeDagen === 1 ? 'dag' : 'dagen'}
                                                                 </span>
                                                             )}
                                                             <div className="mt-2 flex justify-end gap-1.5">
-                                                                <button onClick={() => initConsume(item)} className="p-1.5 text-orange-500 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md hover:border-orange-300 transition-all active:scale-95" title="Verbruik">
+                                                                <button onClick={() => initConsume(item)} className="p-1.5 text-orange-500 bg-white dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-600 shadow-sm hover:shadow-md hover:border-orange-300 transition-all active:scale-95" title="Verbruik">
                                                                     <Icon path={Icons.Minus} size={14}/>
                                                                 </button>
-                                                                <button onClick={() => openEdit(item)} className="p-1.5 text-blue-500 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md hover:border-blue-300 transition-all active:scale-95" title="Bewerk">
+                                                                <button onClick={() => openEdit(item)} className="p-1.5 text-teal-500 bg-white dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-600 shadow-sm hover:shadow-md hover:border-teal-300 transition-all active:scale-95" title="Bewerk">
                                                                     <Icon path={Icons.Edit2} size={14}/>
                                                                 </button>
                                                             </div>
@@ -2832,11 +2832,11 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                 const isCollapsed = collapsedLades.has(lade.id) && !search && !activeCategoryFilter;
                                                 
                                                 return (
-                                                    <div key={lade.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 dark:border-gray-700/50 overflow-hidden page-break-inside-avoid transition-all duration-200">
-                                                        <div className="bg-white dark:bg-gray-800 px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors print:bg-white" onClick={() => toggleLade(lade.id)}>
-                                                            <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm flex items-center gap-2">
-                                                                {isCollapsed ? <Icon path={Icons.ChevronRight} size={18} className="print:hidden text-gray-400"/> : <Icon path={Icons.ChevronDown} size={18} className="print:hidden text-gray-400"/>} 
-                                                                {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
+                                                    <div key={lade.id} className="bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm rounded-2xl shadow-sm border border-stone-100/50 dark:border-stone-700/50 overflow-hidden page-break-inside-avoid transition-all duration-200">
+                                                        <div className="bg-white dark:bg-stone-800 px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex justify-between items-center cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors print:bg-white" onClick={() => toggleLade(lade.id)}>
+                                                            <h3 className="font-bold text-stone-800 dark:text-stone-100 text-sm flex items-center gap-2">
+                                                                {isCollapsed ? <Icon path={Icons.ChevronRight} size={18} className="print:hidden text-stone-400"/> : <Icon path={Icons.ChevronDown} size={18} className="print:hidden text-stone-400"/>} 
+                                                                {lade.naam} <span className="text-xs font-bold text-stone-500 bg-stone-200 dark:bg-stone-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
                                                             </h3>
                                                             <div className="flex items-center gap-3">
     {/* Dynamische Datum weergave (Laatste wijziging vs Check) ALTIJD ZICHTBAAR */}
@@ -2864,7 +2864,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
         if (!displayDate) return null;
 
         return (
-            <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
+            <span className="hidden sm:block text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest print:hidden">
                 {isCheck ? 'Check: ' : 'Laatste wijziging: '} {formatDate(displayDate)}
             </span>
         );
@@ -2874,7 +2874,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
                 <button 
                     onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
-                    className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
+                    className="text-xs flex items-center gap-1 font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 dark:bg-stone-800 dark:hover:bg-stone-700 border border-teal-200 dark:border-teal-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
                     title="Voorraad-Balans (Snel aftikken)"
                 >
                     <Icon path={Icons.CheckSquare} size={14} /> Controle
@@ -2884,7 +2884,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
     </div>
     {!isCollapsed && (
                                                             <ul className="block"> 
-                                                                {ladeItems.length === 0 ? <li className="p-4 text-center text-gray-400 text-sm font-medium italic">Leeg</li> : 
+                                                                {ladeItems.length === 0 ? <li className="p-4 text-center text-stone-400 text-sm font-medium italic">Leeg</li> : 
                                                                 ladeItems.map(item => {
                                                                     const dagenOud = getDagenOud(item.ingevrorenOp);
                                                                     const dagenTotTHT = getDagenTotTHT(item.houdbaarheidsDatum);
@@ -2902,18 +2902,18 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                         <li 
                                                                             key={item.id} 
                                                                             onClick={() => isBulkMode ? toggleBulkSelection(item.id) : setTappedItemId(tappedItemId === item.id ? null : item.id)}
-                                                                            className={`flex items-center justify-between p-3 ${bgClass} ${colorClass} group transition-all duration-200 ${isBulkMode ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30' : 'cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30'}`}
+                                                                            className={`flex items-center justify-between p-3 ${bgClass} ${colorClass} group transition-all duration-200 ${isBulkMode ? 'cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/30' : 'cursor-pointer hover:bg-stone-50/50 dark:hover:bg-stone-700/30'}`}
                                                                         >
                                                                             <div className="flex items-center gap-3 overflow-hidden min-w-0">
                                                                                 {isBulkMode && (
-                                                                                    <div className={`w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all ${isSelected ? 'bg-indigo-500 border-indigo-500 shadow-sm' : 'border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-800'}`}>
+                                                                                    <div className={`w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all ${isSelected ? 'bg-indigo-500 border-indigo-500 shadow-sm' : 'border-stone-300 dark:border-stone-500 bg-white dark:bg-stone-800'}`}>
                                                                                         {isSelected && <Icon path={Icons.Check} size={12} className="text-white"/>}
                                                                                     </div>
                                                                                 )}
                                                                                 <span className={`text-2xl drop-shadow-sm flex-shrink-0 ${isBulkMode ? 'hidden sm:block' : ''}`}>{item.emoji||'📦'}</span>
                                                                                 <div className="min-w-0 flex-grow">
                                                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                                                        <p className={`font-bold text-sm sm:text-base text-gray-900 dark:text-gray-100 tracking-tight leading-tight transition-all ${tappedItemId === item.id ? 'whitespace-normal' : 'truncate'}`}>{item.naam}</p>
+                                                                                        <p className={`font-bold text-sm sm:text-base text-stone-900 dark:text-stone-100 tracking-tight leading-tight transition-all ${tappedItemId === item.id ? 'whitespace-normal' : 'truncate'}`}>{item.naam}</p>
                                                                                         {item.categorie && item.categorie !== "Geen" && (
                                                                                             <Badge type={catColor} text={item.categorie} />
                                                                                         )}
@@ -2924,23 +2924,23 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                                     {item.tags && item.tags.length > 0 && (
                                                                                         <div className="flex flex-wrap gap-1 mt-1">
                                                                                             {item.tags.map(t => (
-                                                                                                <span key={t} className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-gray-100/80 text-gray-600 border border-gray-200/50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 shadow-sm">
+                                                                                                <span key={t} className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-stone-100/80 text-stone-600 border border-stone-200/50 dark:bg-stone-700 dark:text-stone-300 dark:border-stone-600 shadow-sm">
                                                                                                     {t}
                                                                                                 </span>
                                                                                             ))}
                                                                                         </div>
                                                                                     )}
 
-                                                                                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex flex-wrap items-center gap-x-2">
-                                                                                        <span className="font-bold text-gray-800 dark:text-gray-200">{formatAantal(item.aantal)}</span> <span className="font-normal text-gray-600 dark:text-gray-400 ml-0.5">{item.eenheid}</span>
+                                                                                    <div className="text-sm text-stone-600 dark:text-stone-400 mt-1 flex flex-wrap items-center gap-x-2">
+                                                                                        <span className="font-bold text-stone-800 dark:text-stone-200">{formatAantal(item.aantal)}</span> <span className="font-normal text-stone-600 dark:text-stone-400 ml-0.5">{item.eenheid}</span>
                                                                                         {!isStockItem && <span className={`text-xs ${dateColorClass}`}> • {formatDate(item.ingevrorenOp)}</span>}
-                                                                                        {!isStockItem && item.houdbaarheidsDatum && <span className="text-xs text-gray-500 dark:text-gray-500"> • THT: {formatDate(item.houdbaarheidsDatum)}</span>}
+                                                                                        {!isStockItem && item.houdbaarheidsDatum && <span className="text-xs text-stone-500 dark:text-stone-500"> • THT: {formatDate(item.houdbaarheidsDatum)}</span>}
                                                                                         {isStockItem && item.houdbaarheidsDatum && <span className={`text-xs ${dateColorClass}`}> • THT: {formatDate(item.houdbaarheidsDatum)}</span>}
                                                                                         {item.minimumVoorraad > 0 && <span className="text-[10px] text-orange-600 font-bold px-1.5 py-0.5 rounded bg-orange-50 border border-orange-200 dark:bg-orange-900/30 dark:border-orange-800 shadow-sm">Min: {item.minimumVoorraad}</span>}
                                                                                         {item.prijs > 0 && <span className="text-[10px] text-green-700 font-bold px-1.5 py-0.5 rounded bg-green-50 border border-green-200 dark:bg-green-900/30 dark:border-green-800 shadow-sm">€{parseFloat(item.prijs).toFixed(2)}</span>}
                                                                                     </div>
                                                                                     {item.notitie && (
-                                                                                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic font-medium leading-tight">
+                                                                                        <div className="text-xs text-stone-500 dark:text-stone-400 mt-1 italic font-medium leading-tight">
                                                                                             {item.notitie}
                                                                                         </div>
                                                                                     )}
@@ -2951,7 +2951,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                                 <div className={`flex flex-nowrap items-center gap-1 flex-shrink-0 print:hidden transition-all duration-300 overflow-hidden ${tappedItemId === item.id ? 'max-w-[150px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0 md:ml-2 md:max-w-[150px] md:opacity-0 md:group-hover:opacity-100'}`}>
                                                                                     <button onClick={(e)=>{e.stopPropagation(); initConsume(item)}} className="p-1.5 text-orange-600 bg-orange-50 dark:bg-orange-900/30 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-orange-100 dark:border-orange-800/50 flex-shrink-0" title="Verbruik"><Icon path={Icons.Minus} size={14}/></button>
                                                                                     <button onClick={(e)=>{e.stopPropagation(); handleDuplicate(item)}} className="p-1.5 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-indigo-100 dark:border-indigo-800/50 flex-shrink-0" title="Dupliceer"><Icon path={Icons.Copy} size={14}/></button>
-                                                                                    <button onClick={(e)=>{e.stopPropagation(); openEdit(item)}} className="p-1.5 text-blue-600 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-blue-100 dark:border-blue-800/50 flex-shrink-0" title="Bewerken"><Icon path={Icons.Edit2} size={14}/></button>
+                                                                                    <button onClick={(e)=>{e.stopPropagation(); openEdit(item)}} className="p-1.5 text-teal-600 bg-teal-50 dark:bg-teal-900/30 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-teal-100 dark:border-teal-800/50 flex-shrink-0" title="Bewerken"><Icon path={Icons.Edit2} size={14}/></button>
                                                                                     <button onClick={(e)=>{e.stopPropagation(); initDelete(item)}} className="p-1.5 text-red-600 bg-red-50 dark:bg-red-900/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm border border-red-100 dark:border-red-800/50 flex-shrink-0" title="Verwijderen"><Icon path={Icons.Trash2} size={14}/></button>
                                                                                 </div>
                                                                             )}
@@ -2973,14 +2973,14 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             </main>
 <Modal isOpen={!!auditLade} onClose={() => { setAuditLade(null); setAuditItemsToDelete(new Set()); }} title={`Controle: ${auditLade?.naam}`} color="blue" size="lg">
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/50 text-xs text-blue-900 dark:text-blue-200 shadow-sm flex flex-col">
+                    <div className="bg-gradient-to-r from-teal-50 to-indigo-50 dark:from-teal-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-teal-200/60 dark:border-teal-800/50 text-xs text-teal-900 dark:text-teal-200 shadow-sm flex flex-col">
                         <div>
                             <strong className="font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 mb-1"><Icon path={Icons.Info} size={14}/> Instructie</strong> 
                             <span className="font-medium leading-relaxed">Controleer de aantallen in deze lade. Nieuwe items kleuren <strong>blauw</strong>, gewijzigde items kleuren <strong>oranje</strong>. Klik op <strong>'Klopt!'</strong> als het item klopt, of <strong>'Klopt niet'</strong> om het door te strepen. Verwijderingen zijn pas definitief bij opslaan.</span>
                         </div>
 
                         {auditLade?.laatstGecontroleerd && (
-                            <div className="mt-3 pt-2 border-t border-blue-200/60 dark:border-blue-800/60 flex items-center gap-1.5 text-[10px] uppercase font-bold text-blue-800/80 dark:text-blue-300/80 tracking-wider">
+                            <div className="mt-3 pt-2 border-t border-teal-200/60 dark:border-teal-800/60 flex items-center gap-1.5 text-[10px] uppercase font-bold text-teal-800/80 dark:text-teal-300/80 tracking-wider">
                                 <Icon path={Icons.CheckSquare} size={14}/>
                                 Laatst gecontroleerd: {formatDateTime(auditLade.laatstGecontroleerd)}
                             </div>
@@ -3003,7 +3003,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 });
                                 setShowAddModal(true);
                             }}
-                            className="mt-3 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95"
+                            className="mt-3 w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95"
                         >
                             <Icon path={Icons.Plus} size={16} /> Direct een nieuw product toevoegen in deze lade
                         </button>
@@ -3050,10 +3050,10 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             : isChecked 
                                 ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-800/80 shadow-inner scale-[0.99] opacity-75' 
                                 : isNew
-                                    ? 'bg-blue-50 border-blue-300 dark:bg-blue-900/20 dark:border-blue-800/80 shadow-sm' 
+                                    ? 'bg-teal-50 border-teal-300 dark:bg-teal-900/20 dark:border-teal-800/80 shadow-sm' 
                                     : isChanged 
                                         ? 'bg-orange-50 border-orange-300 dark:bg-orange-900/20 dark:border-orange-800/80 shadow-sm' 
-                                        : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-sm hover:shadow-md';
+                                        : 'bg-white border-stone-200 dark:bg-stone-800 dark:border-stone-700 shadow-sm hover:shadow-md';
 
                         return (
                             <div key={item.id} className={`flex flex-col xl:flex-row xl:items-center justify-between p-4 rounded-xl border transition-all duration-300 gap-3 ${borderColor}`}>
@@ -3061,13 +3061,13 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 <div className="flex items-center gap-3 truncate">
                                     <span className={`text-2xl drop-shadow-sm ${isMarkedForDelete ? 'opacity-50' : ''}`}>{item.emoji || '📦'}</span>
                                     <div className="truncate">
-                                        <p className={`font-bold text-sm tracking-tight ${isChecked || isMarkedForDelete ? 'line-through' : ''} ${isMarkedForDelete ? 'text-red-800 dark:text-red-400 decoration-red-500/50' : isChecked ? 'text-green-800 dark:text-green-400 decoration-green-500/50' : isNew ? 'text-blue-900 dark:text-blue-100' : isChanged ? 'text-orange-900 dark:text-orange-100' : 'text-gray-900 dark:text-gray-100'}`}>{item.naam}</p>
+                                        <p className={`font-bold text-sm tracking-tight ${isChecked || isMarkedForDelete ? 'line-through' : ''} ${isMarkedForDelete ? 'text-red-800 dark:text-red-400 decoration-red-500/50' : isChecked ? 'text-green-800 dark:text-green-400 decoration-green-500/50' : isNew ? 'text-teal-900 dark:text-teal-100' : isChanged ? 'text-orange-900 dark:text-orange-100' : 'text-stone-900 dark:text-stone-100'}`}>{item.naam}</p>
                                         
-                                        {isChecked && !isMarkedForDelete && <p className="text-[10px] font-bold text-gray-500 mt-0.5">Afgevinkt: <span className="text-gray-700 dark:text-gray-300">{item.aantal} {item.eenheid}</span></p>}
+                                        {isChecked && !isMarkedForDelete && <p className="text-[10px] font-bold text-stone-500 mt-0.5">Afgevinkt: <span className="text-stone-700 dark:text-stone-300">{item.aantal} {item.eenheid}</span></p>}
                                         {isMarkedForDelete && <p className="text-[10px] font-bold text-red-500 mt-0.5">Wordt verwijderd bij opslaan</p>}
                                         
                                         {!isChecked && !isMarkedForDelete && isNew && (
-                                            <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mt-0.5 flex items-center gap-1">
+                                            <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 mt-0.5 flex items-center gap-1">
                                                 <Icon path={Icons.Plus} size={10}/> Nieuw toegevoegd
                                             </p>
                                         )}
@@ -3085,7 +3085,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                                     {!isChecked && !isMarkedForDelete && (
                                         <div className="flex items-center gap-2 flex-grow sm:flex-grow-0">
-                                            <div className="flex bg-gray-50 dark:bg-gray-900/50 rounded-lg p-1 border border-gray-200/80 dark:border-gray-700 shadow-inner">
+                                            <div className="flex bg-stone-50 dark:bg-stone-900/50 rounded-lg p-1 border border-stone-200/80 dark:border-stone-700 shadow-inner">
                                                 <button onClick={async () => {
                                                     const huidig = parseFloat(item.aantal);
                                                     const nw = Math.max(0.25, huidig - 0.25);
@@ -3094,7 +3094,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                         markLadeAsChanged(auditLade.id); // NIEUW
                                                         await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
                                                     }
-                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
+                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-stone-700 rounded-md text-stone-600 dark:text-stone-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 font-bold shadow-sm transition-all active:scale-95">-</button>
                                                 
                                                 <input 
                                                     type="number" step="0.25" min="0" value={item.aantal}
@@ -3110,7 +3110,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                             }
                                                         }
                                                     }}
-                                                    className="w-14 text-center bg-transparent text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    className="w-14 text-center bg-transparent text-sm font-bold text-stone-900 dark:text-white outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
                                                 
                                                 <button onClick={async () => {
@@ -3119,7 +3119,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     await db.collection('items').doc(item.id).update({ aantal: nw });
                                                     markLadeAsChanged(auditLade.id); // NIEUW
                                                     await logAction('Bewerkt', item.naam, `Aantal: ${huidig} ➔ ${nw} (Balans)`, user, beheerdeUserId);
-                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-bold shadow-sm transition-all active:scale-95">+</button>
+                                                }} className="w-8 h-8 flex items-center justify-center bg-white dark:bg-stone-700 rounded-md text-stone-600 dark:text-stone-300 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 font-bold shadow-sm transition-all active:scale-95">+</button>
                                             </div>
 
                                             <select 
@@ -3130,7 +3130,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     markLadeAsChanged(auditLade.id); // NIEUW
                                                     await logAction('Bewerkt', item.naam, `Eenheid: ${item.eenheid} ➔ ${nieuweEenheid} (Balans)`, user, beheerdeUserId);
                                                 }}
-                                                className="h-10 px-2 text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer transition-all"
+                                                className="h-10 px-2 text-xs font-bold text-stone-700 bg-stone-50 border border-stone-200 dark:bg-stone-700 dark:text-stone-200 dark:border-stone-600 rounded-lg focus:ring-2 focus:ring-teal-500/20 outline-none shadow-sm cursor-pointer transition-all"
                                             >
                                                 {localAlleEenheden.map(eenheid => <option key={eenheid} value={eenheid}>{eenheid}</option>)}
                                             </select>
@@ -3145,7 +3145,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     newSet.delete(item.id);
                                                     setAuditItemsToDelete(newSet);
                                                 }}
-                                                className="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                                className="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                                             >
                                                 <span>Herstellen</span>
                                             </button>
@@ -3156,7 +3156,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                         openEdit(item);
                                                         setFormData(prev => ({...prev, viaBalans: true})); 
                                                     }}
-                                                    className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-900/20 dark:border-blue-800/50 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                                                    className="px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-teal-50 text-teal-600 border border-teal-200 hover:bg-teal-100 hover:text-teal-700 dark:bg-teal-900/20 dark:border-teal-800/50 dark:text-teal-400 dark:hover:bg-teal-900/40"
                                                     title="Product bewerken"
                                                 >
                                                     <Icon path={Icons.Edit2} size={14}/>
@@ -3188,7 +3188,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     if (isChecked) newSet.delete(item.id); else newSet.add(item.id);
                                                     setAuditedItems(newSet);
                                                 }}
-                                                className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center min-w-[100px] gap-1.5 transition-all active:scale-95 shadow-sm ${isChecked ? 'bg-green-500 text-white shadow-inner shadow-green-700/30' : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-green-100 hover:text-green-700 hover:border-green-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-green-900/40 dark:hover:text-green-400 dark:hover:border-green-800'}`}
+                                                className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center min-w-[100px] gap-1.5 transition-all active:scale-95 shadow-sm ${isChecked ? 'bg-green-500 text-white shadow-inner shadow-green-700/30' : 'bg-stone-100 text-stone-700 border border-stone-200 hover:bg-green-100 hover:text-green-700 hover:border-green-300 dark:bg-stone-700 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-green-900/40 dark:hover:text-green-400 dark:hover:border-green-800'}`}
                                             >
                                                 <Icon path={Icons.Check} size={14}/> <span>{isChecked ? 'Gecontroleerd' : 'Klopt!'}</span>
                                             </button>
@@ -3199,7 +3199,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         )
                     })}
                 </div>
-                <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                <div className="mt-5 pt-4 border-t border-stone-100 dark:border-stone-700 flex justify-end">
                     <button 
                         onClick={async () => {
                             if (auditItemsToDelete.size > 0) {
@@ -3233,7 +3233,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             setAuditItemsToDelete(new Set());
                             setAuditedItems(new Set());
                         }} 
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md shadow-blue-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
+                        className="bg-gradient-to-r from-teal-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md shadow-teal-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all active:scale-95"
                     >
                         Klaar met controleren
                     </button>
@@ -3241,11 +3241,11 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             </Modal>
             <Modal isOpen={showBulkMoveModal} onClose={() => setShowBulkMoveModal(false)} title="Verplaats Items." color="indigo">
                 <form onSubmit={handleBulkMove} className="space-y-4">
-                    <p className="text-gray-700 dark:text-gray-300 font-medium text-sm">Naar welke locatie wil je deze <strong>{selectedBulkItems.size}</strong> items verplaatsen?</p>
+                    <p className="text-stone-700 dark:text-stone-300 font-medium text-sm">Naar welke locatie wil je deze <strong>{selectedBulkItems.size}</strong> items verplaatsen?</p>
                     
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Doel Locatie.</label>
-                        <select className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm" value={bulkMoveTarget.vriezerId} onChange={e => setBulkMoveTarget({...bulkMoveTarget, vriezerId: e.target.value, ladeId: ''})} required>
+                        <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Doel Locatie.</label>
+                        <select className="w-full p-3 bg-stone-50 dark:bg-stone-700 dark:text-white border border-stone-200 dark:border-stone-600 rounded-lg font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm" value={bulkMoveTarget.vriezerId} onChange={e => setBulkMoveTarget({...bulkMoveTarget, vriezerId: e.target.value, ladeId: ''})} required>
                             <option value="" disabled>Kies een locatie...</option>
                             {filteredLocaties.map(l => <option key={l.id} value={l.id}>{l.naam}</option>)}
                         </select>
@@ -3253,17 +3253,17 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
                     {bulkMoveTarget.vriezerId && (
                         <div className="space-y-1 animate-in fade-in slide-in-from-top-2">
-                            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Doel Lade.</label>
-                            <select className="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm" value={bulkMoveTarget.ladeId} onChange={e => setBulkMoveTarget({...bulkMoveTarget, ladeId: e.target.value})} required>
+                            <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Doel Lade.</label>
+                            <select className="w-full p-3 bg-stone-50 dark:bg-stone-700 dark:text-white border border-stone-200 dark:border-stone-600 rounded-lg font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm" value={bulkMoveTarget.ladeId} onChange={e => setBulkMoveTarget({...bulkMoveTarget, ladeId: e.target.value})} required>
                                 <option value="" disabled>Kies een lade...</option>
                                 {lades.filter(l => l.vriezerId === bulkMoveTarget.vriezerId).sort((a,b) => a.naam.localeCompare(b.naam)).map(l => <option key={l.id} value={l.id}>{l.naam}</option>)}
                             </select>
                         </div>
                     )}
                     
-                    <div className="pt-4 mt-2 border-t border-gray-100 dark:border-gray-700 grid grid-cols-2 gap-3">
-                        <button type="button" onClick={() => setShowBulkMoveModal(false)} className="p-3 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors active:scale-95 text-sm">Annuleren</button>
-                        <button type="submit" disabled={!bulkMoveTarget.ladeId} className="p-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-xl shadow-md disabled:opacity-50 transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-95 text-sm">Verplaatsen</button>
+                    <div className="pt-4 mt-2 border-t border-stone-100 dark:border-stone-700 grid grid-cols-2 gap-3">
+                        <button type="button" onClick={() => setShowBulkMoveModal(false)} className="p-3 bg-stone-100 text-stone-700 dark:bg-stone-700 dark:text-stone-200 rounded-xl font-bold hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors active:scale-95 text-sm">Annuleren</button>
+                        <button type="submit" disabled={!bulkMoveTarget.ladeId} className="p-3 bg-gradient-to-r from-indigo-600 to-teal-600 text-white font-bold rounded-xl shadow-md disabled:opacity-50 transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-95 text-sm">Verplaatsen</button>
                     </div>
                 </form>
             </Modal>
@@ -3273,18 +3273,18 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
         <div className="space-y-5">
             {editingRecipe.fotoUrl && (
                 <div 
-                    className="-mt-4 -mx-4 mb-5 h-48 sm:h-64 bg-cover bg-center border-b border-gray-200 dark:border-gray-700 shadow-sm rounded-t-xl" 
+                    className="-mt-4 -mx-4 mb-5 h-48 sm:h-64 bg-cover bg-center border-b border-stone-200 dark:border-stone-700 shadow-sm rounded-t-xl" 
                     style={{backgroundImage: `url(${editingRecipe.fotoUrl})`}}
                 ></div>
             )}
             
-            <div className="flex justify-between items-start border-b border-gray-100 dark:border-gray-700 pb-4">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white pr-4 leading-tight tracking-tight">{editingRecipe.naam}</h2>
+            <div className="flex justify-between items-start border-b border-stone-100 dark:border-stone-700 pb-4">
+                <h2 className="text-2xl font-bold text-stone-900 dark:text-white pr-4 leading-tight tracking-tight">{editingRecipe.naam}</h2>
                 <button onClick={() => { 
                     setRecipeFormData(editingRecipe); 
                     setShowRecipeViewModal(false); 
                     setShowRecipeModal(true); 
-                }} className="text-gray-400 hover:text-teal-600 dark:text-gray-500 dark:hover:text-teal-400 transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mt-1 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                }} className="text-stone-400 hover:text-teal-600 dark:text-stone-500 dark:hover:text-teal-400 transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mt-1 bg-stone-50 dark:bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 shadow-sm">
                     <Icon path={Icons.Edit2} size={14}/> Bewerk
                 </button>
             </div>
@@ -3292,14 +3292,14 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             <div className="bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 p-4 rounded-xl border border-teal-100/50 dark:border-teal-800/50 flex justify-between items-center shadow-sm">
                 <span className="font-bold text-sm text-teal-800 dark:text-teal-300">Aantal Personen:</span>
                 <div className="flex items-center gap-3">
-                    <button onClick={() => setViewRecipePersons(Math.max(1, viewRecipePersons - 1))} className="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-teal-600 flex items-center justify-center font-bold text-lg shadow-sm hover:shadow-md hover:scale-105 transition-all active:scale-95">-</button>
-                    <span className="font-bold text-xl w-6 text-center text-gray-800 dark:text-white drop-shadow-sm">{viewRecipePersons}</span>
-                    <button onClick={() => setViewRecipePersons(viewRecipePersons + 1)} className="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-teal-600 flex items-center justify-center font-bold text-lg shadow-sm hover:shadow-md hover:scale-105 transition-all active:scale-95">+</button>
+                    <button onClick={() => setViewRecipePersons(Math.max(1, viewRecipePersons - 1))} className="w-8 h-8 rounded-full bg-white dark:bg-stone-700 text-teal-600 flex items-center justify-center font-bold text-lg shadow-sm hover:shadow-md hover:scale-105 transition-all active:scale-95">-</button>
+                    <span className="font-bold text-xl w-6 text-center text-stone-800 dark:text-white drop-shadow-sm">{viewRecipePersons}</span>
+                    <button onClick={() => setViewRecipePersons(viewRecipePersons + 1)} className="w-8 h-8 rounded-full bg-white dark:bg-stone-700 text-teal-600 flex items-center justify-center font-bold text-lg shadow-sm hover:shadow-md hover:scale-105 transition-all active:scale-95">+</button>
                 </div>
             </div>
 
             <div>
-                <h3 className="font-bold text-gray-800 dark:text-gray-200 mb-2 uppercase tracking-widest text-xs flex items-center gap-2"><Icon path={Icons.ShoppingCart} size={14}/> Ingrediënten</h3>
+                <h3 className="font-bold text-stone-800 dark:text-stone-200 mb-2 uppercase tracking-widest text-xs flex items-center gap-2"><Icon path={Icons.ShoppingCart} size={14}/> Ingrediënten</h3>
                 <ul className="space-y-2">
                     {editingRecipe.ingredienten?.map((ing, idx) => {
                         let berekendAantal = "";
@@ -3309,8 +3309,8 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             berekendAantal = (nieuwAantal % 1 !== 0) ? nieuwAantal.toFixed(1) : nieuwAantal;
                         }
                         return (
-                            <li key={idx} className="flex justify-between items-center p-2.5 bg-white dark:bg-gray-800/80 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:border-teal-200 dark:hover:border-teal-800/50 text-sm">
-                                <span className="font-medium text-gray-800 dark:text-gray-200">{ing.naam}</span>
+                            <li key={idx} className="flex justify-between items-center p-2.5 bg-white dark:bg-stone-800/80 rounded-lg border border-stone-100 dark:border-stone-700 shadow-sm transition-all hover:border-teal-200 dark:hover:border-teal-800/50 text-sm">
+                                <span className="font-medium text-stone-800 dark:text-stone-200">{ing.naam}</span>
                                 <span className="font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 px-2 py-1 rounded-md">{berekendAantal} {ing.eenheid}</span>
                             </li>
                         )
@@ -3319,10 +3319,10 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             </div>
 
             <div className="pt-1">
-                <h3 className="font-bold text-gray-800 dark:text-gray-200 mb-3 uppercase tracking-widest text-xs flex items-center gap-2"><Icon path={Icons.List} size={14}/> Stappen</h3>
+                <h3 className="font-bold text-stone-800 dark:text-stone-200 mb-3 uppercase tracking-widest text-xs flex items-center gap-2"><Icon path={Icons.List} size={14}/> Stappen</h3>
                 <ol className="list-decimal pl-5 space-y-3 text-sm">
                     {editingRecipe.stappen?.map((stap, idx) => (
-                        <li key={idx} className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed pl-2 border-l-[2px] border-teal-200 dark:border-teal-800 marker:font-bold marker:text-teal-500">{stap}</li>
+                        <li key={idx} className="text-stone-700 dark:text-stone-300 font-medium leading-relaxed pl-2 border-l-[2px] border-teal-200 dark:border-teal-800 marker:font-bold marker:text-teal-500">{stap}</li>
                     ))}
                 </ol>
             </div>
@@ -3333,53 +3333,53 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
     <div className="space-y-4">
         <div className="flex gap-3">
             <div className="flex-grow space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Recept Naam</label>
-                <input type="text" className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-sm shadow-sm" value={recipeFormData.naam} onChange={e => setRecipeFormData({...recipeFormData, naam: e.target.value})} placeholder="Bv. Spaghetti Bolognese"/>
+                <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Recept Naam</label>
+                <input type="text" className="w-full p-3 border border-stone-200 dark:border-stone-600 rounded-lg bg-stone-50 dark:bg-stone-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-stone-800 transition-all font-medium text-sm shadow-sm" value={recipeFormData.naam} onChange={e => setRecipeFormData({...recipeFormData, naam: e.target.value})} placeholder="Bv. Spaghetti Bolognese"/>
             </div>
             <div className="w-24 space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Personen</label>
-                <input type="number" min="1" className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-gray-800 transition-all text-center font-bold text-sm shadow-sm" value={recipeFormData.personen} onChange={e => setRecipeFormData({...recipeFormData, personen: parseInt(e.target.value) || 4})}/>
+                <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Personen</label>
+                <input type="number" min="1" className="w-full p-3 border border-stone-200 dark:border-stone-600 rounded-lg bg-stone-50 dark:bg-stone-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-stone-800 transition-all text-center font-bold text-sm shadow-sm" value={recipeFormData.personen} onChange={e => setRecipeFormData({...recipeFormData, personen: parseInt(e.target.value) || 4})}/>
             </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Categorie</label>
-                <select className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-sm shadow-sm" value={recipeFormData.categorie} onChange={e => setRecipeFormData({...recipeFormData, categorie: e.target.value})}>
+                <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Categorie</label>
+                <select className="w-full p-3 border border-stone-200 dark:border-stone-600 rounded-lg bg-stone-50 dark:bg-stone-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-stone-800 transition-all font-medium text-sm shadow-sm" value={recipeFormData.categorie} onChange={e => setRecipeFormData({...recipeFormData, categorie: e.target.value})}>
                     {CATEGORIEEN_RECEPT.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
             </div>
             <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Foto URL</label>
-                <input type="text" className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-gray-800 transition-all font-medium text-sm shadow-sm" value={recipeFormData.fotoUrl} onChange={e => setRecipeFormData({...recipeFormData, fotoUrl: e.target.value})} placeholder="https://link-naar-foto.jpg"/>
+                <label className="text-xs font-bold text-stone-500 uppercase tracking-wide">Foto URL</label>
+                <input type="text" className="w-full p-3 border border-stone-200 dark:border-stone-600 rounded-lg bg-stone-50 dark:bg-stone-700 dark:text-white outline-none focus:border-teal-500 focus:bg-white dark:focus:bg-stone-800 transition-all font-medium text-sm shadow-sm" value={recipeFormData.fotoUrl} onChange={e => setRecipeFormData({...recipeFormData, fotoUrl: e.target.value})} placeholder="https://link-naar-foto.jpg"/>
             </div>
         </div>
 
-        <div className="p-3 border border-gray-200/60 dark:border-gray-700/60 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
-            <h4 className="font-bold text-sm mb-2 text-gray-800 dark:text-gray-200 flex items-center gap-1.5"><Icon path={Icons.ShoppingCart} size={16}/> Ingrediënten</h4>
+        <div className="p-3 border border-stone-200/60 dark:border-stone-700/60 rounded-xl bg-white/50 dark:bg-stone-800/50 backdrop-blur-sm shadow-sm">
+            <h4 className="font-bold text-sm mb-2 text-stone-800 dark:text-stone-200 flex items-center gap-1.5"><Icon path={Icons.ShoppingCart} size={16}/> Ingrediënten</h4>
             <div className="space-y-2 mb-2">
                 {recipeFormData.ingredienten.map((ing, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
-                        <input type="text" className="flex-grow p-2 border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all" value={ing.naam} onChange={e => { const newIng = [...recipeFormData.ingredienten]; newIng[idx].naam = e.target.value; setRecipeFormData({...recipeFormData, ingredienten: newIng}); }} placeholder="Ingrediënt"/>
-                        <input type="number" step="0.5" className="w-16 p-2 border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium text-center shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all" value={ing.aantal} onChange={e => { const newIng = [...recipeFormData.ingredienten]; newIng[idx].aantal = e.target.value; setRecipeFormData({...recipeFormData, ingredienten: newIng}); }} placeholder="Hoeveel"/>
-                        <select className="w-24 p-2 border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all" value={ing.eenheid} onChange={e => { const newIng = [...recipeFormData.ingredienten]; newIng[idx].eenheid = e.target.value; setRecipeFormData({...recipeFormData, ingredienten: newIng}); }}>
+                        <input type="text" className="flex-grow p-2 border border-stone-200 dark:border-stone-600 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all" value={ing.naam} onChange={e => { const newIng = [...recipeFormData.ingredienten]; newIng[idx].naam = e.target.value; setRecipeFormData({...recipeFormData, ingredienten: newIng}); }} placeholder="Ingrediënt"/>
+                        <input type="number" step="0.5" className="w-16 p-2 border border-stone-200 dark:border-stone-600 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium text-center shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all" value={ing.aantal} onChange={e => { const newIng = [...recipeFormData.ingredienten]; newIng[idx].aantal = e.target.value; setRecipeFormData({...recipeFormData, ingredienten: newIng}); }} placeholder="Hoeveel"/>
+                        <select className="w-24 p-2 border border-stone-200 dark:border-stone-600 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all" value={ing.eenheid} onChange={e => { const newIng = [...recipeFormData.ingredienten]; newIng[idx].eenheid = e.target.value; setRecipeFormData({...recipeFormData, ingredienten: newIng}); }}>
                             {EENHEDEN_RECEPT.map(u => <option key={u} value={u}>{u}</option>)}
                         </select>
-                        <button onClick={() => { const newIng = recipeFormData.ingredienten.filter((_, i) => i !== idx); setRecipeFormData({...recipeFormData, ingredienten: newIng}); }} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.X} size={14}/></button>
+                        <button onClick={() => { const newIng = recipeFormData.ingredienten.filter((_, i) => i !== idx); setRecipeFormData({...recipeFormData, ingredienten: newIng}); }} className="text-stone-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.X} size={14}/></button>
                     </div>
                 ))}
             </div>
             <button type="button" onClick={() => setRecipeFormData({...recipeFormData, ingredienten: [...recipeFormData.ingredienten, {naam: '', aantal: 1, eenheid: 'stuks'}]})} className="text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 px-3 py-2 rounded-lg w-full transition-colors border border-teal-100 dark:border-teal-800/50">+ Ingrediënt toevoegen</button>
         </div>
 
-        <div className="p-3 border border-gray-200/60 dark:border-gray-700/60 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm shadow-sm">
-            <h4 className="font-bold text-sm mb-2 text-gray-800 dark:text-gray-200 flex items-center gap-1.5"><Icon path={Icons.List} size={16}/> Bereidingswijze (Stappen)</h4>
+        <div className="p-3 border border-stone-200/60 dark:border-stone-700/60 rounded-xl bg-white/50 dark:bg-stone-800/50 backdrop-blur-sm shadow-sm">
+            <h4 className="font-bold text-sm mb-2 text-stone-800 dark:text-stone-200 flex items-center gap-1.5"><Icon path={Icons.List} size={16}/> Bereidingswijze (Stappen)</h4>
             <div className="space-y-2 mb-2">
                 {recipeFormData.stappen.map((stap, idx) => (
                     <div key={idx} className="flex gap-2 items-start">
                         <span className="font-bold text-teal-500 mt-1.5 bg-teal-50 dark:bg-teal-900/30 w-5 h-5 flex items-center justify-center rounded-full text-[10px] flex-shrink-0">{idx + 1}</span>
-                        <textarea className="flex-grow p-2 border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium h-16 shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all resize-none" value={stap} onChange={e => { const newStappen = [...recipeFormData.stappen]; newStappen[idx] = e.target.value; setRecipeFormData({...recipeFormData, stappen: newStappen}); }} placeholder="Beschrijf de stap..."/>
-                        <button onClick={() => { const newStappen = recipeFormData.stappen.filter((_, i) => i !== idx); setRecipeFormData({...recipeFormData, stappen: newStappen}); }} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-all active:scale-95 mt-0.5"><Icon path={Icons.X} size={14}/></button>
+                        <textarea className="flex-grow p-2 border border-stone-200 dark:border-stone-600 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium h-16 shadow-sm outline-none focus:ring-1 focus:ring-teal-500 transition-all resize-none" value={stap} onChange={e => { const newStappen = [...recipeFormData.stappen]; newStappen[idx] = e.target.value; setRecipeFormData({...recipeFormData, stappen: newStappen}); }} placeholder="Beschrijf de stap..."/>
+                        <button onClick={() => { const newStappen = recipeFormData.stappen.filter((_, i) => i !== idx); setRecipeFormData({...recipeFormData, stappen: newStappen}); }} className="text-stone-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-all active:scale-95 mt-0.5"><Icon path={Icons.X} size={14}/></button>
                     </div>
                 ))}
             </div>
@@ -3405,18 +3405,18 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             <Modal isOpen={showConsumeModal} onClose={() => setShowConsumeModal(false)} title="Product verwerken." color="orange">
                 {itemToConsume && (
                     <div className="space-y-4">
-                        <p className="text-gray-800 dark:text-gray-200 font-medium text-sm">
+                        <p className="text-stone-800 dark:text-stone-200 font-medium text-sm">
                             Je hebt momenteel <strong>{formatAantal(itemToConsume.aantal)} {itemToConsume.eenheid}</strong> van <strong>{itemToConsume.naam}</strong>.<br/>Hoeveel wil je hier van afhalen?
                         </p>
                         
-                        <div className="flex gap-3 items-center bg-gray-50/80 dark:bg-gray-800/80 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700 shadow-inner">
+                        <div className="flex gap-3 items-center bg-stone-50/80 dark:bg-stone-800/80 p-4 rounded-xl border border-stone-200/80 dark:border-stone-700 shadow-inner">
                             <div className="relative flex-grow">
                                 <input 
                                     type="number" 
                                     step="0.25"
                                     min="0.25"
                                     max={itemToConsume.aantal}
-                                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange-500 outline-none text-center text-xl font-bold appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all"
+                                    className="w-full p-3 border border-stone-300 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 dark:text-white focus:ring-2 focus:ring-orange-500 outline-none text-center text-xl font-bold appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all"
                                     value={consumeAmount}
                                     onChange={e => setConsumeAmount(e.target.value)}
                                 />
@@ -3427,7 +3427,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     const max = parseFloat(itemToConsume.aantal) || 5000;
                                     setConsumeAmount(Math.min(current + 0.25, max));
                                   }}
-                                  className="absolute right-1 top-1.5 w-8 h-6 flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded-md cursor-pointer transition-colors"
+                                  className="absolute right-1 top-1.5 w-8 h-6 flex items-center justify-center text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded-md cursor-pointer transition-colors"
                                 >
                                   <Icon path={Icons.ChevronRight} size={16} className="rotate-[-90deg]" />
                                 </button>
@@ -3437,16 +3437,16 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     const current = parseFloat(consumeAmount) || 0;
                                     setConsumeAmount(Math.max(current - 0.25, 0.25));
                                   }}
-                                  className="absolute right-1 bottom-1.5 w-8 h-6 flex items-center justify-center text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded-md cursor-pointer transition-colors"
+                                  className="absolute right-1 bottom-1.5 w-8 h-6 flex items-center justify-center text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded-md cursor-pointer transition-colors"
                                 >
                                   <Icon path={Icons.ChevronRight} size={16} className="rotate-[90deg]" />
                                 </button>
                             </div>
-                            <span className="text-gray-600 dark:text-gray-300 font-bold text-lg w-20 truncate">{itemToConsume.eenheid}</span>
+                            <span className="text-stone-600 dark:text-stone-300 font-bold text-lg w-20 truncate">{itemToConsume.eenheid}</span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 mt-3">
-                            <button onClick={() => setShowConsumeModal(false)} className="p-3 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors active:scale-95 text-sm">
+                            <button onClick={() => setShowConsumeModal(false)} className="p-3 bg-stone-100 text-stone-700 dark:bg-stone-700 dark:text-stone-200 rounded-lg font-bold hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors active:scale-95 text-sm">
                                 Annuleren
                             </button>
                             <button onClick={confirmConsume} className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg font-bold hover:shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 text-sm">
@@ -3460,14 +3460,14 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             <Modal isOpen={showFilterModal} onClose={() => setShowFilterModal(false)} title="Filter & Sorteer." color="blue">
                 <div className="space-y-5">
                     <div>
-                        <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Sorteer op</h4>
+                        <h4 className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-2">Sorteer op</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             {[
                                 { id: 'name', label: 'A-Z' },
                                 { id: 'expiry', label: 'THT / Oudste eerst' },
                                 { id: 'newest', label: 'Nieuwste eerst' }
                             ].map(opt => (
-                                <button key={opt.id} onClick={() => setSortBy(opt.id)} className={`p-3 rounded-lg border text-xs font-bold transition-all active:scale-95 ${sortBy === opt.id ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-400 text-blue-700 dark:from-blue-900/30 dark:to-indigo-900/30 dark:border-blue-500 dark:text-blue-300 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}>
+                                <button key={opt.id} onClick={() => setSortBy(opt.id)} className={`p-3 rounded-lg border text-xs font-bold transition-all active:scale-95 ${sortBy === opt.id ? 'bg-gradient-to-br from-teal-50 to-indigo-50 border-teal-400 text-teal-700 dark:from-teal-900/30 dark:to-indigo-900/30 dark:border-teal-500 dark:text-teal-300 shadow-sm' : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 hover:border-stone-300 dark:hover:border-stone-600'}`}>
                                     {opt.label}
                                 </button>
                             ))}
@@ -3475,11 +3475,11 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     </div>
 
                     <div className="pt-1">
-                        <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Categorie <span className="capitalize text-blue-500">({activeTab})</span></h4>
+                        <h4 className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-2">Categorie <span className="capitalize text-teal-500">({activeTab})</span></h4>
                         <div className="flex flex-wrap gap-2">
                             <button 
                                 onClick={() => setActiveCategoryFilter(null)} 
-                                className={`px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 border ${!activeCategoryFilter ? 'bg-gray-800 border-gray-800 text-white dark:bg-gray-100 dark:border-gray-100 dark:text-gray-900 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 hover:border-gray-300'}`}
+                                className={`px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 border ${!activeCategoryFilter ? 'bg-stone-800 border-stone-800 text-white dark:bg-stone-100 dark:border-stone-100 dark:text-stone-900 shadow-sm' : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 hover:border-stone-300'}`}
                             >
                                 Alles
                             </button>
@@ -3490,7 +3490,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     <button 
                                         key={c.name || c}
                                         onClick={() => setActiveCategoryFilter(c.name || c)} 
-                                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 border flex items-center gap-1.5 ${isSelected ? 'bg-gray-800 border-gray-800 text-white dark:bg-gray-100 dark:border-gray-100 dark:text-gray-900 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 hover:border-gray-300'}`}
+                                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 border flex items-center gap-1.5 ${isSelected ? 'bg-stone-800 border-stone-800 text-white dark:bg-stone-100 dark:border-stone-100 dark:text-stone-900 shadow-sm' : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 hover:border-stone-300'}`}
                                     >
                                         {!isSelected && <span className={`w-2 h-2 rounded-full bg-${catColor}-500 shadow-sm`}></span>}
                                         {c.name || c}
@@ -3500,62 +3500,62 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         </div>
                     </div>
 
-                    <div className="pt-4 mt-2 border-t border-gray-100 dark:border-gray-700">
-                        <button onClick={() => setShowFilterModal(false)} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-md text-white px-5 py-3 rounded-xl font-bold w-full transition-all active:scale-95 text-sm">
+                    <div className="pt-4 mt-2 border-t border-stone-100 dark:border-stone-700">
+                        <button onClick={() => setShowFilterModal(false)} className="bg-gradient-to-r from-teal-600 to-indigo-600 hover:shadow-md text-white px-5 py-3 rounded-xl font-bold w-full transition-all active:scale-95 text-sm">
                             Toepassen
                         </button>
                     </div>
                 </div>
             </Modal>
 
-            <footer className="bg-transparent border-t border-gray-200/50 dark:border-gray-800/50 py-6 print:hidden transition-colors duration-300 mt-auto">
+            <footer className="bg-transparent border-t border-stone-200/50 dark:border-stone-800/50 py-6 print:hidden transition-colors duration-300 mt-auto">
                 <div className="max-w-7xl mx-auto px-4 text-center">
                     <div className="flex items-center justify-center gap-1.5 mb-1">
-                         <span className="text-xs font-medium text-gray-400 dark:text-gray-500">&copy;</span>
-                         <span className="font-bold text-sm tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 drop-shadow-sm">
+                         <span className="text-xs font-medium text-stone-400 dark:text-stone-500">&copy;</span>
+                         <span className="font-bold text-sm tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 drop-shadow-sm">
                              Voorraad.
                          </span>
-                         <button onClick={() => setShowVersionHistory(true)} className="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400 px-1.5 py-0.5 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors cursor-pointer border border-blue-100 dark:border-blue-800">
+                         <button onClick={() => setShowVersionHistory(true)} className="text-[10px] font-bold bg-teal-50 dark:bg-teal-900/20 text-teal-500 dark:text-teal-400 px-1.5 py-0.5 rounded hover:bg-teal-100 dark:hover:bg-teal-900/40 transition-colors cursor-pointer border border-teal-100 dark:border-teal-800">
                             v{APP_VERSION}
                         </button>
                     </div>
-                    <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                    <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500">
                         Beheer je voorraad snel, simpel en met stijl.
                     </p>
                 </div>
             </footer>
 
             {!isBulkMode && (
-                <button onClick={handleOpenAdd} className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
+                <button onClick={handleOpenAdd} className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
             )}
 
 {/* Add/Edit Modal */}
             <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title={editingItem ? "Bewerken." : "Toevoegen."} color="blue">
                 <form onSubmit={handleSaveItem} className="space-y-4">
-                    <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-lg mb-2 border border-gray-200/50 dark:border-gray-700/50">
-                        <button type="button" onClick={() => handleModalTypeChange('vriezer')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${modalType === 'vriezer' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                    <div className="flex bg-stone-100/80 dark:bg-stone-800/80 p-1 rounded-lg mb-2 border border-stone-200/50 dark:border-stone-700/50">
+                        <button type="button" onClick={() => handleModalTypeChange('vriezer')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${modalType === 'vriezer' ? 'bg-white dark:bg-stone-700 shadow-sm text-teal-600 dark:text-teal-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>
                             Vriezer.
                         </button>
                         {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                            <button type="button" onClick={() => handleModalTypeChange('frig')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${modalType === 'frig' ? 'bg-white dark:bg-gray-700 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                            <button type="button" onClick={() => handleModalTypeChange('frig')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${modalType === 'frig' ? 'bg-white dark:bg-stone-700 shadow-sm text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>
                                 Frig.
                             </button>
                         )}
                         {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                            <button type="button" onClick={() => handleModalTypeChange('voorraad')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${modalType === 'voorraad' ? 'bg-white dark:bg-gray-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                            <button type="button" onClick={() => handleModalTypeChange('voorraad')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${modalType === 'voorraad' ? 'bg-white dark:bg-stone-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>
                                 Stock.
                             </button>
                         )}
                     </div>
 
                     <div className="flex gap-2">
-                        <button type="button" onClick={() => setShowEmojiPicker(true)} className="w-11 h-11 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-2xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 hover:border-gray-300 dark:hover:bg-gray-700 transition-colors drop-shadow-sm active:scale-95">{formData.emoji || '🏷️'}</button>
+                        <button type="button" onClick={() => setShowEmojiPicker(true)} className="w-11 h-11 flex-shrink-0 border border-stone-200 dark:border-stone-700 rounded-lg flex items-center justify-center text-2xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-700 transition-colors drop-shadow-sm active:scale-95">{formData.emoji || '🏷️'}</button>
                         
                         <div className="relative flex-grow">
                             <input 
                                 type="text" 
                                 placeholder="Naam van je product..." 
-                                className="w-full h-11 px-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none bg-white/50 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500 font-bold text-sm transition-all shadow-sm" 
+                                className="w-full h-11 px-3 border border-stone-200 dark:border-stone-700 rounded-lg focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 outline-none bg-white/50 dark:bg-stone-800/50 dark:text-white dark:placeholder-stone-500 font-bold text-sm transition-all shadow-sm" 
                                 value={formData.naam} 
                                 onChange={e => {
                                     const ingetypt = e.target.value;
@@ -3580,27 +3580,27 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1"><label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Locatie.</label>
-                        <select className="w-full p-2.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.vriezerId} onChange={e => setFormData({...formData, vriezerId: e.target.value})} required>
+                        <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Locatie.</label>
+                        <select className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.vriezerId} onChange={e => setFormData({...formData, vriezerId: e.target.value})} required>
                             <option value="" disabled>Kies...</option>
                             {modalLocaties.map(l => <option key={l.id} value={l.id}>{l.naam}</option>)}
                         </select></div>
-                        <div className="space-y-1"><label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Lade.</label>
-                        <select className="w-full p-2.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.ladeId} onChange={e => setFormData({...formData, ladeId: e.target.value})} required>
+                        <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Lade.</label>
+                        <select className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.ladeId} onChange={e => setFormData({...formData, ladeId: e.target.value})} required>
                             <option value="" disabled>Kies...</option>
                             {formLades.map(l => <option key={l.id} value={l.id}>{l.naam}</option>)}
                         </select></div>
                     </div>
                     <div className="flex flex-wrap gap-3 items-end">
                       <div className="space-y-1 flex-shrink-0 w-32 sm:w-36">
-                          <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Aantal.</label>
+                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Aantal.</label>
                           <div className="relative">
                             <input 
                               type="number" 
                               step="0.25" 
                               min="0" 
                               max="5000"
-                              className="w-full text-center h-11 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white rounded-lg pr-7 pl-7 font-bold text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
+                              className="w-full text-center h-11 border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 dark:text-white rounded-lg pr-7 pl-7 font-bold text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
                               value={formData.aantal} 
                               onChange={e => setFormData({...formData, aantal: e.target.value})}
                             />
@@ -3611,7 +3611,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 const next = Math.min(current + 0.25, 5000);
                                 setFormData({...formData, aantal: Math.round(next * 100) / 100});
                               }}
-                              className="absolute right-1 top-1 w-6 h-4 flex items-center justify-center text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                              className="absolute right-1 top-1 w-6 h-4 flex items-center justify-center text-stone-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer"
                             >
                               <Icon path={Icons.ChevronRight} size={12} className="rotate-[-90deg]" />
                             </button>
@@ -3622,7 +3622,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 const next = Math.max(current - 0.25, 0);
                                 setFormData({...formData, aantal: Math.round(next * 100) / 100});
                               }}
-                              className="absolute right-1 bottom-1 w-6 h-4 flex items-center justify-center text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                              className="absolute right-1 bottom-1 w-6 h-4 flex items-center justify-center text-stone-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer"
                             >
                               <Icon path={Icons.ChevronRight} size={12} className="rotate-[90deg]" />
                             </button>
@@ -3630,11 +3630,11 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                       </div>
                       
                       <div className="space-y-1 flex-1 min-w-[100px]">
-                          <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Eenheid.</label>
+                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Eenheid.</label>
                           <select 
                             value={formData.eenheid} 
                             onChange={e => setFormData({...formData, eenheid: e.target.value})}
-                            className="w-full h-11 p-2.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm font-medium shadow-sm transition-all"
+                            className="w-full h-11 p-2.5 border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-800 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none text-sm font-medium shadow-sm transition-all"
                           >
                             {alleEenheden.map((eenheid) => (
                               <option key={eenheid} value={eenheid}>
@@ -3645,35 +3645,35 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                       </div>
 
                       <div className="space-y-1 flex-shrink-0 w-[45%] sm:w-24 mt-1 sm:mt-0">
-                          <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Min.</label>
+                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Min.</label>
                           <input 
                             type="number" 
                             placeholder="Minimaal"
                             min="0" 
-                            className="w-full h-11 text-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm font-medium shadow-sm transition-all" 
+                            className="w-full h-11 text-center border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 dark:text-white rounded-lg focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none text-sm font-medium shadow-sm transition-all" 
                             value={formData.minimumVoorraad} 
                             onChange={e => setFormData({...formData, minimumVoorraad: e.target.value})}
                           />
                       </div>
 
                       <div className="space-y-1 flex-shrink-0 w-[45%] sm:w-28 mt-1 sm:mt-0">
-                          <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Prijs (€)</label>
+                          <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Prijs (€)</label>
                           <input 
                             type="number" 
                             step="0.01"
                             placeholder="Optioneel"
                             min="0" 
-                            className="w-full h-11 text-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm font-medium shadow-sm transition-all" 
+                            className="w-full h-11 text-center border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 dark:text-white rounded-lg focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none text-sm font-medium shadow-sm transition-all" 
                             value={formData.prijs} 
                             onChange={e => setFormData({...formData, prijs: e.target.value})}
                           />
                       </div>
                     <div className="space-y-1 flex-1 min-w-[100px]">
-                        <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Notitie (Optioneel).</label>
-                        <input type="text" className="w-full p-2.5 text-sm font-medium bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm transition-all" value={formData.notitie} onChange={e => setFormData({...formData, notitie: e.target.value})} placeholder="Bijv. Voor de BBQ..." />
+                        <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Notitie (Optioneel).</label>
+                        <input type="text" className="w-full p-2.5 text-sm font-medium bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none shadow-sm transition-all" value={formData.notitie} onChange={e => setFormData({...formData, notitie: e.target.value})} placeholder="Bijv. Voor de BBQ..." />
                     </div>   
                     <div className="space-y-1.5 w-full pt-1">
-                        <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Labels (Tags).</label>
+                        <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Labels (Tags).</label>
                         <div className="flex flex-wrap gap-2">
                             {AVAILABLE_TAGS.map(tag => {
                                 const isSelected = formData.tags?.includes(tag);
@@ -3685,7 +3685,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                             const newTags = isSelected ? formData.tags.filter(t => t !== tag) : [...(formData.tags || []), tag];
                                             setFormData({...formData, tags: newTags});
                                         }}
-                                        className={`px-3 py-1.5 text-[10px] font-bold rounded-md border transition-all active:scale-95 ${isSelected ? 'bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-600 shadow-sm' : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700 dark:hover:bg-gray-700'}`}
+                                        className={`px-3 py-1.5 text-[10px] font-bold rounded-md border transition-all active:scale-95 ${isSelected ? 'bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-600 shadow-sm' : 'bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100 hover:border-stone-300 dark:bg-stone-800 dark:text-stone-400 dark:border-stone-700 dark:hover:bg-stone-700'}`}
                                     >
                                         {isSelected && <Icon path={Icons.Check} size={12} className="inline mr-1 -mt-0.5"/>}
                                         {tag}
@@ -3703,14 +3703,14 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             className={`w-full p-2.5 rounded-lg flex items-center justify-between font-bold text-sm border transition-all active:scale-[0.98] ${
                                 formData.altijdGoed 
                                 ? 'bg-green-50 border-green-300 text-green-700 dark:bg-green-900/30 dark:border-green-600 dark:text-green-400 shadow-sm' 
-                                : 'bg-gray-50 border-gray-200 text-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300'
+                                : 'bg-stone-50 border-stone-200 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-700 hover:border-stone-300'
                             }`}
                         >
                             <span className="flex items-center gap-1.5">
                                 <Icon path={Icons.Check} size={16} />
                                 Permanent goed (negeer datums)
                             </span>
-                            <div className={`w-10 h-6 rounded-full p-1 transition-colors border shadow-inner flex items-center ${formData.altijdGoed ? 'bg-green-500 border-green-600' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-700'}`}>
+                            <div className={`w-10 h-6 rounded-full p-1 transition-colors border shadow-inner flex items-center ${formData.altijdGoed ? 'bg-green-500 border-green-600' : 'bg-stone-300 border-stone-400 dark:bg-stone-600 dark:border-stone-700'}`}>
                                 <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${formData.altijdGoed ? 'translate-x-4' : 'translate-x-0'}`}></div>
                             </div>
                         </button>
@@ -3718,19 +3718,19 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
                     {modalType === 'vriezer' && !formData.altijdGoed && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Invriesdatum.</label>
-                            <input type="date" className="w-full p-2.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.ingevrorenOp} onChange={e => setFormData({...formData, ingevrorenOp: e.target.value})} required /></div>
-                            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">THT (Optioneel)</label>
-                            <input type="date" className="w-full p-2.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
+                            <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Invriesdatum.</label>
+                            <input type="date" className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.ingevrorenOp} onChange={e => setFormData({...formData, ingevrorenOp: e.target.value})} required /></div>
+                            <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">THT (Optioneel)</label>
+                            <input type="date" className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
                         </div>
                     )}
                     {(modalType === 'voorraad' || modalType === 'frig') && !formData.altijdGoed && (
-                        <div className="space-y-1"><label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Houdbaarheidsdatum (THT).</label>
-                        <input type="date" className="w-full p-2.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
+                        <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Houdbaarheidsdatum (THT).</label>
+                        <input type="date" className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.houdbaarheidsDatum} onChange={e => setFormData({...formData, houdbaarheidsDatum: e.target.value})} /></div>
                     )}
 
-                    <div className="space-y-1"><label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Categorie.</label>
-                    <select className="w-full p-2.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" value={formData.categorie} onChange={e => setFormData({...formData, categorie: e.target.value})}>
+                    <div className="space-y-1"><label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Categorie.</label>
+                    <select className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-lg text-sm font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" value={formData.categorie} onChange={e => setFormData({...formData, categorie: e.target.value})}>
                         {actieveCategorieen.map(c => <option key={c.name||c} value={c.name||c}>{c.name||c}</option>)}
                     </select></div>
 
@@ -3740,7 +3740,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 <Icon path={Icons.Calendar} size={14} /> Inplannen in Week. (Optioneel)
                             </label>
                             <select 
-                                className="w-full p-2.5 bg-white dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-md text-sm font-medium focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 outline-none shadow-sm transition-all"
+                                className="w-full p-2.5 bg-white dark:bg-stone-800 dark:text-white border border-stone-200 dark:border-stone-700 rounded-md text-sm font-medium focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 outline-none shadow-sm transition-all"
                                 value={formData.geplandeDatum || ''} 
                                 onChange={e => setFormData({...formData, geplandeDatum: e.target.value || ''})}
                             >
@@ -3789,7 +3789,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     type="number" 
                                     min="1" 
                                     max="50"
-                                    className="w-16 p-2 text-center bg-white dark:bg-gray-800 dark:text-white border border-indigo-200 dark:border-indigo-700 rounded-md text-sm font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none shadow-sm transition-all"
+                                    className="w-16 p-2 text-center bg-white dark:bg-stone-800 dark:text-white border border-indigo-200 dark:border-indigo-700 rounded-md text-sm font-bold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none shadow-sm transition-all"
                                     value={formData.bulkAanmaak || 1} 
                                     onChange={e => setFormData({...formData, bulkAanmaak: e.target.value})}
                                 />
@@ -3801,13 +3801,13 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     )}                                                                                    
                     
                     {!editingItem && (
-                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/50 p-2.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 mt-2">
-                            <input type="checkbox" id="rememberLocation" checked={rememberLocation} onChange={e => setRememberLocation(e.target.checked)} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 shadow-sm transition-all" />
-                            <label htmlFor="rememberLocation" className="text-xs font-bold text-gray-700 dark:text-gray-300 cursor-pointer">Onthoud locatie en lade voor volgende</label>
+                        <div className="flex items-center gap-2 bg-stone-50 dark:bg-stone-800/50 p-2.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 mt-2">
+                            <input type="checkbox" id="rememberLocation" checked={rememberLocation} onChange={e => setRememberLocation(e.target.checked)} className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 border-stone-300 dark:border-stone-600 shadow-sm transition-all" />
+                            <label htmlFor="rememberLocation" className="text-xs font-bold text-stone-700 dark:text-stone-300 cursor-pointer">Onthoud locatie en lade voor volgende</label>
                         </div>
                     )}
 
-                    <button type="submit" className="w-full py-3 mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all">Opslaan</button>
+                    <button type="submit" className="w-full py-3 mt-2 bg-gradient-to-r from-teal-600 to-indigo-600 text-white font-bold text-sm rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all">Opslaan</button>
                 </form>
             </Modal>
 
@@ -3819,13 +3819,13 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             {/* Shopping List Modal */}
             <Modal isOpen={showShoppingModal} onClose={() => setShowShoppingModal(false)} title="Boodschappenlijst." color="blue">
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-4 mb-4">
+                    <div className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-stone-200/50 dark:border-stone-700/50 p-4 mb-4">
                         <form onSubmit={handleAddShoppingItem} className="flex flex-col gap-2.5">
                             <div className="flex gap-2.5">
                                 <input 
                                     type="text" 
                                     placeholder="Wat moet je kopen?" 
-                                    className="flex-grow p-3 min-w-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500 dark:text-white font-medium text-sm transition-all shadow-sm" 
+                                    className="flex-grow p-3 min-w-0 border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-900 outline-none focus:ring-1 focus:ring-teal-500 dark:text-white font-medium text-sm transition-all shadow-sm" 
                                     value={shoppingFormData.naam} 
                                     onChange={e => setShoppingFormData({...shoppingFormData, naam: e.target.value})} 
                                     required
@@ -3834,7 +3834,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     <input 
                                         type="number" 
                                         step="0.25"
-                                        className="w-full h-full text-center border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 outline-none dark:text-white font-bold text-sm pr-6 pl-2 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
+                                        className="w-full h-full text-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-900 outline-none dark:text-white font-bold text-sm pr-6 pl-2 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
                                         value={shoppingFormData.aantal} 
                                         onChange={e => setShoppingFormData({...shoppingFormData, aantal: e.target.value})} 
                                     />
@@ -3844,7 +3844,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                         const current = parseFloat(shoppingFormData.aantal) || 0;
                                         setShoppingFormData({...shoppingFormData, aantal: Math.round((current + 0.25) * 100) / 100});
                                       }}
-                                      className="absolute right-1.5 top-1 w-5 h-4 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
+                                      className="absolute right-1.5 top-1 w-5 h-4 flex items-center justify-center text-stone-400 hover:text-teal-600 cursor-pointer"
                                     >
                                       <Icon path={Icons.ChevronRight} size={12} className="rotate-[-90deg]" />
                                     </button>
@@ -3854,7 +3854,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                         const current = parseFloat(shoppingFormData.aantal) || 0;
                                         setShoppingFormData({...shoppingFormData, aantal: Math.max(0, Math.round((current - 0.25) * 100) / 100)});
                                       }}
-                                      className="absolute right-1.5 bottom-1 w-5 h-4 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
+                                      className="absolute right-1.5 bottom-1 w-5 h-4 flex items-center justify-center text-stone-400 hover:text-teal-600 cursor-pointer"
                                     >
                                       <Icon path={Icons.ChevronRight} size={12} className="rotate-[90deg]" />
                                     </button>
@@ -3863,20 +3863,20 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             
                             <div className="flex gap-2.5">
                                 <select 
-                                    className="flex-grow p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 outline-none focus:ring-1 focus:ring-blue-500 dark:text-white font-medium text-sm transition-all shadow-sm"
+                                    className="flex-grow p-3 border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-900 outline-none focus:ring-1 focus:ring-teal-500 dark:text-white font-medium text-sm transition-all shadow-sm"
                                     value={shoppingFormData.winkel}
                                     onChange={e => setShoppingFormData({...shoppingFormData, winkel: e.target.value})}
                                 >
                                     <option value="">Kies winkel (optioneel)...</option>
                                     {WINKELS.map(w => <option key={w.name} value={w.name}>{w.name}</option>)}
                                 </select>
-                                <button type="submit" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 rounded-lg font-bold flex-shrink-0 flex items-center justify-center shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all"><Icon path={Icons.Plus} size={20}/></button>
+                                <button type="submit" className="bg-gradient-to-r from-teal-600 to-indigo-600 text-white px-6 rounded-lg font-bold flex-shrink-0 flex items-center justify-center shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all"><Icon path={Icons.Plus} size={20}/></button>
                             </div>
                         </form>
                     </div>
 
                     <div className="flex justify-between items-end mb-2 px-1">
-                        <h4 className="font-bold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-wide">Jouw Lijstje</h4>
+                        <h4 className="font-bold text-xs text-stone-800 dark:text-stone-200 uppercase tracking-wide">Jouw Lijstje</h4>
                         <div className="flex gap-2">
                             <button onClick={handleShareWhatsApp} className="text-[10px] flex items-center gap-1 font-bold text-white bg-green-500 hover:bg-green-600 px-2.5 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all active:scale-95" title="Deel via WhatsApp">
                                 <Icon path={Icons.MessageCircle} size={12}/> WhatsApp
@@ -3890,7 +3890,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     </div>
 
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar">
-                        {shoppingList.length === 0 && <p className="text-center text-gray-400 py-8 font-medium italic text-sm">Je boodschappenlijst is leeg.</p>}
+                        {shoppingList.length === 0 && <p className="text-center text-stone-400 py-8 font-medium italic text-sm">Je boodschappenlijst is leeg.</p>}
                         
                         {Object.entries(groupedShoppingList)
                             .sort(([winkelA], [winkelB]) => {
@@ -3906,18 +3906,18 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     <div key={winkel} className="mb-4 animate-in fade-in slide-in-from-bottom-2">
                                         <div className="flex items-center gap-2 mb-2 px-1">
                                             <span className={`w-2.5 h-2.5 rounded-full bg-${winkelColor}-500 shadow-sm`}></span>
-                                            <h5 className="font-bold text-[10px] uppercase text-gray-500 dark:text-gray-400 tracking-widest">{winkel}</h5>
+                                            <h5 className="font-bold text-[10px] uppercase text-stone-500 dark:text-stone-400 tracking-widest">{winkel}</h5>
                                         </div>
                                         <div className="space-y-2">
                                             {lijstItems.sort((a,b) => a.checked - b.checked).map(item => (
-                                                <div key={item.id} className={`flex items-center justify-between p-2.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border transition-all duration-300 shadow-sm hover:shadow-md ${item.checked ? 'border-blue-200/50 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-800/30' : 'border-gray-200/60 dark:border-gray-700/60 hover:border-blue-300 dark:hover:border-blue-600'}`}>
+                                                <div key={item.id} className={`flex items-center justify-between p-2.5 bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm rounded-lg border transition-all duration-300 shadow-sm hover:shadow-md ${item.checked ? 'border-teal-200/50 bg-teal-50/50 dark:bg-teal-900/10 dark:border-teal-800/30' : 'border-stone-200/60 dark:border-stone-700/60 hover:border-teal-300 dark:hover:border-teal-600'}`}>
                                                     <div className="flex items-center gap-3 cursor-pointer overflow-hidden flex-grow group" onClick={() => toggleShoppingItem(item)}>
-                                                        <div className={`w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all ${item.checked ? 'bg-blue-500 border-blue-500 shadow-sm' : 'border-gray-300 dark:border-gray-500 group-hover:border-blue-400'}`}>
+                                                        <div className={`w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all ${item.checked ? 'bg-teal-500 border-teal-500 shadow-sm' : 'border-stone-300 dark:border-stone-500 group-hover:border-teal-400'}`}>
                                                             {item.checked && <Icon path={Icons.Check} size={12} className="text-white"/>}
                                                         </div>
                                                         <div className="flex flex-col min-w-0">
-                                                            <span className={`font-medium text-sm truncate transition-colors ${item.checked ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-900 dark:text-gray-100'}`}>
-                                                                {item.aantal > 0 && <span className={`font-bold mr-1.5 ${item.checked ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'}`}>{formatAantal(item.aantal)} {item.eenheid}</span>}
+                                                            <span className={`font-medium text-sm truncate transition-colors ${item.checked ? 'text-stone-400 dark:text-stone-500 line-through' : 'text-stone-900 dark:text-stone-100'}`}>
+                                                                {item.aantal > 0 && <span className={`font-bold mr-1.5 ${item.checked ? 'text-stone-400 dark:text-stone-500' : 'text-teal-600 dark:text-teal-400'}`}>{formatAantal(item.aantal)} {item.eenheid}</span>}
                                                                 {item.naam}
                                                             </span>
                                                         </div>
@@ -3938,7 +3938,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             {/* Delete Confirmation Modal */}
             <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Product verwijderen." color="red">
-                <p className="text-gray-800 dark:text-gray-200 mb-5 font-medium text-sm">Wat is de reden voor het verwijderen van <strong>{itemToDelete?.naam}</strong>?</p>
+                <p className="text-stone-800 dark:text-stone-200 mb-5 font-medium text-sm">Wat is de reden voor het verwijderen van <strong>{itemToDelete?.naam}</strong>?</p>
                 <div className="grid grid-cols-1 gap-3">
                     <button onClick={() => confirmDelete('consumed')} className="flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 dark:from-green-900/40 dark:to-emerald-900/40 dark:text-green-300 rounded-lg font-bold hover:shadow-sm transition-all active:scale-95 border border-green-200 dark:border-green-800 text-sm">
                         <Icon path={Icons.Utensils} size={18} /> Opgegeten
@@ -3946,7 +3946,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     <button onClick={() => confirmDelete('wasted')} className="flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-red-50 to-rose-50 text-red-800 dark:from-red-900/40 dark:to-rose-900/40 dark:text-red-300 rounded-lg font-bold hover:shadow-sm transition-all active:scale-95 border border-red-200 dark:border-red-800 text-sm">
                         <Icon path={Icons.Trash2} size={18} /> Weggegooid (Verspild)
                     </button>
-                    <button onClick={() => confirmDelete('other')} className="flex items-center justify-center gap-2 p-3 bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-lg font-medium hover:shadow-sm transition-all active:scale-95 border border-gray-200 dark:border-gray-700 text-sm">
+                    <button onClick={() => confirmDelete('other')} className="flex items-center justify-center gap-2 p-3 bg-stone-50 text-stone-700 dark:bg-stone-800 dark:text-stone-300 rounded-lg font-medium hover:shadow-sm transition-all active:scale-95 border border-stone-200 dark:border-stone-700 text-sm">
                         Andere reden / Foutje
                     </button>
                 </div>
@@ -3954,14 +3954,14 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             {/* Shopify Modal */}
             <Modal isOpen={showShopifyModal} onClose={() => setShowShopifyModal(false)} title="Boodschappenlijst?" color="blue">
-                <p className="text-gray-800 dark:text-gray-200 mb-4 font-medium text-sm">Wil je <strong>{itemToShopify?.naam}</strong> op de boodschappenlijst zetten?</p>
+                <p className="text-stone-800 dark:text-stone-200 mb-4 font-medium text-sm">Wil je <strong>{itemToShopify?.naam}</strong> op de boodschappenlijst zetten?</p>
                 
                 <div className="space-y-4">
                     <div className="flex gap-3">
                         <div className="flex-1 min-w-0">
-                            <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 block">Winkel (optioneel)</label>
+                            <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-1 block">Winkel (optioneel)</label>
                             <select 
-                                className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 outline-none focus:ring-1 focus:ring-blue-500 dark:text-white font-medium text-sm transition-all shadow-sm"
+                                className="w-full p-3 border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-800 outline-none focus:ring-1 focus:ring-teal-500 dark:text-white font-medium text-sm transition-all shadow-sm"
                                 value={shopForDeletedItem}
                                 onChange={(e) => setShopForDeletedItem(e.target.value)}
                             >
@@ -3970,12 +3970,12 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             </select>
                         </div>
                         <div className="w-28 sm:w-32 flex-shrink-0">
-                            <label className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 block">Aantal</label>
+                            <label className="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wide mb-1 block">Aantal</label>
                             <div className="relative">
                                 <input 
                                     type="number" 
                                     step="0.25"
-                                    className="w-full h-11 text-center border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 outline-none dark:text-white pr-6 pl-2 font-bold text-sm appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
+                                    className="w-full h-11 text-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-800 outline-none dark:text-white pr-6 pl-2 font-bold text-sm appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none shadow-sm transition-all" 
                                     value={aantalForShopifyItem} 
                                     onChange={(e) => setAantalForShopifyItem(e.target.value)}
                                 />
@@ -3985,7 +3985,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     const current = parseFloat(aantalForShopifyItem) || 0;
                                     setAantalForShopifyItem(Math.round((current + 0.25) * 100) / 100);
                                   }}
-                                  className="absolute right-1 top-1 w-5 h-4 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
+                                  className="absolute right-1 top-1 w-5 h-4 flex items-center justify-center text-stone-400 hover:text-teal-600 cursor-pointer"
                                 >
                                   <Icon path={Icons.ChevronRight} size={12} className="rotate-[-90deg]" />
                                 </button>
@@ -3995,7 +3995,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     const current = parseFloat(aantalForShopifyItem) || 0;
                                     setAantalForShopifyItem(Math.max(0, Math.round((current - 0.25) * 100) / 100));
                                   }}
-                                  className="absolute right-1 bottom-1 w-5 h-4 flex items-center justify-center text-gray-400 hover:text-blue-600 cursor-pointer"
+                                  className="absolute right-1 bottom-1 w-5 h-4 flex items-center justify-center text-stone-400 hover:text-teal-600 cursor-pointer"
                                 >
                                   <Icon path={Icons.ChevronRight} size={12} className="rotate-[90deg]" />
                                 </button>
@@ -4004,10 +4004,10 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mt-1">
-                        <button onClick={() => setShowShopifyModal(false)} className="p-3 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active:scale-95 border border-gray-200 dark:border-gray-700 text-sm">
+                        <button onClick={() => setShowShopifyModal(false)} className="p-3 bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300 rounded-lg font-medium hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors active:scale-95 border border-stone-200 dark:border-stone-700 text-sm">
                             Nee
                         </button>
-                        <button onClick={handleAddToShoppingFromDelete} className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-95 text-sm">
+                        <button onClick={handleAddToShoppingFromDelete} className="p-3 bg-gradient-to-r from-teal-600 to-indigo-600 text-white rounded-lg font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-95 text-sm">
                             Ja, voeg toe
                         </button>
                     </div>
@@ -4016,9 +4016,9 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             {/* Stats Modal */}
             <Modal isOpen={showStatsModal} onClose={() => setShowStatsModal(false)} title="Statistieken." color="purple">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl text-center border border-blue-100/50 dark:border-blue-800/50 mb-4 shadow-sm">
-                    <span className="block text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 mb-1 drop-shadow-sm">€{totalStockValue.toFixed(2)}</span>
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-blue-800/80 dark:text-blue-200/80">Totale Voorraadwaarde</span>
+                <div className="bg-gradient-to-br from-teal-50 to-indigo-50 dark:from-teal-900/20 dark:to-indigo-900/20 p-4 rounded-xl text-center border border-teal-100/50 dark:border-teal-800/50 mb-4 shadow-sm">
+                    <span className="block text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-600 dark:from-teal-400 dark:to-indigo-400 mb-1 drop-shadow-sm">€{totalStockValue.toFixed(2)}</span>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-teal-800/80 dark:text-teal-200/80">Totale Voorraadwaarde</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-5">
@@ -4036,7 +4036,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 {stats.consumed + stats.wasted > 0 ? (
                     <div className="relative pt-1">
                         <div className="flex mb-2 items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wide text-gray-600 dark:text-gray-400">Verspillingspercentage</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-stone-600 dark:text-stone-400">Verspillingspercentage</span>
                             <span className="text-xs font-bold text-red-500">
                                 {Math.round((stats.wasted / (stats.consumed + stats.wasted)) * 100)}%
                             </span>
@@ -4044,14 +4044,14 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         <div className="overflow-hidden h-2.5 mb-3 text-xs flex rounded-full bg-green-200 dark:bg-green-900 shadow-inner">
                             <div style={{ width: `${Math.round((stats.wasted / (stats.consumed + stats.wasted)) * 100)}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-red-500 to-rose-500"></div>
                         </div>
-                        <p className="text-[10px] text-center text-gray-400 dark:text-gray-500 font-medium italic mt-1">Gebaseerd op handmatige invoer bij verwijderen.</p>
+                        <p className="text-[10px] text-center text-stone-400 dark:text-stone-500 font-medium italic mt-1">Gebaseerd op handmatige invoer bij verwijderen.</p>
                     </div>
-                ) : <p className="text-center text-gray-400 font-medium text-xs">Nog geen verbruiksdata beschikbaar.</p>}
+                ) : <p className="text-center text-stone-400 font-medium text-xs">Nog geen verbruiksdata beschikbaar.</p>}
             </Modal>
 
             <Modal isOpen={showLogModal} onClose={() => setShowLogModal(false)} title="Logboek." color="teal">
                 {logs.length === 0 ? (
-                    <p className="text-gray-400 dark:text-gray-500 font-medium text-center py-8 text-sm">Nog geen activiteiten opgeslagen.</p>
+                    <p className="text-stone-400 dark:text-stone-500 font-medium text-center py-8 text-sm">Nog geen activiteiten opgeslagen.</p>
                 ) : (
                     <ul className="space-y-2.5">
                         {logs.map(log => {
@@ -4060,20 +4060,20 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             const isDeleted = log.action === 'Verwijderd';
                             
                             return (
-                                <li key={log.id} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-2.5 border border-gray-200/60 dark:border-gray-700/60 shadow-sm transition-all hover:shadow-md flex flex-col gap-1">
+                                <li key={log.id} className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm rounded-lg p-2.5 border border-stone-200/60 dark:border-stone-700/60 shadow-sm transition-all hover:shadow-md flex flex-col gap-1">
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-2">
-                                            <span className={`flex items-center justify-center w-6 h-6 rounded-md shadow-sm ${isAdded ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : isDeleted ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                                            <span className={`flex items-center justify-center w-6 h-6 rounded-md shadow-sm ${isAdded ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : isDeleted ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' : 'bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400'}`}>
                                                 <Icon path={isAdded ? Icons.Plus : isDeleted ? Icons.Trash2 : Icons.Edit2} size={12}/>
                                             </span>
-                                            <span className="font-bold text-gray-800 dark:text-gray-100 text-xs tracking-tight">{log.item}</span>
+                                            <span className="font-bold text-stone-800 dark:text-stone-100 text-xs tracking-tight">{log.item}</span>
                                         </div>
-                                        <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500">{formatDateTime(log.timestamp)}</span>
+                                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500">{formatDateTime(log.timestamp)}</span>
                                     </div>
                                     <div className="flex justify-between items-end mt-0.5">
                                         <div className="flex flex-col gap-1">
                                             <div className="flex gap-1.5">
-                                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest ${isAdded ? 'bg-green-50 text-green-600 border border-green-200 dark:bg-green-900/20 dark:border-green-800/50' : isDeleted ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/20 dark:border-red-800/50' : 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800/50'}`}>
+                                                <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest ${isAdded ? 'bg-green-50 text-green-600 border border-green-200 dark:bg-green-900/20 dark:border-green-800/50' : isDeleted ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/20 dark:border-red-800/50' : 'bg-teal-50 text-teal-600 border border-teal-200 dark:bg-teal-900/20 dark:border-teal-800/50'}`}>
                                                     {log.action}
                                                 </span>
                                                 {isAdmin && (
@@ -4082,9 +4082,9 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                     </span>
                                                 )}
                                             </div>
-                                            {log.details && <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400 leading-snug">{log.details}</p>}
+                                            {log.details && <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 leading-snug">{log.details}</p>}
                                         </div>
-                                        <div className="text-[8px] font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1 uppercase tracking-widest">
+                                        <div className="text-[8px] font-bold text-stone-400 dark:text-stone-500 flex items-center gap-1 uppercase tracking-widest">
                                             <Icon path={Icons.User} size={10}/> {log.actorName}
                                         </div>
                                     </div>
@@ -4096,18 +4096,18 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             </Modal>
 
             <Modal isOpen={showBeheerModal} onClose={() => setShowBeheerModal(false)} title="Instellingen." color="purple">
-                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg mb-5 border border-gray-200 dark:border-gray-700">
-                    <button onClick={() => setBeheerTab('locaties')} className={`flex-1 py-1.5 font-bold text-xs rounded-md transition-all ${beheerTab==='locaties'?'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Locaties.</button>
-                    <button onClick={() => setBeheerTab('categorieen')} className={`flex-1 py-1.5 font-bold text-xs rounded-md transition-all ${beheerTab==='categorieen'?'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Categorieën.</button>
-                    <button onClick={() => setBeheerTab('eenheden')} className={`flex-1 py-1.5 font-bold text-xs rounded-md transition-all ${beheerTab==='eenheden'?'bg-white dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Eenheden.</button>
+                <div className="flex bg-stone-100 dark:bg-stone-800 p-1 rounded-lg mb-5 border border-stone-200 dark:border-stone-700">
+                    <button onClick={() => setBeheerTab('locaties')} className={`flex-1 py-1.5 font-bold text-xs rounded-md transition-all ${beheerTab==='locaties'?'bg-white dark:bg-stone-700 text-teal-600 dark:text-teal-400 shadow-sm':'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>Locaties.</button>
+                    <button onClick={() => setBeheerTab('categorieen')} className={`flex-1 py-1.5 font-bold text-xs rounded-md transition-all ${beheerTab==='categorieen'?'bg-white dark:bg-stone-700 text-purple-600 dark:text-purple-400 shadow-sm':'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>Categorieën.</button>
+                    <button onClick={() => setBeheerTab('eenheden')} className={`flex-1 py-1.5 font-bold text-xs rounded-md transition-all ${beheerTab==='eenheden'?'bg-white dark:bg-stone-700 text-orange-600 dark:text-orange-400 shadow-sm':'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>Eenheden.</button>
                 </div>
 
                 {beheerTab === 'locaties' && (
                     <div className="space-y-5">
                         <div>
                             <div className="flex justify-between items-center mb-2">
-                                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Locaties</h4>
-                                <span className="text-[9px] uppercase text-gray-400 font-bold tracking-widest bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
+                                <h4 className="font-bold text-stone-800 dark:text-stone-200 text-sm">Locaties</h4>
+                                <span className="text-[9px] uppercase text-stone-400 font-bold tracking-widest bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
                             </div>
                             <ul className="space-y-2 mb-4 relative">
                                 {filteredLocaties.map(l => (
@@ -4118,18 +4118,18 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                         onDragOver={handleDragOver}
                                         onDrop={(e) => handleDrop(e, l.id)}
                                         onDragEnd={handleDragEnd}
-                                        className={`flex justify-between p-2.5 bg-white dark:bg-gray-800 rounded-lg items-center border shadow-sm transition-all ${draggedLocId === l.id ? 'opacity-40 border-blue-400 border-dashed' : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600'}`}
+                                        className={`flex justify-between p-2.5 bg-white dark:bg-stone-800 rounded-lg items-center border shadow-sm transition-all ${draggedLocId === l.id ? 'opacity-40 border-teal-400 border-dashed' : 'border-stone-200 dark:border-stone-700 hover:border-teal-300 dark:hover:border-teal-600'}`}
                                     >
                                         <div className="flex items-center gap-2.5 w-full">
-                                            <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" title="Sleep om volgorde aan te passen">
+                                            <div className="cursor-grab active:cursor-grabbing p-1 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300" title="Sleep om volgorde aan te passen">
                                                 <Icon path={Icons.GripVertical} size={16}/>
                                             </div>
                                             <button 
                                                 onClick={() => cycleLocatieColor(l)}
-                                                className={`w-6 h-6 flex-shrink-0 rounded-full bg-gradient-to-br ${GRADIENTS[l.color || 'blue']} border border-white dark:border-gray-800 shadow-sm transition-transform hover:scale-110 active:scale-95`}
+                                                className={`w-6 h-6 flex-shrink-0 rounded-full bg-gradient-to-br ${GRADIENTS[l.color || 'blue']} border border-white dark:border-stone-800 shadow-sm transition-transform hover:scale-110 active:scale-95`}
                                                 title="Klik om kleur te wijzigen"
                                             ></button>
-                                            <span onClick={() => setSelectedLocatieForBeheer(l.id)} className={`cursor-pointer flex-grow text-sm font-medium ${selectedLocatieForBeheer===l.id?'text-blue-600 dark:text-blue-400 font-bold':''}`}>{l.naam}</span>
+                                            <span onClick={() => setSelectedLocatieForBeheer(l.id)} className={`cursor-pointer flex-grow text-sm font-medium ${selectedLocatieForBeheer===l.id?'text-teal-600 dark:text-teal-400 font-bold':''}`}>{l.naam}</span>
                                         </div>
                                         <button onClick={() => handleDeleteLocatie(l.id)} className="text-red-500 p-1.5 ml-2 flex-shrink-0 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-md transition-colors active:scale-95"><Icon path={Icons.Trash2} size={14}/></button>
                                     </li>
@@ -4139,29 +4139,29 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 <select 
                                     value={newLocatieColor} 
                                     onChange={e => setNewLocatieColor(e.target.value)}
-                                    className="border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white w-24 text-xs font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm"
+                                    className="border border-stone-200 dark:border-stone-700 p-2 rounded-lg bg-white dark:bg-stone-800 dark:text-white w-24 text-xs font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm"
                                 >
                                     {Object.keys(GRADIENTS).map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
-                                <input className="flex-grow border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white text-xs font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe locatie" value={newLocatieNaam} onChange={e=>setNewLocatieNaam(e.target.value)} required />
-                                <button className="bg-blue-600 text-white px-4 rounded-lg font-bold shadow-sm hover:bg-blue-700 active:scale-95 transition-all">+</button>
+                                <input className="flex-grow border border-stone-200 dark:border-stone-700 p-2 rounded-lg bg-white dark:bg-stone-800 dark:text-white text-xs font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe locatie" value={newLocatieNaam} onChange={e=>setNewLocatieNaam(e.target.value)} required />
+                                <button className="bg-teal-600 text-white px-4 rounded-lg font-bold shadow-sm hover:bg-teal-700 active:scale-95 transition-all">+</button>
                             </form>
                         </div>
                         {selectedLocatieForBeheer && (
-                            <div className="pt-4 border-t border-gray-100 dark:border-gray-700 animate-in fade-in slide-in-from-top-2">
-                                <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2 text-sm">Lades <span className="text-blue-500 font-medium text-xs ml-1">in {filteredLocaties.find(l => l.id === selectedLocatieForBeheer)?.naam}</span></h4>
+                            <div className="pt-4 border-t border-stone-100 dark:border-stone-700 animate-in fade-in slide-in-from-top-2">
+                                <h4 className="font-bold text-stone-800 dark:text-stone-200 mb-2 text-sm">Lades <span className="text-teal-500 font-medium text-xs ml-1">in {filteredLocaties.find(l => l.id === selectedLocatieForBeheer)?.naam}</span></h4>
                                 <ul className="space-y-2 mb-3">
                                     {lades.filter(l => l.vriezerId === selectedLocatieForBeheer).sort((a,b)=>a.naam.localeCompare(b.naam)).map(l => (
-                                        <li key={l.id} className="flex justify-between p-2 bg-white dark:bg-gray-800 rounded-lg items-center border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:border-blue-200">
+                                        <li key={l.id} className="flex justify-between p-2 bg-white dark:bg-stone-800 rounded-lg items-center border border-stone-200 dark:border-stone-700 shadow-sm transition-all hover:border-teal-200">
                                             {editingLadeId === l.id ? 
-                                                <div className="flex gap-2 w-full"><input className="flex-grow border border-blue-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editingLadeName} onChange={e=>setEditingLadeName(e.target.value)} /><button onClick={()=>saveLadeName(l.id)} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button></div> 
+                                                <div className="flex gap-2 w-full"><input className="flex-grow border border-teal-400 p-1.5 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium focus:outline-none" value={editingLadeName} onChange={e=>setEditingLadeName(e.target.value)} /><button onClick={()=>saveLadeName(l.id)} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button></div> 
                                                 : 
-                                                <><span className="font-medium text-sm text-gray-700 dark:text-gray-200">{l.naam}</span><div className="flex gap-1.5"><button onClick={()=>startEditLade(l)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button><button onClick={() => handleDeleteLade(l.id)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button></div></>
+                                                <><span className="font-medium text-sm text-stone-700 dark:text-stone-200">{l.naam}</span><div className="flex gap-1.5"><button onClick={()=>startEditLade(l)} className="text-teal-600 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button><button onClick={() => handleDeleteLade(l.id)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button></div></>
                                             }
                                         </li>
                                     ))}
                                 </ul>
-                                <form onSubmit={handleAddLade} className="flex gap-2"><input className="flex-grow border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white text-xs font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe lade" value={newLadeNaam} onChange={e=>setNewLadeNaam(e.target.value)} required /><button className="bg-blue-600 text-white px-4 rounded-lg font-bold shadow-sm hover:bg-blue-700 active:scale-95 transition-all">+</button></form>
+                                <form onSubmit={handleAddLade} className="flex gap-2"><input className="flex-grow border border-stone-200 dark:border-stone-700 p-2 rounded-lg bg-white dark:bg-stone-800 dark:text-white text-xs font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe lade" value={newLadeNaam} onChange={e=>setNewLadeNaam(e.target.value)} required /><button className="bg-teal-600 text-white px-4 rounded-lg font-bold shadow-sm hover:bg-teal-700 active:scale-95 transition-all">+</button></form>
                             </div>
                         )}
                     </div>
@@ -4169,8 +4169,8 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 {beheerTab === 'categorieen' && (
                     <div className="animate-in fade-in slide-in-from-left-2">
                         <div className="flex justify-between items-center mb-3">
-                            <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">Categorieën</h4>
-                            <span className="text-[9px] uppercase text-gray-400 font-bold tracking-widest bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
+                            <h4 className="font-bold text-sm text-stone-800 dark:text-stone-200">Categorieën</h4>
+                            <span className="text-[9px] uppercase text-stone-400 font-bold tracking-widest bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
                         </div>
                         <ul className="space-y-2 mb-4 relative">
                             {actieveCategorieen.map(cat => (
@@ -4181,25 +4181,25 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
                                     onDrop={(e) => handleDropCat(e, cat.name)}
                                     onDragEnd={() => setDraggedCatName(null)}
-                                    className={`flex justify-between p-2.5 bg-white dark:bg-gray-800 rounded-lg items-center border shadow-sm transition-all ${draggedCatName === cat.name ? 'opacity-40 border-purple-400 border-dashed' : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'}`}
+                                    className={`flex justify-between p-2.5 bg-white dark:bg-stone-800 rounded-lg items-center border shadow-sm transition-all ${draggedCatName === cat.name ? 'opacity-40 border-purple-400 border-dashed' : 'border-stone-200 dark:border-stone-700 hover:border-purple-300'}`}
                                 >
                                     <div className="flex items-center gap-2.5 w-full">
-                                        <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500" title="Sleep om volgorde aan te passen">
+                                        <div className="cursor-grab active:cursor-grabbing p-1 text-stone-400 hover:text-stone-600 dark:text-stone-500" title="Sleep om volgorde aan te passen">
                                             <Icon path={Icons.GripVertical} size={16}/>
                                         </div>
                                         {editingCatName === cat.name ?
                                             <div className="flex gap-2 w-full items-center">
-                                                <input className="flex-grow border border-purple-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputName} onChange={e=>setEditCatInputName(e.target.value)} />
-                                                <select className="border border-purple-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputColor} onChange={e=>setEditCatInputColor(e.target.value)}>
+                                                <input className="flex-grow border border-purple-400 p-1.5 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputName} onChange={e=>setEditCatInputName(e.target.value)} />
+                                                <select className="border border-purple-400 p-1.5 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium focus:outline-none" value={editCatInputColor} onChange={e=>setEditCatInputColor(e.target.value)}>
                                                     {Object.keys(BADGE_COLORS).map(c => <option key={c} value={c}>{c}</option>)}
                                                 </select>
                                                 <button onClick={saveCat} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button>
                                             </div>
                                             :
                                             <>
-                                                <div className="flex items-center gap-2.5 flex-grow"><div className={`w-3 h-3 rounded-full bg-${cat.color}-500 shadow-sm border border-white dark:border-gray-800`}></div><span className="font-medium text-sm text-gray-700 dark:text-gray-200">{cat.name}</span></div>
+                                                <div className="flex items-center gap-2.5 flex-grow"><div className={`w-3 h-3 rounded-full bg-${cat.color}-500 shadow-sm border border-white dark:border-stone-800`}></div><span className="font-medium text-sm text-stone-700 dark:text-stone-200">{cat.name}</span></div>
                                                 <div className="flex gap-1.5">
-                                                    <button onClick={()=>startEditCat(cat)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button>
+                                                    <button onClick={()=>startEditCat(cat)} className="text-teal-600 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button>
                                                     <button onClick={() => handleDeleteCat(cat.name)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button>
                                                 </div>
                                             </>
@@ -4209,8 +4209,8 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             ))}
                         </ul>
                         <form onSubmit={handleAddCat} className="flex gap-2 items-center">
-                            <input className="flex-grow border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white text-xs font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" placeholder="Naam" value={newCatName} onChange={e=>setNewCatName(e.target.value)} required />
-                            <select className="border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white text-xs font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={newCatColor} onChange={e=>setNewCatColor(e.target.value)}>
+                            <input className="flex-grow border border-stone-200 dark:border-stone-700 p-2 rounded-lg bg-white dark:bg-stone-800 dark:text-white text-xs font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" placeholder="Naam" value={newCatName} onChange={e=>setNewCatName(e.target.value)} required />
+                            <select className="border border-stone-200 dark:border-stone-700 p-2 rounded-lg bg-white dark:bg-stone-800 dark:text-white text-xs font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={newCatColor} onChange={e=>setNewCatColor(e.target.value)}>
                                 {Object.keys(BADGE_COLORS).map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                             <button className="bg-purple-600 text-white px-4 rounded-lg font-bold shadow-sm hover:bg-purple-700 active:scale-95 transition-all">+</button>
@@ -4221,17 +4221,17 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 {beheerTab === 'eenheden' && (
                     <div className="animate-in fade-in slide-in-from-right-2">
                         <div className="flex justify-between items-center mb-3">
-                            <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">Mijn eenheden</h4>
-                            <span className="text-[9px] uppercase text-gray-400 font-bold tracking-widest bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
+                            <h4 className="font-bold text-sm text-stone-800 dark:text-stone-200">Mijn eenheden</h4>
+                            <span className="text-[9px] uppercase text-stone-400 font-bold tracking-widest bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2 py-0.5 rounded shadow-sm">Sleep om te sorteren</span>
                         </div>
                         
-                        <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-lg mb-4 border border-gray-200/50 dark:border-gray-700/50">
-                            <button onClick={() => setEenheidFilter('vries')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'vries' ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Vriezer.</button>
+                        <div className="flex bg-stone-100/80 dark:bg-stone-800/80 p-1 rounded-lg mb-4 border border-stone-200/50 dark:border-stone-700/50">
+                            <button onClick={() => setEenheidFilter('vries')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'vries' ? 'bg-white dark:bg-stone-700 shadow-sm text-teal-600 dark:text-teal-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>Vriezer.</button>
                             {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                                <button onClick={() => setEenheidFilter('frig')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'frig' ? 'bg-white dark:bg-gray-700 shadow-sm text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Frig.</button>
+                                <button onClick={() => setEenheidFilter('frig')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'frig' ? 'bg-white dark:bg-stone-700 shadow-sm text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>Frig.</button>
                             )}
                             {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                                <button onClick={() => setEenheidFilter('voorraad')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'voorraad' ? 'bg-white dark:bg-gray-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>Stock.</button>
+                                <button onClick={() => setEenheidFilter('voorraad')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all active:scale-95 ${eenheidFilter === 'voorraad' ? 'bg-white dark:bg-stone-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'}`}>Stock.</button>
                             )}
                         </div>
 
@@ -4244,7 +4244,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
                             return (
                                 <ul className="space-y-2 mb-4 relative">
-                                    {actieveEenhedenLijst.length === 0 ? <li className="text-gray-400 font-medium italic text-center py-4 text-xs bg-gray-50 dark:bg-gray-800/50 rounded-lg">Geen eigen eenheden voor {eenheidFilter}.</li> : 
+                                    {actieveEenhedenLijst.length === 0 ? <li className="text-stone-400 font-medium italic text-center py-4 text-xs bg-stone-50 dark:bg-stone-800/50 rounded-lg">Geen eigen eenheden voor {eenheidFilter}.</li> : 
                                     actieveEenhedenLijst.map(u => (
                                         <li 
                                             key={u} 
@@ -4253,19 +4253,19 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                             onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
                                             onDrop={(e) => handleDropUnit(e, u)}
                                             onDragEnd={() => setDraggedUnitName(null)}
-                                            className={`flex justify-between p-2.5 bg-white dark:bg-gray-800 rounded-lg items-center border shadow-sm transition-all hover:border-gray-300 ${draggedUnitName === u ? 'opacity-40 border-orange-400 border-dashed' : 'border-gray-200 dark:border-gray-700'}`}
+                                            className={`flex justify-between p-2.5 bg-white dark:bg-stone-800 rounded-lg items-center border shadow-sm transition-all hover:border-stone-300 ${draggedUnitName === u ? 'opacity-40 border-orange-400 border-dashed' : 'border-stone-200 dark:border-stone-700'}`}
                                         >
                                             <div className="flex items-center gap-2.5 w-full">
-                                                <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500" title="Sleep om volgorde aan te passen">
+                                                <div className="cursor-grab active:cursor-grabbing p-1 text-stone-400 hover:text-stone-600 dark:text-stone-500" title="Sleep om volgorde aan te passen">
                                                     <Icon path={Icons.GripVertical} size={16}/>
                                                 </div>
                                                 {editingUnitName === u ? 
-                                                    <div className="flex gap-2 w-full"><input className="flex-grow border border-blue-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editUnitInput} onChange={e=>setEditUnitInput(e.target.value)} /><button onClick={saveUnitName} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button></div>
+                                                    <div className="flex gap-2 w-full"><input className="flex-grow border border-teal-400 p-1.5 rounded-md bg-white dark:bg-stone-700 dark:text-white text-xs font-medium focus:outline-none" value={editUnitInput} onChange={e=>setEditUnitInput(e.target.value)} /><button onClick={saveUnitName} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button></div>
                                                     :
                                                     <>
-                                                        <span className="flex-grow font-medium text-sm text-gray-700 dark:text-gray-200">{u}</span>
+                                                        <span className="flex-grow font-medium text-sm text-stone-700 dark:text-stone-200">{u}</span>
                                                         <div className="flex gap-1.5 flex-shrink-0">
-                                                            <button onClick={()=>startEditUnit(u)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button>
+                                                            <button onClick={()=>startEditUnit(u)} className="text-teal-600 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button>
                                                             <button onClick={() => handleDeleteUnit(u)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button>
                                                         </div>
                                                     </>
@@ -4276,7 +4276,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 </ul>
                             );
                         })()}
-                        <form onSubmit={handleAddUnit} className="flex gap-2"><input className="flex-grow border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white text-xs font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe eenheid" value={newUnitNaam} onChange={e=>setNewUnitNaam(e.target.value)} required /><button className={`text-white font-bold px-4 rounded-lg shadow-sm active:scale-95 transition-all ${eenheidFilter === 'voorraad' ? 'bg-orange-500 hover:bg-orange-600' : eenheidFilter === 'frig' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}>+</button></form>
+                        <form onSubmit={handleAddUnit} className="flex gap-2"><input className="flex-grow border border-stone-200 dark:border-stone-700 p-2 rounded-lg bg-white dark:bg-stone-800 dark:text-white text-xs font-medium focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe eenheid" value={newUnitNaam} onChange={e=>setNewUnitNaam(e.target.value)} required /><button className={`text-white font-bold px-4 rounded-lg shadow-sm active:scale-95 transition-all ${eenheidFilter === 'voorraad' ? 'bg-orange-500 hover:bg-orange-600' : eenheidFilter === 'frig' ? 'bg-green-600 hover:bg-green-700' : 'bg-teal-600 hover:bg-teal-700'}`}>+</button></form>
                     </div>
                 )}
             </Modal>
@@ -4298,13 +4298,13 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     </button>
                 </div>
 
-                <div className="bg-gray-50/80 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200/60 dark:border-gray-700/50 mb-5 shadow-sm">
-                    <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 mb-1.5 flex items-center gap-1.5">
+                <div className="bg-stone-50/80 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-200/60 dark:border-stone-700/50 mb-5 shadow-sm">
+                    <h4 className="font-bold text-sm text-stone-800 dark:text-stone-200 mb-1.5 flex items-center gap-1.5">
                         <Icon path={Icons.BookOpen} size={16} /> Algemene Rondleiding (Tour)
                     </h4>
-                    <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-3">Stel in of nieuwe gebruikers standaard de tour te zien krijgen.</p>
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 mb-3">Stel in of nieuwe gebruikers standaard de tour te zien krijgen.</p>
                     <div className="flex flex-col sm:flex-row gap-2">
-                        <button onClick={toggleGlobalOnboardingStatus} className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex justify-center items-center gap-1.5 transition-all active:scale-95 shadow-sm ${globalOnboardingActive ? 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800/50' : 'bg-gray-200 text-gray-600 border border-gray-300 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'}`}>
+                        <button onClick={toggleGlobalOnboardingStatus} className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex justify-center items-center gap-1.5 transition-all active:scale-95 shadow-sm ${globalOnboardingActive ? 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800/50' : 'bg-stone-200 text-stone-600 border border-stone-300 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-300 dark:border-stone-600'}`}>
                             <Icon path={globalOnboardingActive ? Icons.Check : Icons.X} size={14} /> 
                             {globalOnboardingActive ? 'Tour staat AAN' : 'Tour is UIT'}
                         </button>
@@ -4314,23 +4314,23 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     </div>
                 </div>
 
-                <ul className="divide-y divide-gray-100 dark:divide-gray-700/50 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                <ul className="divide-y divide-stone-100 dark:divide-stone-700/50 bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 shadow-sm overflow-hidden">
                     {usersList.map(u => (
-                        <li key={u.id} className="p-3.5 flex flex-col gap-2.5 hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                        <li key={u.id} className="p-3.5 flex flex-col gap-2.5 hover:bg-stone-50/50 dark:hover:bg-stone-700/30 transition-colors">
                             <div className="flex flex-col sm:flex-row justify-between sm:items-center items-start">
                                 <div>
-                                    <p className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                                    <p className="font-bold text-stone-900 dark:text-white text-sm flex items-center gap-2">
                                         {u.email || u.displayName}
-                                        {u.id === beheerdeUserId && <span className="text-[9px] bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 px-1.5 py-0.5 rounded uppercase tracking-widest border border-blue-200 dark:border-blue-800/50">Huidig</span>}
+                                        {u.id === beheerdeUserId && <span className="text-[9px] bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300 px-1.5 py-0.5 rounded uppercase tracking-widest border border-teal-200 dark:border-teal-800/50">Huidig</span>}
                                     </p>
-                                    <p className="text-[10px] font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-900 inline-block px-1.5 py-0.5 rounded mt-1 border border-gray-200 dark:border-gray-800">{u.id}</p>
+                                    <p className="text-[10px] font-mono text-stone-400 dark:text-stone-500 bg-stone-100 dark:bg-stone-900 inline-block px-1.5 py-0.5 rounded mt-1 border border-stone-200 dark:border-stone-800">{u.id}</p>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0 justify-end">
                                     <button onClick={() => { setDashboardUser(u.id); setShowUserAdminModal(false); setShowDashboardModal(true); }} className="px-2.5 py-1.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50 transition-all shadow-sm flex items-center gap-1 active:scale-95">
                                         <Icon path={Icons.LayoutDashboard} size={12}/> Dashboard
                                     </button>
                                     {u.id !== beheerdeUserId && (
-                                        <button onClick={() => { setBeheerdeUserId(u.id); setShowUserAdminModal(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className="px-2.5 py-1.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-all shadow-sm active:scale-95">
+                                        <button onClick={() => { setBeheerdeUserId(u.id); setShowUserAdminModal(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className="px-2.5 py-1.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-600 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-all shadow-sm active:scale-95">
                                             Wissel
                                         </button>
                                     )}
@@ -4339,45 +4339,45 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-1.5 mt-1 bg-gray-50/80 dark:bg-gray-900/50 p-2.5 rounded-lg border border-gray-200/60 dark:border-gray-700/50">
-                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+                            <div className="flex flex-col gap-1.5 mt-1 bg-stone-50/80 dark:bg-stone-900/50 p-2.5 rounded-lg border border-stone-200/60 dark:border-stone-700/50">
+                                <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('frig')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'frig')}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+                                        className="rounded border-stone-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
                                     />
                                     <span>Verberg 'Frig.' tabblad</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300">
+                                <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('voorraad')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'voorraad')}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+                                        className="rounded border-stone-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
                                     />
                                     <span>Verberg 'Stock.' tabblad</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-1 border-t border-gray-200/60 dark:border-gray-700/60 pt-1.5">
+                                <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 mt-1 border-t border-stone-200/60 dark:border-stone-700/60 pt-1.5">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('weekmenu')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'weekmenu')}
-                                        className="rounded border-gray-300 text-pink-600 focus:ring-pink-500 w-3.5 h-3.5"
+                                        className="rounded border-stone-300 text-pink-600 focus:ring-pink-500 w-3.5 h-3.5"
                                     />
                                     <span className="font-bold text-pink-700 dark:text-pink-400">Verberg 'Week.' tabblad</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">
+                                <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 mt-0.5">
                                     <input 
                                         type="checkbox" 
                                         checked={(u.hiddenTabs || []).includes('recepten')} 
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'recepten')}
-                                        className="rounded border-gray-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
+                                        className="rounded border-stone-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
                                     />
                                     <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Recepten.' tabblad</span>
                                 </div>                                    
 {/* Gecombineerde rij voor Controle Knop instellingen */}
-<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-medium text-gray-700 dark:text-gray-300 mt-1 border-t border-gray-200/60 dark:border-gray-700/60 pt-2 pb-1">
+<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-medium text-stone-700 dark:text-stone-300 mt-1 border-t border-stone-200/60 dark:border-stone-700/60 pt-2 pb-1">
     
     {/* Optie 1: Verberg de knop (Bestaande checkbox) */}
     <div className="flex items-center gap-2">
@@ -4385,54 +4385,54 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             type="checkbox" 
             checked={(u.hiddenTabs || []).includes('balans')} 
             onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+            className="rounded border-stone-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
         />
-        <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Controle' knop</span>
+        <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Controle' knop</span>
     </div>
 
     {/* Optie 2: Mooie Tailwind schakelaar voor Actief AAN/UIT */}
     <div className="flex items-center gap-2">
-        <span className="font-bold text-gray-500 dark:text-gray-400">Status:</span>
+        <span className="font-bold text-stone-500 dark:text-stone-400">Status:</span>
         <button
             type="button"
             onClick={() => toggleUserBalansMode(u.id, u.showBalans)}
-            className={`w-10 h-6 rounded-full p-1 transition-colors border shadow-inner flex items-center focus:outline-none ${u.showBalans ? 'bg-green-500 border-green-600' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-700'}`}
+            className={`w-10 h-6 rounded-full p-1 transition-colors border shadow-inner flex items-center focus:outline-none ${u.showBalans ? 'bg-green-500 border-green-600' : 'bg-stone-300 border-stone-400 dark:bg-stone-600 dark:border-stone-700'}`}
             title={u.showBalans ? "Controle staat AAN" : "Controle staat UIT"}
         >
             <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${u.showBalans ? 'translate-x-4' : 'translate-x-0'}`}></div>
         </button>
-        <span className={`font-bold w-6 ${u.showBalans ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+        <span className={`font-bold w-6 ${u.showBalans ? 'text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400'}`}>
             {u.showBalans ? 'AAN' : 'UIT'}
         </span>
     </div>
 </div>
 
 {/* NIEUW: Code voor het aanzetten van de controle modus */}
-<div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">
+<div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 mt-0.5">
     <input 
         type="checkbox" 
         checked={u.showBalans || false} 
         onChange={() => toggleUserBalansMode(u.id, u.showBalans)}
-        className="rounded border-gray-300 text-green-600 focus:ring-green-500 w-3.5 h-3.5"
+        className="rounded border-stone-300 text-green-600 focus:ring-green-500 w-3.5 h-3.5"
     />
     <span className="font-bold text-green-700 dark:text-green-400">Zet 'Controle' modus actief AAN</span>
 </div>
 
-                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 border-t border-gray-200/60 dark:border-gray-700/60 pt-2 mt-1">
+                                <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 border-t border-stone-200/60 dark:border-stone-700/60 pt-2 mt-1">
                                     <input 
                                         type="checkbox" 
                                         checked={u.tourDisabled || false} 
                                         onChange={() => toggleUserTourDisabled(u.id, u.tourDisabled)}
-                                        className="rounded border-gray-300 text-orange-600 focus:ring-orange-500 w-3.5 h-3.5"
+                                        className="rounded border-stone-300 text-orange-600 focus:ring-orange-500 w-3.5 h-3.5"
                                     />
                                     <span className="font-bold text-orange-700 dark:text-orange-400">Rondleiding uitzetten voor deze gebruiker</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">
+                                <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 mt-0.5">
                                     <input 
                                         type="checkbox" 
                                         checked={u.showHelpButton || false} 
                                         onChange={() => toggleUserHelpButton(u.id, u.showHelpButton)}
-                                        className="rounded border-gray-300 text-red-600 focus:ring-red-500 w-3.5 h-3.5"
+                                        className="rounded border-stone-300 text-red-600 focus:ring-red-500 w-3.5 h-3.5"
                                     />
                                     <span className="font-bold text-red-700 dark:text-red-400">Toon lichtrode 'Hulp' knop in hoofdmenu</span>
                                 </div>
@@ -4443,7 +4443,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     </button>
                                 </div>
                             </div>
-                            <p className="text-[9px] uppercase font-bold tracking-widest text-gray-400 dark:text-gray-500 mt-0.5">
+                            <p className="text-[9px] uppercase font-bold tracking-widest text-stone-400 dark:text-stone-500 mt-0.5">
                                 Laatst gezien: {u.laatstGezien ? formatDateTime(u.laatstGezien) : 'Nooit'}
                             </p>
                         </li>
@@ -4452,34 +4452,34 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             </Modal>
 
             <Modal isOpen={showTourAdminModal} onClose={() => setShowTourAdminModal(false)} title="Tour Aanpassen." color="purple" size="lg">
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-5 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">Hier kun je de inhoud van de rondleiding stap-voor-stap aanpassen. Gebruik de pijltjes om de volgorde te veranderen.</p>
+                <p className="text-xs font-medium text-stone-600 dark:text-stone-300 mb-5 bg-stone-50 dark:bg-stone-800/50 p-3 rounded-lg border border-stone-200 dark:border-stone-700">Hier kun je de inhoud van de rondleiding stap-voor-stap aanpassen. Gebruik de pijltjes om de volgorde te veranderen.</p>
                 <div className="space-y-4">
                     {editingTourSteps.map((step, index) => (
-                        <div key={index} className="bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200/60 dark:border-gray-700/60 relative shadow-sm hover:shadow-md transition-shadow">
-                            <div className="absolute top-3 right-3 flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-md p-1">
-                                <button onClick={() => moveEditStep(index, 'up')} disabled={index === 0} className={`p-1 rounded transition-colors ${index === 0 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 hover:bg-white hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-600'}`}>
+                        <div key={index} className="bg-white/50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-200/60 dark:border-stone-700/60 relative shadow-sm hover:shadow-md transition-shadow">
+                            <div className="absolute top-3 right-3 flex gap-1 bg-stone-100 dark:bg-stone-700 rounded-md p-1">
+                                <button onClick={() => moveEditStep(index, 'up')} disabled={index === 0} className={`p-1 rounded transition-colors ${index === 0 ? 'text-stone-300 dark:text-stone-600' : 'text-stone-600 hover:bg-white hover:shadow-sm dark:text-stone-300 dark:hover:bg-stone-600'}`}>
                                     <Icon path={Icons.ChevronDown} className="rotate-180" size={14}/>
                                 </button>
-                                <button onClick={() => moveEditStep(index, 'down')} disabled={index === editingTourSteps.length - 1} className={`p-1 rounded transition-colors ${index === editingTourSteps.length - 1 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 hover:bg-white hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-600'}`}>
+                                <button onClick={() => moveEditStep(index, 'down')} disabled={index === editingTourSteps.length - 1} className={`p-1 rounded transition-colors ${index === editingTourSteps.length - 1 ? 'text-stone-300 dark:text-stone-600' : 'text-stone-600 hover:bg-white hover:shadow-sm dark:text-stone-300 dark:hover:bg-stone-600'}`}>
                                     <Icon path={Icons.ChevronDown} size={14}/>
                                 </button>
-                                <div className="w-px bg-gray-300 dark:bg-gray-600 mx-0.5"></div>
-                                <button onClick={() => handleDeleteEditStep(index)} className="p-1 rounded text-red-500 hover:bg-white hover:shadow-sm dark:hover:bg-gray-600 transition-colors">
+                                <div className="w-px bg-stone-300 dark:bg-stone-600 mx-0.5"></div>
+                                <button onClick={() => handleDeleteEditStep(index)} className="p-1 rounded text-red-500 hover:bg-white hover:shadow-sm dark:hover:bg-stone-600 transition-colors">
                                     <Icon path={Icons.Trash2} size={14}/>
                                 </button>
                             </div>
                             
-                            <h4 className="font-bold text-sm text-purple-600 dark:text-purple-400 mb-3 border-b border-gray-100 dark:border-gray-700/50 pb-1.5 inline-block">Stap {index + 1}</h4>
+                            <h4 className="font-bold text-sm text-purple-600 dark:text-purple-400 mb-3 border-b border-stone-100 dark:border-stone-700/50 pb-1.5 inline-block">Stap {index + 1}</h4>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Titel</label>
-                                    <input type="text" className="w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.title} onChange={e => handleUpdateEditStep(index, 'title', e.target.value)} />
+                                    <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest block">Titel</label>
+                                    <input type="text" className="w-full p-2.5 border border-stone-200 dark:border-stone-600 rounded-lg dark:bg-stone-700 dark:text-white text-sm font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.title} onChange={e => handleUpdateEditStep(index, 'title', e.target.value)} />
                                 </div>
                                 <div className="flex gap-2">
                                     <div className="flex-grow space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Icoon</label>
-                                        <select className="w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.icon} onChange={e => handleUpdateEditStep(index, 'icon', e.target.value)}>
+                                        <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest block">Icoon</label>
+                                        <select className="w-full p-2.5 border border-stone-200 dark:border-stone-600 rounded-lg dark:bg-stone-700 dark:text-white text-sm font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.icon} onChange={e => handleUpdateEditStep(index, 'icon', e.target.value)}>
                                             {Object.keys(Icons).map(iconName => <option key={iconName} value={iconName}>{iconName}</option>)}
                                         </select>
                                     </div>
@@ -4490,20 +4490,20 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             </div>
                             
                             <div className="mb-3 space-y-1">
-                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Tekst (Content)</label>
-                                <textarea className="w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium h-20 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm resize-none" value={step.content} onChange={e => handleUpdateEditStep(index, 'content', e.target.value)} />
+                                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest block">Tekst (Content)</label>
+                                <textarea className="w-full p-2.5 border border-stone-200 dark:border-stone-600 rounded-lg dark:bg-stone-700 dark:text-white text-sm font-medium h-20 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm resize-none" value={step.content} onChange={e => handleUpdateEditStep(index, 'content', e.target.value)} />
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Kleur (Thema)</label>
-                                <select className="w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.colorName} onChange={e => handleUpdateEditStep(index, 'colorName', e.target.value)}>
+                                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest block">Kleur (Thema)</label>
+                                <select className="w-full p-2.5 border border-stone-200 dark:border-stone-600 rounded-lg dark:bg-stone-700 dark:text-white text-sm font-medium focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all shadow-sm" value={step.colorName} onChange={e => handleUpdateEditStep(index, 'colorName', e.target.value)}>
                                     {TOUR_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                         </div>
                     ))}
                     
-                    <button onClick={handleAddEditStep} className="w-full py-3 bg-gray-50 text-gray-600 dark:bg-gray-800/50 dark:text-gray-300 rounded-xl font-bold border-2 border-dashed border-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:border-gray-400 dark:hover:bg-gray-700 dark:hover:border-gray-500 transition-all active:scale-95 flex justify-center items-center gap-2 text-sm">
+                    <button onClick={handleAddEditStep} className="w-full py-3 bg-stone-50 text-stone-600 dark:bg-stone-800/50 dark:text-stone-300 rounded-xl font-bold border-2 border-dashed border-stone-300 dark:border-stone-600 hover:bg-stone-100 hover:border-stone-400 dark:hover:bg-stone-700 dark:hover:border-stone-500 transition-all active:scale-95 flex justify-center items-center gap-2 text-sm">
                         <Icon path={Icons.Plus} size={16}/> Nieuwe Stap Toevoegen
                     </button>
                     
@@ -4554,10 +4554,10 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 )}
                 <div className="space-y-3">
                     {currentVersionData && (
-                        <div className="bg-gray-50/50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700/50">
+                        <div className="bg-stone-50/50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-100 dark:border-stone-700/50">
                             <div className="flex items-center gap-2.5 mb-4">
-                                <h4 className="font-bold text-blue-600 dark:text-blue-400 text-lg tracking-tight">Versie {APP_VERSION}</h4>
-                                <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800/50">Nieuw</span>
+                                <h4 className="font-bold text-teal-600 dark:text-teal-400 text-lg tracking-tight">Versie {APP_VERSION}</h4>
+                                <span className="bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border border-teal-200 dark:border-teal-800/50">Nieuw</span>
                             </div>
                             <ul className="space-y-3">
                                 {currentVersionData.changes.map((change, idx) => {
@@ -4566,7 +4566,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     const text = parts.slice(1).join(': ');
                                     
                                     let IconComp = Icons.Zap;
-                                    let iconColor = "text-blue-500 bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-300";
+                                    let iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
 
                                     if (type.includes('Feature') || type.includes('Nieuw') || type.includes('Mega')) {
                                         IconComp = Icons.Star;
@@ -4576,16 +4576,16 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                         iconColor = "text-green-600 bg-green-50 border-green-100 dark:bg-green-900/30 dark:border-green-800/50 dark:text-green-400";
                                     } else if (type.includes('Update') || type.includes('Compact') || type.includes('Mobiele') || type.includes('Lijstweergave') || type.includes('Logboek')) {
                                          IconComp = Icons.Zap;
-                                         iconColor = "text-blue-500 bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-300";
+                                         iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
                                     }
 
                                     return (
-                                        <li key={idx} className="flex gap-3 text-xs text-gray-600 dark:text-gray-300 items-start bg-white dark:bg-gray-800 p-2.5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                                        <li key={idx} className="flex gap-3 text-xs text-stone-600 dark:text-stone-300 items-start bg-white dark:bg-stone-800 p-2.5 rounded-lg shadow-sm border border-stone-100 dark:border-stone-700">
                                             <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${iconColor}`}>
                                                 <Icon path={IconComp} size={14} />
                                             </div>
                                              <div className="pt-0.5">
-                                                <span className="font-bold block text-gray-900 dark:text-gray-100 text-[10px] uppercase tracking-widest mb-1 opacity-90">{type}</span>
+                                                <span className="font-bold block text-stone-900 dark:text-stone-100 text-[10px] uppercase tracking-widest mb-1 opacity-90">{type}</span>
                                                 <span className="leading-relaxed font-medium">{text || change}</span>
                                             </div>
                                         </li>
@@ -4609,20 +4609,20 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         onMouseUp={handleSwipeEnd}
                         onMouseLeave={handleSwipeEnd}
                     >
-                        <div className={`w-20 h-20 flex items-center justify-center rounded-2xl bg-gradient-to-br from-${tourSteps[onboardingStep].colorName || 'blue'}-100 to-${tourSteps[onboardingStep].colorName || 'blue'}-50 dark:from-${tourSteps[onboardingStep].colorName || 'blue'}-900/40 dark:to-${tourSteps[onboardingStep].colorName || 'blue'}-900/20 text-${tourSteps[onboardingStep].colorName || 'blue'}-600 dark:text-${tourSteps[onboardingStep].colorName || 'blue'}-400 mb-1 pointer-events-none shadow-md border border-white/50 dark:border-gray-700/50 rotate-3 transform transition-transform`}>
+                        <div className={`w-20 h-20 flex items-center justify-center rounded-2xl bg-gradient-to-br from-${tourSteps[onboardingStep].colorName || 'blue'}-100 to-${tourSteps[onboardingStep].colorName || 'blue'}-50 dark:from-${tourSteps[onboardingStep].colorName || 'blue'}-900/40 dark:to-${tourSteps[onboardingStep].colorName || 'blue'}-900/20 text-${tourSteps[onboardingStep].colorName || 'blue'}-600 dark:text-${tourSteps[onboardingStep].colorName || 'blue'}-400 mb-1 pointer-events-none shadow-md border border-white/50 dark:border-stone-700/50 rotate-3 transform transition-transform`}>
                             <Icon path={Icons[tourSteps[onboardingStep].icon] || Icons.Box} size={40} className="-rotate-3 drop-shadow-sm"/>
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white pointer-events-none tracking-tight leading-tight">{tourSteps[onboardingStep].title}</h3>
-                        <p className="text-gray-500 dark:text-gray-300 leading-relaxed max-w-sm whitespace-pre-line pointer-events-none font-medium text-sm">{tourSteps[onboardingStep].content}</p>
+                        <h3 className="text-xl font-bold text-stone-900 dark:text-white pointer-events-none tracking-tight leading-tight">{tourSteps[onboardingStep].title}</h3>
+                        <p className="text-stone-500 dark:text-stone-300 leading-relaxed max-w-sm whitespace-pre-line pointer-events-none font-medium text-sm">{tourSteps[onboardingStep].content}</p>
 
                         <div className="flex gap-2 py-4 pointer-events-none">
                             {tourSteps.map((_, i) => (
-                                <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === onboardingStep ? `bg-${tourSteps[onboardingStep].colorName || 'blue'}-600 dark:bg-${tourSteps[onboardingStep].colorName || 'blue'}-500 w-5 shadow-sm` : 'bg-gray-200 dark:bg-gray-700'}`}></div>
+                                <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === onboardingStep ? `bg-${tourSteps[onboardingStep].colorName || 'blue'}-600 dark:bg-${tourSteps[onboardingStep].colorName || 'blue'}-500 w-5 shadow-sm` : 'bg-stone-200 dark:bg-stone-700'}`}></div>
                             ))}
                         </div>
 
-                        <div className="flex flex-col w-full items-center gap-2.5 pt-4 border-t border-gray-100 dark:border-gray-800">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 flex items-center gap-1.5 mb-2 animate-pulse bg-gray-50 dark:bg-gray-800 px-3 py-1 rounded-full">
+                        <div className="flex flex-col w-full items-center gap-2.5 pt-4 border-t border-stone-100 dark:border-stone-800">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500 flex items-center gap-1.5 mb-2 animate-pulse bg-stone-50 dark:bg-stone-800 px-3 py-1 rounded-full">
                                 <Icon path={Icons.ChevronRight} className="rotate-180" size={12} /> 
                                 Swipe 
                                 <Icon path={Icons.ChevronRight} size={12} />
@@ -4634,7 +4634,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 </button>
                             )}
 
-                            <button onClick={finishTutorial} className="mt-2 text-[10px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors opacity-50 hover:opacity-100 uppercase tracking-widest cursor-pointer bg-transparent border-none">
+                            <button onClick={finishTutorial} className="mt-2 text-[10px] font-bold text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors opacity-50 hover:opacity-100 uppercase tracking-widest cursor-pointer bg-transparent border-none">
                                 Overslaan
                             </button>
                         </div>
@@ -4644,24 +4644,24 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             <Modal isOpen={showVersionHistory} onClose={() => setShowVersionHistory(false)} title="Nieuws." color="blue">
                 <div className="mb-8 text-center px-4">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 tracking-tight leading-tight">
-                        Ontdek alle updates en verbeteringen aan <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 text-xl">Voorraad.</span>
+                    <h3 className="text-lg font-bold text-stone-900 dark:text-white mb-2 tracking-tight leading-tight">
+                        Ontdek alle updates en verbeteringen aan <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-500 text-xl">Voorraad.</span>
                     </h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-800/50 shadow-sm">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-700 dark:text-blue-300">Huidige versie {APP_VERSION}</span>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 rounded-full border border-teal-200 dark:border-teal-800/50 shadow-sm">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-teal-700 dark:text-teal-300">Huidige versie {APP_VERSION}</span>
                     </div>
                 </div>
 
                 <div className="space-y-8 relative pl-2">
-                    <div className="absolute left-[19px] top-2 bottom-5 w-0.5 bg-gradient-to-b from-blue-200 via-gray-200 to-transparent dark:from-blue-800/50 dark:via-gray-700/50"></div>
+                    <div className="absolute left-[19px] top-2 bottom-5 w-0.5 bg-gradient-to-b from-teal-200 via-stone-200 to-transparent dark:from-teal-800/50 dark:via-stone-700/50"></div>
 
                     {VERSION_HISTORY.map((v, i) => (
                         <div key={v.version} className="relative pl-10 group">
-                            <div className={`absolute left-[13px] top-1.5 w-3.5 h-3.5 rounded-full border-[2.5px] border-white dark:border-gray-800 z-10 transition-transform group-hover:scale-125 ${i === 0 ? 'bg-blue-500 shadow-sm shadow-blue-300/50 dark:shadow-blue-900/50' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+                            <div className={`absolute left-[13px] top-1.5 w-3.5 h-3.5 rounded-full border-[2.5px] border-white dark:border-stone-800 z-10 transition-transform group-hover:scale-125 ${i === 0 ? 'bg-teal-500 shadow-sm shadow-teal-300/50 dark:shadow-teal-900/50' : 'bg-stone-300 dark:bg-stone-600'}`}></div>
 
                             <div className="mb-3 flex items-center gap-2">
-                                <span className={`text-xl font-bold tracking-tight ${i === 0 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>v{v.version}</span>
-                                {i === 0 && <span className="bg-blue-600 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow-sm">Nieuw</span>}
+                                <span className={`text-xl font-bold tracking-tight ${i === 0 ? 'text-stone-900 dark:text-white' : 'text-stone-400 dark:text-stone-500'}`}>v{v.version}</span>
+                                {i === 0 && <span className="bg-teal-600 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow-sm">Nieuw</span>}
                             </div>
                             
                             <ul className="space-y-3">
@@ -4671,7 +4671,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     const text = parts.slice(1).join(': ');
                                     
                                     let IconComp = Icons.Zap;
-                                    let iconColor = "text-blue-500 bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-300";
+                                    let iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
 
                                     if (type.includes('Feature') || type.includes('Nieuw') || type.includes('Mega')) {
                                         IconComp = Icons.Star;
@@ -4681,16 +4681,16 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                         iconColor = "text-green-600 bg-green-50 border-green-100 dark:bg-green-900/30 dark:border-green-800/50 dark:text-green-400";
                                     } else if (type.includes('Update') || type.includes('Compact') || type.includes('Mobiele') || type.includes('Lijstweergave') || type.includes('Logboek')) {
                                          IconComp = Icons.Zap;
-                                         iconColor = "text-blue-500 bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-300";
+                                         iconColor = "text-teal-500 bg-teal-50 border-teal-100 dark:bg-teal-900/30 dark:border-teal-800/50 dark:text-teal-300";
                                     }
 
                                     return (
-                                        <li key={idx} className="flex gap-3 text-xs text-gray-600 dark:text-gray-300 items-start bg-white dark:bg-gray-800/50 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/50 transition-colors hover:border-gray-300 dark:hover:border-gray-600">
+                                        <li key={idx} className="flex gap-3 text-xs text-stone-600 dark:text-stone-300 items-start bg-white dark:bg-stone-800/50 p-3 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700/50 transition-colors hover:border-stone-300 dark:hover:border-stone-600">
                                             <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${iconColor}`}>
                                                 <Icon path={IconComp} size={14} />
                                             </div>
                                             <div className="pt-0.5">
-                                                <span className="font-bold block text-gray-900 dark:text-gray-100 text-[10px] uppercase tracking-widest mb-1 opacity-90">{type}</span>
+                                                <span className="font-bold block text-stone-900 dark:text-stone-100 text-[10px] uppercase tracking-widest mb-1 opacity-90">{type}</span>
                                                 <span className="leading-relaxed font-medium">{text || change}</span>
                                             </div>
                                         </li>
@@ -4704,10 +4704,10 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             <Modal isOpen={showDashboardModal} onClose={() => setShowDashboardModal(false)} title="Dashboard." color="blue" size="xl">
                 <div className="space-y-5 min-h-[50vh]">
-                    <div className="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100/50 dark:border-blue-800/30">
-                        <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2.5">Selecteer een gebruiker om direct in hun voorraad te kijken zonder in te loggen op hun account.</p>
+                    <div className="bg-teal-50/50 dark:bg-teal-900/10 p-4 rounded-xl border border-teal-100/50 dark:border-teal-800/30">
+                        <p className="text-xs font-medium text-stone-600 dark:text-stone-300 mb-2.5">Selecteer een gebruiker om direct in hun voorraad te kijken zonder in te loggen op hun account.</p>
                         <select 
-                            className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:text-white font-medium text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm"
+                            className="w-full p-3 border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-800 dark:text-white font-medium text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all shadow-sm"
                             value={dashboardUser} 
                             onChange={e => setDashboardUser(e.target.value)}
                         >
@@ -4719,14 +4719,14 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                     </div>
 
                     {dashboardData.loading ? (
-                        <div className="text-center py-12 text-blue-500 dark:text-blue-400 flex flex-col items-center justify-center bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
-                            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-xl flex items-center justify-center mb-3 shadow-inner">
+                        <div className="text-center py-12 text-teal-500 dark:text-teal-400 flex flex-col items-center justify-center bg-stone-50/50 dark:bg-stone-800/30 rounded-2xl border border-stone-100 dark:border-stone-700/50">
+                            <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/40 rounded-xl flex items-center justify-center mb-3 shadow-inner">
                                 <Icon path={Icons.Box} className="animate-bounce drop-shadow-sm" size={24} />
                             </div>
-                            <span className="font-bold tracking-wide text-sm text-gray-700 dark:text-gray-300">Laden van voorraad...</span>
+                            <span className="font-bold tracking-wide text-sm text-stone-700 dark:text-stone-300">Laden van voorraad...</span>
                         </div>
                     ) : dashboardUser && dashboardData.vriezers.length === 0 ? (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700/50 font-medium text-sm">
+                        <div className="text-center py-12 text-stone-500 dark:text-stone-400 bg-stone-50 dark:bg-stone-800/50 rounded-2xl border border-stone-100 dark:border-stone-700/50 font-medium text-sm">
                             Deze gebruiker heeft nog geen locaties aangemaakt.
                         </div>
                     ) : (
@@ -4739,15 +4739,15 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
                                 return (
                                     <div key={type} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                        <h3 className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 border-b border-gray-100 dark:border-gray-800 pb-2">
+                                        <h3 className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-4 border-b border-stone-100 dark:border-stone-800 pb-2">
                                             {typeNames[type]}
                                         </h3>
                                         
                                         <div className="flex flex-col gap-5">
                                             {typeLocaties.map(v => (
-                                                <div key={v.id} className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-gray-200/60 dark:border-gray-700/60 shadow-sm overflow-hidden">
-                                                    <h4 className="font-bold text-lg mb-3 text-gray-900 dark:text-white flex items-center gap-2">
-                                                        <span className={`w-3 h-3 rounded-full bg-gradient-to-br from-${v.color || 'blue'}-400 to-${v.color || 'blue'}-600 inline-block shadow-sm border border-white dark:border-gray-800`}></span>
+                                                <div key={v.id} className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-stone-200/60 dark:border-stone-700/60 shadow-sm overflow-hidden">
+                                                    <h4 className="font-bold text-lg mb-3 text-stone-900 dark:text-white flex items-center gap-2">
+                                                        <span className={`w-3 h-3 rounded-full bg-gradient-to-br from-${v.color || 'blue'}-400 to-${v.color || 'blue'}-600 inline-block shadow-sm border border-white dark:border-stone-800`}></span>
                                                         {v.naam}
                                                     </h4>
                                                     
@@ -4757,7 +4757,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                             const isLadeOpen = openDashboardLades.has(l.id);
                                                             
                                                             return (
-                                                                <div key={l.id} className="bg-gray-50 dark:bg-gray-900/50 rounded-xl shadow-inner border border-gray-200/50 dark:border-gray-700/50 flex flex-col transition-all overflow-hidden">
+                                                                <div key={l.id} className="bg-stone-50 dark:bg-stone-900/50 rounded-xl shadow-inner border border-stone-200/50 dark:border-stone-700/50 flex flex-col transition-all overflow-hidden">
                                                                     <button 
                                                                         onClick={() => {
                                                                             const newSet = new Set(openDashboardLades);
@@ -4765,34 +4765,34 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                             else newSet.add(l.id);
                                                                             setOpenDashboardLades(newSet);
                                                                         }}
-                                                                        className={`w-full text-left font-bold text-xs p-3 flex justify-between items-center sticky top-0 z-10 transition-colors ${isLadeOpen ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 shadow-sm' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                                                        className={`w-full text-left font-bold text-xs p-3 flex justify-between items-center sticky top-0 z-10 transition-colors ${isLadeOpen ? 'bg-white dark:bg-stone-800 text-teal-600 dark:text-teal-400 border-b border-stone-100 dark:border-stone-700 shadow-sm' : 'bg-transparent text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'}`}
                                                                     >
                                                                         <span className="flex items-center gap-1.5">
-                                                                            <Icon path={isLadeOpen ? Icons.ChevronDown : Icons.ChevronRight} size={16} className="text-gray-400"/>
+                                                                            <Icon path={isLadeOpen ? Icons.ChevronDown : Icons.ChevronRight} size={16} className="text-stone-400"/>
                                                                             {l.naam}
                                                                         </span>
-                                                                        <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${isLadeOpen ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>{ladeItems.length} items</span>
+                                                                        <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${isLadeOpen ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300' : 'bg-stone-200 text-stone-600 dark:bg-stone-700 dark:text-stone-400'}`}>{ladeItems.length} items</span>
                                                                     </button>
                                                                     
                                                                     {isLadeOpen && (
-                                                                        <ul className="p-1.5 space-y-1.5 overflow-y-auto flex-grow max-h-[50vh] bg-white dark:bg-gray-800 custom-scrollbar">
+                                                                        <ul className="p-1.5 space-y-1.5 overflow-y-auto flex-grow max-h-[50vh] bg-white dark:bg-stone-800 custom-scrollbar">
                                                                             {ladeItems.length === 0 ? (
-                                                                                <li className="text-[11px] italic font-medium text-gray-400 text-center py-4">Lade is leeg</li>
+                                                                                <li className="text-[11px] italic font-medium text-stone-400 text-center py-4">Lade is leeg</li>
                                                                             ) : (
                                                                                 ladeItems.map(i => (
-                                                                                    <li key={i.id} className="text-xs flex justify-between items-center bg-gray-50/80 dark:bg-gray-700/50 px-2.5 py-2 rounded-lg border border-gray-100 dark:border-gray-600 shadow-sm transition-all hover:border-blue-300 hover:shadow-md dark:hover:border-blue-600 group">
-                                                                                        <span className="truncate mr-2 flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                                                                                    <li key={i.id} className="text-xs flex justify-between items-center bg-stone-50/80 dark:bg-stone-700/50 px-2.5 py-2 rounded-lg border border-stone-100 dark:border-stone-600 shadow-sm transition-all hover:border-teal-300 hover:shadow-md dark:hover:border-teal-600 group">
+                                                                                        <span className="truncate mr-2 flex items-center gap-2 text-stone-900 dark:text-stone-100">
                                                                                             <span className="text-xl drop-shadow-sm">{i.emoji}</span>
                                                                                             <div className="truncate">
                                                                                                 <span className="font-bold block tracking-tight">{i.naam}</span>
-                                                                                                {i.notitie && <span className="block text-[9px] font-medium italic text-gray-500 mt-0.5 truncate">{i.notitie}</span>}
+                                                                                                {i.notitie && <span className="block text-[9px] font-medium italic text-stone-500 mt-0.5 truncate">{i.notitie}</span>}
                                                                                             </div>
                                                                                         </span>
                                                                                         <div className="flex items-center gap-2">
-                                                                                            <span className="font-bold text-gray-800 dark:text-gray-200 flex-shrink-0 whitespace-nowrap bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded-md border border-gray-200 dark:border-gray-600 shadow-sm">
-                                                                                                {formatAantal(i.aantal)} <span className="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase ml-0.5">{i.eenheid}</span>
+                                                                                            <span className="font-bold text-stone-800 dark:text-stone-200 flex-shrink-0 whitespace-nowrap bg-white dark:bg-stone-800 px-1.5 py-0.5 rounded-md border border-stone-200 dark:border-stone-600 shadow-sm">
+                                                                                                {formatAantal(i.aantal)} <span className="text-[9px] font-medium text-stone-500 dark:text-stone-400 uppercase ml-0.5">{i.eenheid}</span>
                                                                                             </span>
-                                                                                            <button onClick={() => openEditFromDashboard(i)} className="p-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-md flex-shrink-0 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all active:scale-95 shadow-sm" title="Bewerken">
+                                                                                            <button onClick={() => openEditFromDashboard(i)} className="p-1.5 text-teal-600 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 rounded-md flex-shrink-0 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all active:scale-95 shadow-sm" title="Bewerken">
                                                                                                 <Icon path={Icons.Edit2} size={14}/>
                                                                                             </button>
                                                                                         </div>
