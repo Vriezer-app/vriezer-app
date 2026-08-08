@@ -2121,7 +2121,7 @@ const toggleMaintenanceMode = async () => {
         return acc;
     }, {});
 
-    return (
+   return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0f172a] font-sans text-gray-800 dark:text-gray-100 transition-colors duration-300">
              {notification && (
                 <Toast 
@@ -2177,7 +2177,7 @@ const toggleMaintenanceMode = async () => {
                                             </>
                                         )}
                                     </button>
-{/* -- NIEUW: CONTROLE KNOPPEN TONEN/VERBERGEN -- */}
+                                    
                                     {(!myHiddenTabs.includes('balans') || isAdmin) && (
                                         <button onClick={toggleBalansMode} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
                                             {myShowBalans ? (
@@ -2191,6 +2191,7 @@ const toggleMaintenanceMode = async () => {
                                             )}
                                         </button>
                                     )}
+                                    
                                     {isAdmin && (
                                         <>
                                             <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
@@ -2785,7 +2786,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 );
                             })()}
                         </div>
-) : (
+                    ) : (
                         <div className={`grid gap-5 items-start ${gridClass}`}>
                             {filteredLocaties.map(vriezer => {
                                 const gradientKeys = Object.keys(GRADIENTS);
