@@ -1904,10 +1904,10 @@ const openEdit = (item) => {
         }
     };
 
-    const toggleUserHelpButton = async (userId, currentStatus) => {
+const toggleUserShowBalans = async (userId, currentStatus) => {
         try {
-            await db.collection('users').doc(userId).set({ showHelpButton: !currentStatus }, { merge: true });
-            showNotification(`Hulp knop is nu ${!currentStatus ? 'zichtbaar' : 'verborgen'} voor deze gebruiker.`, "success");
+            await db.collection('users').doc(userId).set({ showBalans: !currentStatus }, { merge: true });
+            showNotification(`Controle modus is nu ${!currentStatus ? 'AAN' : 'UIT'} voor deze gebruiker.`, "success");
         } catch(e) {
             showNotification("Fout bij aanpassen van instelling.", "error");
         }
@@ -2121,7 +2121,7 @@ const toggleMaintenanceMode = async () => {
         return acc;
     }, {});
 
-    return (
+   return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0f172a] font-sans text-gray-800 dark:text-gray-100 transition-colors duration-300">
              {notification && (
                 <Toast 
@@ -2177,7 +2177,7 @@ const toggleMaintenanceMode = async () => {
                                             </>
                                         )}
                                     </button>
-{/* -- NIEUW: CONTROLE KNOPPEN TONEN/VERBERGEN -- */}
+                                    
                                     {(!myHiddenTabs.includes('balans') || isAdmin) && (
                                         <button onClick={toggleBalansMode} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
                                             {myShowBalans ? (
@@ -2191,6 +2191,7 @@ const toggleMaintenanceMode = async () => {
                                             )}
                                         </button>
                                     )}
+                                    
                                     {isAdmin && (
                                         <>
                                             <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors">
@@ -2787,7 +2788,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                         </div>
                     ) : (
                         <div className={`grid gap-5 items-start ${gridClass}`}>
-                            {filteredLocaties.map(vriezer => {
+{filteredLocaties.map(vriezer => {
                                 const gradientKeys = Object.keys(GRADIENTS);
                                 let hash = 0;
                                 for (let i = 0; i < vriezer.id.length; i++) hash = (hash << 5) - hash + vriezer.id.charCodeAt(i);
@@ -2830,40 +2831,41 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                 {isCollapsed ? <Icon path={Icons.ChevronRight} size={18} className="print:hidden text-gray-400"/> : <Icon path={Icons.ChevronDown} size={18} className="print:hidden text-gray-400"/>} 
                                                                 {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
                                                             </h3>
-                                                            {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
-                                                                <div className="flex items-center gap-3">
+                                                            <div className="flex items-center gap-3">
+                                                                
+                                                                {/* Dynamische Datum weergave (Laatste wijziging vs Check) - ALTIJD ZICHTBAAR */}
+                                                                {(() => {
+                                                                    const checkDate = lade.laatstGecontroleerd ? (lade.laatstGecontroleerd.toDate ? lade.laatstGecontroleerd.toDate() : new Date(lade.laatstGecontroleerd)) : null;
+                                                                    const modDate = lade.laatstGewijzigd ? (lade.laatstGewijzigd.toDate ? lade.laatstGewijzigd.toDate() : new Date(lade.laatstGewijzigd)) : null;
                                                                     
-                                                                    {/* Dynamische Datum weergave (Laatste wijziging vs Check) */}
-                                                                    {(() => {
-                                                                        const checkDate = lade.laatstGecontroleerd ? (lade.laatstGecontroleerd.toDate ? lade.laatstGecontroleerd.toDate() : new Date(lade.laatstGecontroleerd)) : null;
-                                                                        const modDate = lade.laatstGewijzigd ? (lade.laatstGewijzigd.toDate ? lade.laatstGewijzigd.toDate() : new Date(lade.laatstGewijzigd)) : null;
-                                                                        
-                                                                        let displayDate = null;
-                                                                        let isCheck = true;
+                                                                    let displayDate = null;
+                                                                    let isCheck = true;
 
-                                                                        if (checkDate && (!modDate || checkDate >= modDate)) {
-                                                                            displayDate = checkDate;
-                                                                            isCheck = true;
-                                                                        } else if (modDate && (!checkDate || modDate > checkDate)) {
-                                                                            displayDate = modDate;
-                                                                            isCheck = false;
-                                                                        } else if (checkDate) {
-                                                                            displayDate = checkDate;
-                                                                            isCheck = true;
-                                                                        } else if (modDate) {
-                                                                            displayDate = modDate;
-                                                                            isCheck = false;
-                                                                        }
+                                                                    if (checkDate && (!modDate || checkDate >= modDate)) {
+                                                                        displayDate = checkDate;
+                                                                        isCheck = true;
+                                                                    } else if (modDate && (!checkDate || modDate > checkDate)) {
+                                                                        displayDate = modDate;
+                                                                        isCheck = false;
+                                                                    } else if (checkDate) {
+                                                                        displayDate = checkDate;
+                                                                        isCheck = true;
+                                                                    } else if (modDate) {
+                                                                        displayDate = modDate;
+                                                                        isCheck = false;
+                                                                    }
 
-                                                                        if (!displayDate) return null;
+                                                                    if (!displayDate) return null;
 
-                                                                        return (
-                                                                            <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
-                                                                                {isCheck ? 'Check: ' : 'Laatste wijziging: '} {formatDate(displayDate)}
-                                                                            </span>
-                                                                        );
-                                                                    })()}
+                                                                    return (
+                                                                        <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
+                                                                            {isCheck ? 'Check: ' : 'Laatste wijziging: '} {formatDate(displayDate)}
+                                                                        </span>
+                                                                    );
+                                                                })()}
 
+                                                                {/* CONTROLE KNOP - ALLEEN ZICHTBAAR ALS FUNCTIE AAN STAAT */}
+                                                                {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
                                                                     <button 
                                                                         onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
                                                                         className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
@@ -2871,8 +2873,8 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                     >
                                                                         <Icon path={Icons.CheckSquare} size={14} /> Controle
                                                                     </button>
-                                                                </div>
-                                                            )}
+                                                                )}
+                                                            </div>
                                                         </div>
 
                                                         {!isCollapsed && (
@@ -2961,8 +2963,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 );
                             })}
                         </div>
-                    )
-                )}
+                    )}
             </main>
 <Modal isOpen={!!auditLade} onClose={() => { setAuditLade(null); setAuditItemsToDelete(new Set()); }} title={`Controle: ${auditLade?.naam}`} color="blue" size="lg">
                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1.5 custom-scrollbar">
@@ -4145,13 +4146,60 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2 text-sm">Lades <span className="text-blue-500 font-medium text-xs ml-1">in {filteredLocaties.find(l => l.id === selectedLocatieForBeheer)?.naam}</span></h4>
                                 <ul className="space-y-2 mb-3">
                                     {lades.filter(l => l.vriezerId === selectedLocatieForBeheer).sort((a,b)=>a.naam.localeCompare(b.naam)).map(l => (
-                                        <li key={l.id} className="flex justify-between p-2 bg-white dark:bg-gray-800 rounded-lg items-center border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:border-blue-200">
-                                            {editingLadeId === l.id ? 
-                                                <div className="flex gap-2 w-full"><input className="flex-grow border border-blue-400 p-1.5 rounded-md bg-white dark:bg-gray-700 dark:text-white text-xs font-medium focus:outline-none" value={editingLadeName} onChange={e=>setEditingLadeName(e.target.value)} /><button onClick={()=>saveLadeName(l.id)} className="bg-green-500 text-white px-3 rounded-md font-bold shadow-sm active:scale-95"><Icon path={Icons.Check} size={14}/></button></div> 
-                                                : 
-                                                <><span className="font-medium text-sm text-gray-700 dark:text-gray-200">{l.naam}</span><div className="flex gap-1.5"><button onClick={()=>startEditLade(l)} className="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Edit2} size={14}/></button><button onClick={() => handleDeleteLade(l.id)} className="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-md transition-all active:scale-95"><Icon path={Icons.Trash2} size={14}/></button></div></>
-                                            }
-                                        </li>
+                                        return (
+                                                    <div key={lade.id} className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 dark:border-gray-700/50 overflow-hidden page-break-inside-avoid transition-all duration-200">
+                                                        <div className="bg-white dark:bg-gray-800 px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors print:bg-white" onClick={() => toggleLade(lade.id)}>
+                                                            <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm flex items-center gap-2">
+                                                                {isCollapsed ? <Icon path={Icons.ChevronRight} size={18} className="print:hidden text-gray-400"/> : <Icon path={Icons.ChevronDown} size={18} className="print:hidden text-gray-400"/>} 
+                                                                {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
+                                                            </h3>
+                                                            <div className="flex items-center gap-3">
+                                                                
+                                                                {/* Dynamische Datum weergave (Laatste wijziging vs Check) - ALTIJD ZICHTBAAR */}
+                                                                {(() => {
+                                                                    const checkDate = lade.laatstGecontroleerd ? (lade.laatstGecontroleerd.toDate ? lade.laatstGecontroleerd.toDate() : new Date(lade.laatstGecontroleerd)) : null;
+                                                                    const modDate = lade.laatstGewijzigd ? (lade.laatstGewijzigd.toDate ? lade.laatstGewijzigd.toDate() : new Date(lade.laatstGewijzigd)) : null;
+                                                                    
+                                                                    let displayDate = null;
+                                                                    let isCheck = true;
+
+                                                                    if (checkDate && (!modDate || checkDate >= modDate)) {
+                                                                        displayDate = checkDate;
+                                                                        isCheck = true;
+                                                                    } else if (modDate && (!checkDate || modDate > checkDate)) {
+                                                                        displayDate = modDate;
+                                                                        isCheck = false;
+                                                                    } else if (checkDate) {
+                                                                        displayDate = checkDate;
+                                                                        isCheck = true;
+                                                                    } else if (modDate) {
+                                                                        displayDate = modDate;
+                                                                        isCheck = false;
+                                                                    }
+
+                                                                    if (!displayDate) return null;
+
+                                                                    return (
+                                                                        <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
+                                                                            {isCheck ? 'Check: ' : 'Laatste wijziging: '} {formatDate(displayDate)}
+                                                                        </span>
+                                                                    );
+                                                                })()}
+
+                                                                {/* CONTROLE KNOP - ALLEEN ZICHTBAAR ALS FUNCTIE AAN STAAT */}
+                                                                {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
+                                                                    <button 
+                                                                        onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
+                                                                        className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
+                                                                        title="Voorraad-Balans (Snel aftikken)"
+                                                                    >
+                                                                        <Icon path={Icons.CheckSquare} size={14} /> Controle
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {!isCollapsed && (
                                     ))}
                                 </ul>
                                 <form onSubmit={handleAddLade} className="flex gap-2"><input className="flex-grow border border-gray-200 dark:border-gray-700 p-2 rounded-lg bg-white dark:bg-gray-800 dark:text-white text-xs font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm" placeholder="Nieuwe lade" value={newLadeNaam} onChange={e=>setNewLadeNaam(e.target.value)} required /><button className="bg-blue-600 text-white px-4 rounded-lg font-bold shadow-sm hover:bg-blue-700 active:scale-95 transition-all">+</button></form>
@@ -4340,6 +4388,19 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                         onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'frig')}
                                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
                                     />
+                                   <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Controle' knop in menu</span>
+                                </div>
+
+                                {/* -- NIEUW: CONTROLE MODUS AAN/UIT BEHEREN -- */}
+                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={u.showBalans || false} 
+                                        onChange={() => toggleUserShowBalans(u.id, u.showBalans)}
+                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+                                    />
+                                    <span className="font-bold text-blue-700 dark:text-blue-400">Zet 'Controle' modus AAN voor gebruiker</span>
+                                </div>         
                                     <span>Verberg 'Frig.' tabblad</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300">
