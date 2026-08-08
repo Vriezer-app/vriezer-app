@@ -2870,18 +2870,19 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
         );
     })()}
 
-    {/* Controle-knop afhankelijk van instellingen */}
-    {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
-        <button 
-            onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
-            className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
-            title="Voorraad-Balans (Snel aftikken)"
-        >
-            <Icon path={Icons.CheckSquare} size={14} /> Controle
-        </button>
-    )}
-</div>
-                                                        {!isCollapsed && (
+{/* Controle-knop afhankelijk van instellingen */}
+            {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
+                    className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
+                    title="Voorraad-Balans (Snel aftikken)"
+                >
+                    <Icon path={Icons.CheckSquare} size={14} /> Controle
+                </button>
+            )}
+        </div>
+    </div>
+    {!isCollapsed && (
                                                             <ul className="block"> 
                                                                 {ladeItems.length === 0 ? <li className="p-4 text-center text-gray-400 text-sm font-medium italic">Leeg</li> : 
                                                                 ladeItems.map(item => {
