@@ -2830,40 +2830,41 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                 {isCollapsed ? <Icon path={Icons.ChevronRight} size={18} className="print:hidden text-gray-400"/> : <Icon path={Icons.ChevronDown} size={18} className="print:hidden text-gray-400"/>} 
                                                                 {lade.naam} <span className="text-xs font-bold text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">{ladeItems.length}</span>
                                                             </h3>
-                                                            {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
-                                                                <div className="flex items-center gap-3">
+                                                            <div className="flex items-center gap-3">
+                                                                
+                                                                {/* Dynamische Datum weergave (Laatste wijziging vs Check) - ALTIJD ZICHTBAAR */}
+                                                                {(() => {
+                                                                    const checkDate = lade.laatstGecontroleerd ? (lade.laatstGecontroleerd.toDate ? lade.laatstGecontroleerd.toDate() : new Date(lade.laatstGecontroleerd)) : null;
+                                                                    const modDate = lade.laatstGewijzigd ? (lade.laatstGewijzigd.toDate ? lade.laatstGewijzigd.toDate() : new Date(lade.laatstGewijzigd)) : null;
                                                                     
-                                                                    {/* Dynamische Datum weergave (Laatste wijziging vs Check) */}
-                                                                    {(() => {
-                                                                        const checkDate = lade.laatstGecontroleerd ? (lade.laatstGecontroleerd.toDate ? lade.laatstGecontroleerd.toDate() : new Date(lade.laatstGecontroleerd)) : null;
-                                                                        const modDate = lade.laatstGewijzigd ? (lade.laatstGewijzigd.toDate ? lade.laatstGewijzigd.toDate() : new Date(lade.laatstGewijzigd)) : null;
-                                                                        
-                                                                        let displayDate = null;
-                                                                        let isCheck = true;
+                                                                    let displayDate = null;
+                                                                    let isCheck = true;
 
-                                                                        if (checkDate && (!modDate || checkDate >= modDate)) {
-                                                                            displayDate = checkDate;
-                                                                            isCheck = true;
-                                                                        } else if (modDate && (!checkDate || modDate > checkDate)) {
-                                                                            displayDate = modDate;
-                                                                            isCheck = false;
-                                                                        } else if (checkDate) {
-                                                                            displayDate = checkDate;
-                                                                            isCheck = true;
-                                                                        } else if (modDate) {
-                                                                            displayDate = modDate;
-                                                                            isCheck = false;
-                                                                        }
+                                                                    if (checkDate && (!modDate || checkDate >= modDate)) {
+                                                                        displayDate = checkDate;
+                                                                        isCheck = true;
+                                                                    } else if (modDate && (!checkDate || modDate > checkDate)) {
+                                                                        displayDate = modDate;
+                                                                        isCheck = false;
+                                                                    } else if (checkDate) {
+                                                                        displayDate = checkDate;
+                                                                        isCheck = true;
+                                                                    } else if (modDate) {
+                                                                        displayDate = modDate;
+                                                                        isCheck = false;
+                                                                    }
 
-                                                                        if (!displayDate) return null;
+                                                                    if (!displayDate) return null;
 
-                                                                        return (
-                                                                            <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
-                                                                                {isCheck ? 'Check: ' : 'Laatste wijziging: '} {formatDate(displayDate)}
-                                                                            </span>
-                                                                        );
-                                                                    })()}
+                                                                    return (
+                                                                        <span className="hidden sm:block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest print:hidden">
+                                                                            {isCheck ? 'Check: ' : 'Laatste wijziging: '} {formatDate(displayDate)}
+                                                                        </span>
+                                                                    );
+                                                                })()}
 
+                                                                {/* CONTROLE KNOP - ALLEEN ZICHTBAAR ALS FUNCTIE AAN STAAT */}
+                                                                {(!myHiddenTabs.includes('balans') || isAdmin) && myShowBalans && (
                                                                     <button 
                                                                         onClick={(e) => { e.stopPropagation(); setAuditLade(lade); setAuditedItems(new Set()); setAuditItemsToDelete(new Set()); }} 
                                                                         className="text-xs flex items-center gap-1 font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-md shadow-sm transition-all active:scale-95 print:hidden"
@@ -2871,7 +2872,8 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                                                     >
                                                                         <Icon path={Icons.CheckSquare} size={14} /> Controle
                                                                     </button>
-                                                                </div>
+                                                                )}
+                                                            </div>
                                                             )}
                                                         </div>
 
