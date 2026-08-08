@@ -720,8 +720,7 @@ function App() {
         }
     };
 
-    useEffect(() => {
-const toggleBalansMode = async () => {
+    const toggleBalansMode = async () => {
         if (!user) return;
         const newStatus = !myShowBalans;
         setMyShowBalans(newStatus);
@@ -735,6 +734,8 @@ const toggleBalansMode = async () => {
             console.error("Kon balans instelling niet opslaan", e);
         }
     };
+
+    useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (u) => {
             if (u) {
                 setUser(u);
