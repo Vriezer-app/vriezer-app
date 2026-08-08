@@ -4377,14 +4377,35 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                     />
                                     <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Recepten.' tabblad</span>
                                 </div>                                    
-                                <div className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">
-    <input 
-        type="checkbox" 
-        checked={(u.hiddenTabs || []).includes('balans')} 
-        onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
-        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
-    />
-    <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Controle' knop</span>
+{/* Gecombineerde rij voor Controle Knop instellingen */}
+<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-medium text-gray-700 dark:text-gray-300 mt-1 border-t border-gray-200/60 dark:border-gray-700/60 pt-2 pb-1">
+    
+    {/* Optie 1: Verberg de knop (Bestaande checkbox) */}
+    <div className="flex items-center gap-2">
+        <input 
+            type="checkbox" 
+            checked={(u.hiddenTabs || []).includes('balans')} 
+            onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
+            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+        />
+        <span className="font-bold text-blue-700 dark:text-blue-400">Verberg 'Controle' knop</span>
+    </div>
+
+    {/* Optie 2: Mooie Tailwind schakelaar voor Actief AAN/UIT */}
+    <div className="flex items-center gap-2">
+        <span className="font-bold text-gray-500 dark:text-gray-400">Status:</span>
+        <button
+            type="button"
+            onClick={() => toggleUserBalansMode(u.id, u.showBalans)}
+            className={`w-10 h-6 rounded-full p-1 transition-colors border shadow-inner flex items-center focus:outline-none ${u.showBalans ? 'bg-green-500 border-green-600' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-700'}`}
+            title={u.showBalans ? "Controle staat AAN" : "Controle staat UIT"}
+        >
+            <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${u.showBalans ? 'translate-x-4' : 'translate-x-0'}`}></div>
+        </button>
+        <span className={`font-bold w-6 ${u.showBalans ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+            {u.showBalans ? 'AAN' : 'UIT'}
+        </span>
+    </div>
 </div>
 
 {/* NIEUW: Code voor het aanzetten van de controle modus */}
