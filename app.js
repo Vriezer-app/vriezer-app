@@ -4345,7 +4345,7 @@ const toggleMaintenanceMode = async () => {
                             </div>
                         )}
 
-                        <div className="relative">
+                        <div className="relative hidden sm:block">
                             <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all active:scale-95 shadow-sm">
                                 {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400"><Icon path={Icons.User} size={20}/></div>}
                             </button>
@@ -5136,15 +5136,15 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                 {isAdmin && managedUserHiddenTabs.includes('frig') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
-                        <button onClick={handleOpenAdd} title="Toevoegen" className={`flex-shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-white shadow-lg border-4 border-white dark:border-stone-800 active:scale-90 transition-all duration-300 ${navCompact ? 'w-9 h-9 -mt-2' : 'w-12 h-12 -mt-5'}`}>
-                            <Icon path={Icons.Plus} size={navCompact ? 16 : 22}/>
-                        </button>
                         {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
                             <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Stock" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='voorraad' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
                                 <Icon path={Icons.Box} size={navCompact ? 16 : 19}/>
                                 {isAdmin && managedUserHiddenTabs.includes('voorraad') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
+                        <button onClick={handleOpenAdd} title="Toevoegen" className={`flex-shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-white shadow-lg border-4 border-white dark:border-stone-800 active:scale-90 transition-all duration-300 ${navCompact ? 'w-9 h-9 -mt-2' : 'w-12 h-12 -mt-5'}`}>
+                            <Icon path={Icons.Plus} size={navCompact ? 16 : 22}/>
+                        </button>
                         {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
                             <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} title="Weekmenu" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='weekmenu' ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
                                 <Icon path={Icons.Calendar} size={navCompact ? 16 : 19}/>
