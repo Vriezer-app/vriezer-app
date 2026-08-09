@@ -2554,6 +2554,22 @@ function App() {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false); 
     const [showSwitchMenu, setShowSwitchMenu] = useState(false);
+    const [navCompact, setNavCompact] = useState(false);
+    const lastScrollY = useRef(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentY = window.scrollY;
+            if (currentY > lastScrollY.current && currentY > 60) {
+                setNavCompact(true);
+            } else {
+                setNavCompact(false);
+            }
+            lastScrollY.current = currentY;
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
     const [showUserAdminModal, setShowUserAdminModal] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [notifPermission, setNotifPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
@@ -4194,6 +4210,78 @@ const toggleMaintenanceMode = async () => {
         return acc;
     }, {});
 
+    // Bouwt het profielmenu-paneel op; 'positionClasses' bepaalt waar het paneel verschijnt
+    // (rechtsboven vanaf de header, of rechtsboven-de-pil vanaf de onderste navigatie).
+    const renderProfileMenu = (positionClasses) => (
+        <div className={`absolute w-56 bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-xl shadow-xl border border-stone-100 dark:border-stone-700 py-2 z-50 ${positionClasses}`}>
+            <div className="px-4 py-2 border-b border-stone-50 dark:border-stone-700 mb-1">
+                <p className="text-sm font-bold text-stone-900 dark:text-stone-100 truncate">{user.displayName || 'Gebruiker'}</p>
+                <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{user.email}</p>
+            </div>
+            
+            <button onClick={toggleDarkMode} className={CX_MENU_ITEM}>
+                {darkMode ? (
+                    <>
+                        <Icon path={Icons.Sun} size={16} /> Licht.
+                    </>
+                ) : (
+                    <>
+                        <Icon path={Icons.Moon} size={16} /> Donker.
+                    </>
+                )}
+            </button>
+            {notifPermission !== 'granted' && notifPermission !== 'unsupported' && (
+                <button onClick={requestNotificationPermission} className={CX_MENU_ITEM}>
+                    <Icon path={Icons.Bell} size={16} /> {notifPermission === 'denied' ? 'Meldingen geblokkeerd.' : 'Meldingen inschakelen.'}
+                </button>
+            )}
+            {(!myHiddenTabs.includes('balans') || isAdmin) && (
+                <button onClick={toggleBalansMode} className={CX_MENU_ITEM}>
+                    {myShowBalans ? (
+                        <>
+                            <Icon path={Icons.CheckSquare} size={16} /> Controle uit.
+                        </>
+                    ) : (
+                        <>
+                            <Icon path={Icons.CheckSquare} size={16} /> Controle aan.
+                        </>
+                    )}
+                </button>
+            )}
+            {isAdmin && (
+                <>
+                    <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
+                        <Icon path={Icons.Users} size={16}/> Gebruikers & Wisselen.
+                    </button>
+                    <button onClick={() => { openTourAdmin(); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
+                        <Icon path={Icons.Edit2} size={16}/> Tour Aanpassen.
+                    </button>
+                </>
+            )}
+            <button onClick={() => { setShowStatsModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
+                <Icon path={Icons.PieChart} size={16}/> Statistieken.
+            </button>
+            <button onClick={() => { setShowLogModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
+                <Icon path={Icons.LogBook} size={16}/> Logboek.
+            </button>
+            <button onClick={() => { setShowShareModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
+                <Icon path={Icons.Share} size={16}/> Delen.
+            </button>
+            <button onClick={exportToCSV} className={CX_MENU_ITEM}>
+                <Icon path={Icons.Download} size={16}/> Exporteer naar Excel.
+            </button>
+            <button onClick={exportToPDF} className={CX_MENU_ITEM}>
+                <Icon path={Icons.Download} size={16}/> Exporteer naar PDF.
+            </button>
+            <button onClick={handlePrint} className={CX_MENU_ITEM}>
+                <Icon path={Icons.Printer} size={16}/> Print.
+            </button>
+            <button onClick={handleLogout} className="w-full text-left px-4 py-2 mt-1 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t border-stone-50 dark:border-stone-700 transition-colors">
+                <Icon path={Icons.LogOut} size={16}/> Uitloggen.
+            </button>
+        </div>
+    );
+
     // ===== RENDER =====
     return (
         <div className="min-h-screen flex flex-col bg-stone-50 dark:bg-[#1c1917] font-sans text-stone-800 dark:text-stone-100 transition-colors duration-300">
@@ -4261,76 +4349,7 @@ const toggleMaintenanceMode = async () => {
                             <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all active:scale-95 shadow-sm">
                                 {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400"><Icon path={Icons.User} size={20}/></div>}
                             </button>
-                            {showProfileMenu && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-xl shadow-xl border border-stone-100 dark:border-stone-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <div className="px-4 py-2 border-b border-stone-50 dark:border-stone-700 mb-1">
-                                        <p className="text-sm font-bold text-stone-900 dark:text-stone-100 truncate">{user.displayName || 'Gebruiker'}</p>
-                                        <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{user.email}</p>
-                                    </div>
-                                    
-                                    <button onClick={toggleDarkMode} className={CX_MENU_ITEM}>
-                                        {darkMode ? (
-                                            <>
-                                                <Icon path={Icons.Sun} size={16} /> Licht.
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Icon path={Icons.Moon} size={16} /> Donker.
-                                            </>
-                                        )}
-                                    </button>
-                                    {notifPermission !== 'granted' && notifPermission !== 'unsupported' && (
-                                        <button onClick={requestNotificationPermission} className={CX_MENU_ITEM}>
-                                            <Icon path={Icons.Bell} size={16} /> {notifPermission === 'denied' ? 'Meldingen geblokkeerd.' : 'Meldingen inschakelen.'}
-                                        </button>
-                                    )}
-{/* -- NIEUW: CONTROLE KNOPPEN TONEN/VERBERGEN -- */}
-                                    {(!myHiddenTabs.includes('balans') || isAdmin) && (
-                                        <button onClick={toggleBalansMode} className={CX_MENU_ITEM}>
-                                            {myShowBalans ? (
-                                                <>
-                                                    <Icon path={Icons.CheckSquare} size={16} /> Controle uit.
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Icon path={Icons.CheckSquare} size={16} /> Controle aan.
-                                                </>
-                                            )}
-                                        </button>
-                                    )}
-                                    {isAdmin && (
-                                        <>
-                                            <button onClick={() => { setShowUserAdminModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
-                                                <Icon path={Icons.Users} size={16}/> Gebruikers & Wisselen.
-                                            </button>
-                                            <button onClick={() => { openTourAdmin(); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
-                                                <Icon path={Icons.Edit2} size={16}/> Tour Aanpassen.
-                                            </button>
-                                        </>
-                                    )}
-                                    <button onClick={() => { setShowStatsModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
-                                        <Icon path={Icons.PieChart} size={16}/> Statistieken.
-                                    </button>
-                                    <button onClick={() => { setShowLogModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
-                                        <Icon path={Icons.LogBook} size={16}/> Logboek.
-                                    </button>
-                                    <button onClick={() => { setShowShareModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
-                                        <Icon path={Icons.Share} size={16}/> Delen.
-                                    </button>
-                                    <button onClick={exportToCSV} className={CX_MENU_ITEM}>
-                                        <Icon path={Icons.Download} size={16}/> Exporteer naar Excel.
-                                    </button>
-                                    <button onClick={exportToPDF} className={CX_MENU_ITEM}>
-                                        <Icon path={Icons.Download} size={16}/> Exporteer naar PDF.
-                                    </button>
-                                    <button onClick={handlePrint} className={CX_MENU_ITEM}>
-                                        <Icon path={Icons.Printer} size={16}/> Print.
-                                    </button>
-                                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 mt-1 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t border-stone-50 dark:border-stone-700 transition-colors">
-                                        <Icon path={Icons.LogOut} size={16}/> Uitloggen.
-                                    </button>
-                                </div>
-                            )}
+                            {showProfileMenu && renderProfileMenu('right-0 mt-2 animate-in fade-in slide-in-from-top-2 duration-200')}
                         </div>
                     </div>
                 </div>
@@ -5107,36 +5126,42 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 <button onClick={handleOpenAdd} className="hidden sm:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
 
                 <nav className="fixed left-4 right-4 z-40 print:hidden sm:hidden" style={{ bottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
-                    <div className="max-w-sm mx-auto flex items-center justify-around bg-white/90 dark:bg-stone-800/90 backdrop-blur-xl rounded-full shadow-xl border border-white/60 dark:border-stone-700/60 py-2 px-2">
-                        <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Vriezer" className={`flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                            <Icon path={Icons.Snowflake} size={20}/>
+                    <div className={`max-w-sm mx-auto flex items-center justify-around bg-white/90 dark:bg-stone-800/90 backdrop-blur-xl rounded-full shadow-xl border border-white/60 dark:border-stone-700/60 transition-all duration-300 ${navCompact ? 'py-1 px-1' : 'py-2 px-2'}`}>
+                        <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Vriezer" className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                            <Icon path={Icons.Snowflake} size={navCompact ? 16 : 19}/>
                         </button>
                         {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Frig" className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='frig' ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.Fridge} size={20}/>
-                                {isAdmin && managedUserHiddenTabs.includes('frig') && <Icon path={Icons.Lock} size={10} className="absolute top-1 right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
+                            <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Frig" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='frig' ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.Fridge} size={navCompact ? 16 : 19}/>
+                                {isAdmin && managedUserHiddenTabs.includes('frig') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
-                        <button onClick={handleOpenAdd} title="Toevoegen" className="flex-shrink-0 flex items-center justify-center w-12 h-12 -mt-5 rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-white shadow-lg border-4 border-white dark:border-stone-800 active:scale-90 transition-all">
-                            <Icon path={Icons.Plus} size={22}/>
+                        <button onClick={handleOpenAdd} title="Toevoegen" className={`flex-shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-white shadow-lg border-4 border-white dark:border-stone-800 active:scale-90 transition-all duration-300 ${navCompact ? 'w-9 h-9 -mt-2' : 'w-12 h-12 -mt-5'}`}>
+                            <Icon path={Icons.Plus} size={navCompact ? 16 : 22}/>
                         </button>
                         {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Stock" className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='voorraad' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.Box} size={20}/>
-                                {isAdmin && managedUserHiddenTabs.includes('voorraad') && <Icon path={Icons.Lock} size={10} className="absolute top-1 right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
+                            <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Stock" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='voorraad' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.Box} size={navCompact ? 16 : 19}/>
+                                {isAdmin && managedUserHiddenTabs.includes('voorraad') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
                         {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} title="Weekmenu" className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='weekmenu' ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.Calendar} size={20}/>
-                                {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <Icon path={Icons.Lock} size={10} className="absolute top-1 right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
+                            <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} title="Weekmenu" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='weekmenu' ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.Calendar} size={navCompact ? 16 : 19}/>
+                                {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
                         {(!myHiddenTabs.includes('recepten') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Recepten" className={`flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='recepten' ? 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.BookOpen} size={20}/>
+                            <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Recepten" className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='recepten' ? 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.BookOpen} size={navCompact ? 16 : 19}/>
                             </button>
                         )}
+                        <div className="relative">
+                            <button onClick={() => setShowProfileMenu(!showProfileMenu)} title="Profiel" className={`flex items-center justify-center rounded-full overflow-hidden border-2 transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${showProfileMenu ? 'border-teal-500' : 'border-stone-200 dark:border-stone-700'}`}>
+                                {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400"><Icon path={Icons.User} size={navCompact ? 14 : 17}/></div>}
+                            </button>
+                            {showProfileMenu && renderProfileMenu('right-0 bottom-full mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200')}
+                        </div>
                     </div>
                 </nav>
                 </>
