@@ -410,22 +410,23 @@ const Modal = ({ isOpen, onClose, title, children, color = "blue", size = "md", 
     if (!isOpen) return null;
     
     const gradientClass = GRADIENTS[color] || GRADIENTS.blue;
-    const sizeClass = size === "xl" ? "max-w-6xl" : size === "lg" ? "max-w-4xl" : "max-w-lg";
+    const sizeClass = size === "xl" ? "sm:max-w-6xl" : size === "lg" ? "sm:max-w-4xl" : "sm:max-w-lg";
 
-    let alignmentClass = "items-center justify-center";
-    if (position === "left") alignmentClass = "items-center justify-center lg:justify-start lg:pl-8 xl:pl-24";
-    if (position === "right") alignmentClass = "items-center justify-center lg:justify-end lg:pr-8 xl:pr-24";
+    let alignmentClass = "items-end sm:items-center justify-center";
+    if (position === "left") alignmentClass = "items-end sm:items-center justify-center lg:justify-start lg:pl-8 xl:pl-24";
+    if (position === "right") alignmentClass = "items-end sm:items-center justify-center lg:justify-end lg:pr-8 xl:pr-24";
 
     return (
-        <div className={`fixed inset-0 z-50 flex ${alignmentClass} p-4 ${hideBackdrop ? 'pointer-events-none' : 'bg-black/40 backdrop-blur-sm'} print:hidden`} onClick={!hideBackdrop ? onClose : undefined}>
-            <div className={`bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-stone-100 dark:border-stone-700 w-full ${sizeClass} max-h-[90vh] overflow-y-auto modal-animate flex flex-col pointer-events-auto transform transition-all`} onClick={e => e.stopPropagation()}>
-                <div className="flex justify-between items-center p-4 border-b border-stone-100 dark:border-stone-700 sticky top-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-md z-10 rounded-t-2xl">
+        <div className={`fixed inset-0 z-50 flex ${alignmentClass} sm:p-4 ${hideBackdrop ? 'pointer-events-none' : 'bg-black/40 backdrop-blur-sm'} print:hidden`} onClick={!hideBackdrop ? onClose : undefined}>
+            <div className={`bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-t-3xl sm:rounded-2xl shadow-xl border border-stone-100 dark:border-stone-700 w-full ${sizeClass} max-h-[92vh] sm:max-h-[90vh] overflow-y-auto modal-animate flex flex-col pointer-events-auto transform transition-all`} onClick={e => e.stopPropagation()}>
+                <div className="w-10 h-1.5 bg-stone-300 dark:bg-stone-600 rounded-full mx-auto mt-2.5 mb-0.5 sm:hidden flex-shrink-0"></div>
+                <div className="flex justify-between items-center p-4 border-b border-stone-100 dark:border-stone-700 sticky top-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-md z-10 rounded-t-3xl sm:rounded-t-2xl flex-shrink-0">
                     <h3 className={`text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r ${gradientClass}`}>{title}</h3>
                     {!hideCloseButton && (
                         <button onClick={onClose} className="p-2 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-all active:scale-95"><Icon path={Icons.X} className="text-stone-500 dark:text-stone-400" /></button>
                     )}
                 </div>
-                <div className="p-4 space-y-4 flex-grow overflow-y-auto text-stone-800 dark:text-stone-200">{children}</div>
+                <div className="p-4 space-y-4 flex-grow overflow-y-auto text-stone-800 dark:text-stone-200 safe-bottom">{children}</div>
             </div>
         </div>
     );
@@ -4333,35 +4334,37 @@ const toggleMaintenanceMode = async () => {
                         </div>
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto px-4 flex space-x-6 border-b border-stone-100 dark:border-stone-800 overflow-x-auto">
-                    <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='vriezer' ? 'border-purple-500 text-purple-600 dark:text-purple-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}><Icon path={Icons.Snowflake}/> Vriez.</button>
-                    {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='frig' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                            <Icon path={Icons.Fridge}/> Frig.
-                            {isAdmin && managedUserHiddenTabs.includes('frig') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
-                        </button>
-                    )}
-                    {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='voorraad' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                            <Icon path={Icons.Box}/> Stock.
-                            {isAdmin && managedUserHiddenTabs.includes('voorraad') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
-                        </button>
-                    )}
-                    {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='weekmenu' ? 'border-pink-500 text-pink-600 dark:text-pink-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                            <Icon path={Icons.Calendar}/> Week.
-                            {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
-                        </button>
-                    )}
-                    {(!myHiddenTabs.includes('recepten') || isAdmin) && (
-                        <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`pb-2 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='recepten' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                            <Icon path={Icons.BookOpen}/> Recepten.
-                        </button>
-                    )}
-                </div>
             </header>
 
-            <main className="max-w-7xl mx-auto p-4 space-y-4 flex-grow w-full pb-32 relative">
+            {/* Op tablet/desktop (sm en groter) blijft een bovenste tabbalk zichtbaar; op smartphone wordt de onderste navigatie gebruikt */}
+            <div className="hidden sm:flex max-w-7xl mx-auto px-4 gap-6 border-b border-stone-100 dark:border-stone-800 overflow-x-auto bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-md sticky top-[57px] z-20 print:hidden">
+                <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='vriezer' ? 'border-purple-500 text-purple-600 dark:text-purple-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}><Icon path={Icons.Snowflake}/> Vriez.</button>
+                {(!myHiddenTabs.includes('frig') || isAdmin) && (
+                    <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='frig' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
+                        <Icon path={Icons.Fridge}/> Frig.
+                        {isAdmin && managedUserHiddenTabs.includes('frig') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
+                    </button>
+                )}
+                {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
+                    <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='voorraad' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
+                        <Icon path={Icons.Box}/> Stock.
+                        {isAdmin && managedUserHiddenTabs.includes('voorraad') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
+                    </button>
+                )}
+                {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
+                    <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='weekmenu' ? 'border-pink-500 text-pink-600 dark:text-pink-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
+                        <Icon path={Icons.Calendar}/> Week.
+                        {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
+                    </button>
+                )}
+                {(!myHiddenTabs.includes('recepten') || isAdmin) && (
+                    <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='recepten' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
+                        <Icon path={Icons.BookOpen}/> Recepten.
+                    </button>
+                )}
+            </div>
+
+            <main className="max-w-7xl mx-auto p-4 space-y-4 flex-grow w-full pb-32 sm:pb-20 relative">
                 {activeTab !== 'weekmenu' && activeTab !== 'recepten' && (
                 <div className="flex flex-col gap-3 print:hidden">
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide items-center">
@@ -5100,7 +5103,51 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             </footer>
 
             {!isBulkMode && (
-                <button onClick={handleOpenAdd} className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
+                <>
+                <button onClick={handleOpenAdd} className="fixed bottom-24 sm:bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
+
+                <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-[#1c1917]/90 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 print:hidden safe-bottom sm:hidden">
+                    <div className="max-w-7xl mx-auto flex items-stretch justify-around">
+                        <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 min-w-0 transition-colors active:scale-95 ${activeTab==='vriezer' ? 'text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                            <Icon path={Icons.Snowflake} size={22}/>
+                            <span className="text-[10px] font-bold truncate">Vriezer</span>
+                        </button>
+                        {(!myHiddenTabs.includes('frig') || isAdmin) && (
+                            <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 min-w-0 transition-colors active:scale-95 relative ${activeTab==='frig' ? 'text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <div className="relative">
+                                    <Icon path={Icons.Fridge} size={22}/>
+                                    {isAdmin && managedUserHiddenTabs.includes('frig') && <Icon path={Icons.Lock} size={10} className="absolute -top-1 -right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
+                                </div>
+                                <span className="text-[10px] font-bold truncate">Frig</span>
+                            </button>
+                        )}
+                        {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
+                            <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 min-w-0 transition-colors active:scale-95 relative ${activeTab==='voorraad' ? 'text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <div className="relative">
+                                    <Icon path={Icons.Box} size={22}/>
+                                    {isAdmin && managedUserHiddenTabs.includes('voorraad') && <Icon path={Icons.Lock} size={10} className="absolute -top-1 -right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
+                                </div>
+                                <span className="text-[10px] font-bold truncate">Stock</span>
+                            </button>
+                        )}
+                        {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
+                            <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 min-w-0 transition-colors active:scale-95 relative ${activeTab==='weekmenu' ? 'text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <div className="relative">
+                                    <Icon path={Icons.Calendar} size={22}/>
+                                    {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <Icon path={Icons.Lock} size={10} className="absolute -top-1 -right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
+                                </div>
+                                <span className="text-[10px] font-bold truncate">Week</span>
+                            </button>
+                        )}
+                        {(!myHiddenTabs.includes('recepten') || isAdmin) && (
+                            <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 min-w-0 transition-colors active:scale-95 ${activeTab==='recepten' ? 'text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.BookOpen} size={22}/>
+                                <span className="text-[10px] font-bold truncate">Recepten</span>
+                            </button>
+                        )}
+                    </div>
+                </nav>
+                </>
             )}
 
 {/* Add/Edit Modal */}
