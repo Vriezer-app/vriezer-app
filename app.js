@@ -18,6 +18,26 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 const auth = firebase.auth();
 
+// Offline-modus: Firestore cachet data lokaal (IndexedDB), zodat de app blijft werken
+// zonder internetverbinding en wijzigingen automatisch synct zodra je weer online bent.
+db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+    if (err.code === 'failed-precondition') {
+        console.warn('Offline-persistentie kon niet worden ingeschakeld: app is in meerdere tabbladen open.');
+    } else if (err.code === 'unimplemented') {
+        console.warn('Offline-persistentie wordt niet ondersteund door deze browser.');
+    }
+});
+
+// Registreer de service worker voor het cachen van de app-shell (HTML/JS/iconen),
+// zodat de app ook offline kan opstarten.
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+            console.warn('Service worker registratie mislukt:', err);
+        });
+    });
+}
+
 // --- 2. CONFIGURATIE DATA ---
 const APP_VERSION = '10.2'; 
 
@@ -182,6 +202,7 @@ const Icon = ({ path, size = 20, className = "" }) => (
 
 const Icons = {
     Plus: <path d="M5 12h14M12 5v14"/>,
+    Bell: <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>,
     Minus: <path d="M5 12h14"/>,
     Search: <path d="m21 21-4.3-4.3M11 17a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>,
     Filter: <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>,
@@ -894,7 +915,7 @@ const LogModal = ({ isAdmin, items, logs, setShowLogModal, showLogModal, user })
 );
 
 // Boodschappenlijst modal
-const ShoppingListModal = ({ clearCheckedShopping, deleteShoppingItem, groupedShoppingList, handleAddShoppingItem, handleShareWhatsApp, items, moveShoppingToStock, setShoppingFormData, setShowShoppingModal, shoppingFormData, shoppingList, showShoppingModal, toggleShoppingItem }) => (
+const ShoppingListModal = ({ clearCheckedShopping, deleteShoppingItem, groupedShoppingList, handleAddShoppingItem, handleShareList, handleShareWhatsApp, items, moveShoppingToStock, setShoppingFormData, setShowShoppingModal, shoppingFormData, shoppingList, showShoppingModal, toggleShoppingItem }) => (
 <Modal isOpen={showShoppingModal} onClose={() => setShowShoppingModal(false)} title="Boodschappenlijst." color="blue">
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-stone-200/50 dark:border-stone-700/50 p-4 mb-4">
@@ -956,6 +977,9 @@ const ShoppingListModal = ({ clearCheckedShopping, deleteShoppingItem, groupedSh
                     <div className="flex justify-between items-end mb-2 px-1">
                         <h4 className="font-bold text-xs text-stone-800 dark:text-stone-200 uppercase tracking-wide">Jouw Lijstje</h4>
                         <div className="flex gap-2">
+                            <button onClick={handleShareList} className="text-[10px] flex items-center gap-1 font-bold text-white bg-teal-600 hover:bg-teal-700 px-2.5 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all active:scale-95" title="Delen">
+                                <Icon path={Icons.Share} size={12}/> Delen
+                            </button>
                             <button onClick={handleShareWhatsApp} className="text-[10px] flex items-center gap-1 font-bold text-white bg-green-500 hover:bg-green-600 px-2.5 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all active:scale-95" title="Deel via WhatsApp">
                                 <Icon path={Icons.MessageCircle} size={12}/> WhatsApp
                             </button>
@@ -2519,6 +2543,7 @@ function App() {
     const [showProfileMenu, setShowProfileMenu] = useState(false); 
     const [showUserAdminModal, setShowUserAdminModal] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [notifPermission, setNotifPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
     const [showLogModal, setShowLogModal] = useState(false); 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
@@ -2934,6 +2959,59 @@ const alleEenheden = activeCustomUnits.length > 0
         }
     }, [isDataLoaded, alerts.length]); 
 
+    // Meldingen: toont een browsermelding voor bijna-vervallen/verlopen producten.
+    // Werkt zolang de app open (of recent actief) is; volledige achtergrond-push
+    // (ook wanneer de app helemaal gesloten is) vereist een Firebase Cloud
+    // Messaging-server, wat buiten deze twee bestanden valt.
+    useEffect(() => {
+        if (!isDataLoaded || alerts.length === 0) return;
+        if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+
+        const todayKey = new Date().toISOString().split('T')[0];
+        const notifiedKey = `notified_${todayKey}_${alerts.length}`;
+        if (localStorage.getItem(notifiedKey)) return;
+
+        const title = alerts.length === 1
+            ? '1 product heeft aandacht nodig'
+            : `${alerts.length} producten hebben aandacht nodig`;
+        const body = alerts.slice(0, 5).map(i => i.naam).join(', ') + (alerts.length > 5 ? ', ...' : '');
+
+        const showIt = (registration) => {
+            const options = {
+                body,
+                icon: './icon_192x192.png',
+                badge: './icon_192x192.png',
+                tag: 'voorraad-alerts'
+            };
+            if (registration && registration.showNotification) {
+                registration.showNotification(title, options);
+            } else {
+                new Notification(title, options);
+            }
+        };
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(showIt).catch(() => showIt(null));
+        } else {
+            showIt(null);
+        }
+        localStorage.setItem(notifiedKey, '1');
+    }, [isDataLoaded, alerts]);
+
+    const requestNotificationPermission = async () => {
+        if (typeof Notification === 'undefined') {
+            showNotification('Meldingen worden niet ondersteund door deze browser.', 'error');
+            return;
+        }
+        const result = await Notification.requestPermission();
+        setNotifPermission(result);
+        if (result === 'granted') {
+            showNotification('Meldingen zijn ingeschakeld!', 'success');
+        } else if (result === 'denied') {
+            showNotification('Meldingen zijn geblokkeerd. Wijzig dit in je browserinstellingen.', 'error');
+        }
+    };
+
     // ===== HANDLERS & BUSINESSLOGICA =====
     const handleGoogleLogin = async () => { 
         try { 
@@ -2985,6 +3063,51 @@ const alleEenheden = activeCustomUnits.length > 0
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const exportToPDF = () => {
+        setShowProfileMenu(false);
+        if (items.length === 0) return alert("Geen producten om te exporteren.");
+        if (typeof window.jspdf === 'undefined') {
+            return alert("PDF-export is niet beschikbaar (bibliotheek kon niet laden).");
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape' });
+
+        doc.setFontSize(16);
+        doc.text('Voorraad. - Overzicht', 14, 15);
+        doc.setFontSize(9);
+        doc.setTextColor(120);
+        doc.text(`Geëxporteerd op ${formatDate(new Date().toISOString())}`, 14, 21);
+
+        const head = [['Naam', 'Aantal', 'Eenheid', 'Categorie', 'Locatie', 'Lade', 'THT / Ingevroren', 'Type', 'Prijs']];
+        const body = items.map(item => {
+            const loc = vriezers.find(v => v.id === item.vriezerId);
+            const locNaam = loc ? loc.naam : 'Onbekend';
+            const type = loc ? loc.type : 'Onbekend';
+            const datum = item.houdbaarheidsDatum ? formatDate(item.houdbaarheidsDatum) : (item.ingevrorenOp ? formatDate(item.ingevrorenOp) : '');
+            return [
+                item.naam || '',
+                formatAantal(item.aantal),
+                item.eenheid || '',
+                item.categorie || '',
+                locNaam,
+                item.ladeNaam || '',
+                datum,
+                type,
+                item.prijs ? `€ ${item.prijs}` : ''
+            ];
+        });
+
+        doc.autoTable({
+            head, body,
+            startY: 26,
+            styles: { fontSize: 8, cellPadding: 2 },
+            headStyles: { fillColor: [13, 148, 136] } // teal-600
+        });
+
+        doc.save(`Voorraad_Export_${new Date().toISOString().split('T')[0]}.pdf`);
     };
     
     const handleDragStart = (e, id) => {
@@ -3403,9 +3526,7 @@ const handleSaveItem = async (e) => {
         }
     };
     
-    const handleShareWhatsApp = () => {
-        if (shoppingList.length === 0) return;
-        
+    const buildShoppingListText = () => {
         let text = "🛒 *Mijn Boodschappenlijstje*\n\n";
         
         const grouped = shoppingList.reduce((acc, item) => {
@@ -3427,8 +3548,38 @@ const handleSaveItem = async (e) => {
             });
             text += "\n";
         });
-        
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+
+        return text;
+    };
+
+    const handleShareWhatsApp = () => {
+        if (shoppingList.length === 0) return;
+        window.open(`https://wa.me/?text=${encodeURIComponent(buildShoppingListText())}`, '_blank');
+    };
+
+    // Native deelvenster (Web Share API): laat de gebruiker kiezen via welke app
+    // (Mail, Berichten, WhatsApp, ...) het lijstje gedeeld wordt. Werkt vooral goed
+    // op mobiel; op desktop of oudere browsers valt dit terug op kopiëren naar klembord.
+    const handleShareList = async () => {
+        if (shoppingList.length === 0) return;
+        const text = buildShoppingListText();
+
+        if (navigator.share) {
+            try {
+                await navigator.share({ title: 'Boodschappenlijstje', text });
+            } catch (err) {
+                // gebruiker annuleerde het deelvenster, geen actie nodig
+            }
+        } else if (navigator.clipboard) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showNotification('Boodschappenlijst gekopieerd naar klembord!', 'success');
+            } catch (err) {
+                handleShareWhatsApp();
+            }
+        } else {
+            handleShareWhatsApp();
+        }
     };
 
     const moveShoppingToStock = async (item) => {
@@ -4074,6 +4225,11 @@ const toggleMaintenanceMode = async () => {
                                             </>
                                         )}
                                     </button>
+                                    {notifPermission !== 'granted' && notifPermission !== 'unsupported' && (
+                                        <button onClick={requestNotificationPermission} className={CX_MENU_ITEM}>
+                                            <Icon path={Icons.Bell} size={16} /> {notifPermission === 'denied' ? 'Meldingen geblokkeerd.' : 'Meldingen inschakelen.'}
+                                        </button>
+                                    )}
 {/* -- NIEUW: CONTROLE KNOPPEN TONEN/VERBERGEN -- */}
                                     {(!myHiddenTabs.includes('balans') || isAdmin) && (
                                         <button onClick={toggleBalansMode} className={CX_MENU_ITEM}>
@@ -4109,6 +4265,9 @@ const toggleMaintenanceMode = async () => {
                                     </button>
                                     <button onClick={exportToCSV} className={CX_MENU_ITEM}>
                                         <Icon path={Icons.Download} size={16}/> Exporteer naar Excel.
+                                    </button>
+                                    <button onClick={exportToPDF} className={CX_MENU_ITEM}>
+                                        <Icon path={Icons.Download} size={16}/> Exporteer naar PDF.
                                     </button>
                                     <button onClick={handlePrint} className={CX_MENU_ITEM}>
                                         <Icon path={Icons.Printer} size={16}/> Print.
@@ -4898,7 +5057,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             <EmojiPickerModal setFormData={setFormData} setShowEmojiPicker={setShowEmojiPicker} showEmojiPicker={showEmojiPicker} />
 
             {/* Shopping List Modal */}
-            <ShoppingListModal clearCheckedShopping={clearCheckedShopping} deleteShoppingItem={deleteShoppingItem} groupedShoppingList={groupedShoppingList} handleAddShoppingItem={handleAddShoppingItem} handleShareWhatsApp={handleShareWhatsApp} items={items} moveShoppingToStock={moveShoppingToStock} setShoppingFormData={setShoppingFormData} setShowShoppingModal={setShowShoppingModal} shoppingFormData={shoppingFormData} shoppingList={shoppingList} showShoppingModal={showShoppingModal} toggleShoppingItem={toggleShoppingItem} />
+            <ShoppingListModal clearCheckedShopping={clearCheckedShopping} deleteShoppingItem={deleteShoppingItem} groupedShoppingList={groupedShoppingList} handleAddShoppingItem={handleAddShoppingItem} handleShareList={handleShareList} handleShareWhatsApp={handleShareWhatsApp} items={items} moveShoppingToStock={moveShoppingToStock} setShoppingFormData={setShoppingFormData} setShowShoppingModal={setShowShoppingModal} shoppingFormData={shoppingFormData} shoppingList={shoppingList} showShoppingModal={showShoppingModal} toggleShoppingItem={toggleShoppingItem} />
 
             {/* Delete Confirmation Modal */}
             <DeleteModal confirmDelete={confirmDelete} itemToDelete={itemToDelete} items={items} setShowDeleteModal={setShowDeleteModal} showDeleteModal={showDeleteModal} />
