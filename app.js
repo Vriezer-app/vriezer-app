@@ -203,6 +203,8 @@ const Icon = ({ path, size = 20, className = "" }) => (
 const Icons = {
     Plus: <path d="M5 12h14M12 5v14"/>,
     Bell: <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>,
+    Trash: <g><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></g>,
+    Upload: <g><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></g>,
     Minus: <path d="M5 12h14"/>,
     Search: <path d="m21 21-4.3-4.3M11 17a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>,
     Filter: <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>,
@@ -249,6 +251,52 @@ const Icons = {
 };
 
 // --- 4. HULPFUNCTIES ---
+
+// Slim zoeken: naast de gewone substring-match ook tikfouten tolereren en een
+// kleine set Belgisch-Nederlandse synoniemen herkennen (bv. "patat" vindt "aardappel").
+const normalizeSearchText = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+const levenshteinDistance = (a, b) => {
+    const m = a.length, n = b.length;
+    if (m === 0) return n;
+    if (n === 0) return m;
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+        }
+    }
+    return dp[m][n];
+};
+
+const SEARCH_SYNONYMS = {
+    'patat': ['aardappel', 'aardappelen'], 'patatten': ['aardappel', 'aardappelen'],
+    'aardappel': ['patat', 'patatten'], 'aardappelen': ['patat', 'patatten'],
+    'look': ['knoflook'], 'knoflook': ['look'],
+    'ajuin': ['ui', 'uien'], 'ui': ['ajuin'], 'uien': ['ajuin'],
+    'frigo': ['koelkast'], 'koelkast': ['frigo'],
+    'diepvries': ['vriezer', 'diepvriezer'], 'vriezer': ['diepvries'],
+    'gsm': ['smartphone', 'telefoon']
+};
+
+const smartMatch = (itemName, query) => {
+    const nQuery = normalizeSearchText((query || '').trim());
+    if (!nQuery) return true;
+    const nName = normalizeSearchText(itemName || '');
+    if (nName.includes(nQuery)) return true;
+
+    const synonyms = SEARCH_SYNONYMS[nQuery] || [];
+    if (synonyms.some(s => nName.includes(s))) return true;
+
+    const maxDist = nQuery.length <= 4 ? 1 : 2;
+    return nName.split(/\s+/).some(word => {
+        if (Math.abs(word.length - nQuery.length) > maxDist + 1) return false;
+        return levenshteinDistance(word, nQuery) <= maxDist;
+    });
+};
+
 const getDagenOud = (timestamp) => {
     if (!timestamp) return 0;
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -2359,6 +2407,85 @@ const AddEditItemModal = ({ actieveCategorieen, alleEenheden, editingItem, formD
             </Modal>
 );
 
+// Deel-modal: nodig iemand uit via e-mail, zie status van eerdere uitnodigingen, trek toegang in.
+const ShareModal = ({ showShareModal, setShowShareModal, shareEmail, setShareEmail, handleShare, myOutgoingShares, revokeShare, setShowPublicLinkModal }) => (
+    <Modal isOpen={showShareModal} onClose={() => setShowShareModal(false)} title="Delen." color="blue">
+        <form onSubmit={handleShare} className="space-y-2">
+            <label className={CX_LABEL}>Nodig iemand uit via e-mail</label>
+            <div className="flex gap-2">
+                <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)} placeholder="naam@voorbeeld.be" className={CX_INPUT} />
+                <button type="submit" className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-bold whitespace-nowrap transition-all active:scale-95 shadow-sm">Uitnodigen</button>
+            </div>
+            <p className="text-xs text-stone-500 dark:text-stone-400">De uitgenodigde persoon moet inloggen met exact dit e-mailadres en de uitnodiging accepteren voordat die jouw voorraad kan zien en beheren.</p>
+        </form>
+
+        {myOutgoingShares.length > 0 && (
+            <div className="space-y-2 pt-2 border-t border-stone-100 dark:border-stone-700">
+                <label className={CX_LABEL}>Gedeeld met</label>
+                {myOutgoingShares.map(s => (
+                    <div key={s.id} className="flex items-center justify-between bg-stone-50 dark:bg-stone-800/50 p-3 rounded-xl border border-stone-100 dark:border-stone-700">
+                        <div className="min-w-0">
+                            <p className="text-sm font-bold text-stone-800 dark:text-stone-100 truncate">{s.sharedWithEmail}</p>
+                            <p className={`text-[10px] font-bold uppercase tracking-wide ${s.status === 'accepted' ? 'text-green-600 dark:text-green-400' : s.status === 'declined' ? 'text-red-500' : 'text-orange-500'}`}>
+                                {s.status === 'accepted' ? 'Geaccepteerd' : s.status === 'declined' ? 'Geweigerd' : 'Wacht op reactie...'}
+                            </p>
+                        </div>
+                        <button onClick={() => revokeShare(s.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all active:scale-95 flex-shrink-0" title="Toegang intrekken">
+                            <Icon path={Icons.Trash} size={16}/>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        )}
+
+        <div className="pt-2 border-t border-stone-100 dark:border-stone-700">
+            <button onClick={() => { setShowShareModal(false); setShowPublicLinkModal(true); }} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-bold transition-all active:scale-95">
+                <Icon path={Icons.Link} size={16}/> Bekijk-link zonder account
+            </button>
+        </div>
+    </Modal>
+);
+
+// Modal om een publieke, alleen-lezen deel-link te genereren zonder dat de ontvanger
+// een account nodig heeft. Vereist een passende Firestore Security Rule (zie PublicShareView).
+const PublicLinkModal = ({ showPublicLinkModal, setShowPublicLinkModal, myPublicShareEnabled, togglePublicShare, publicShareToken, regeneratePublicLink }) => {
+    const link = publicShareToken ? `${window.location.origin}${window.location.pathname}?deel=${publicShareToken}` : '';
+    const [copied, setCopied] = useState(false);
+
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(link);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (e) { /* klembord niet beschikbaar, gebruiker kan handmatig selecteren */ }
+    };
+
+    return (
+        <Modal isOpen={showPublicLinkModal} onClose={() => setShowPublicLinkModal(false)} title="Bekijk-link." color="indigo">
+            <p className="text-sm text-stone-600 dark:text-stone-300">Iedereen met deze link kan je voorraad bekijken (alleen-lezen), zonder in te loggen. Handig om snel even te delen met bv. familie.</p>
+
+            <div className="flex items-center justify-between bg-stone-50 dark:bg-stone-800/50 p-3 rounded-xl border border-stone-100 dark:border-stone-700">
+                <span className="text-sm font-bold text-stone-800 dark:text-stone-100">Link actief</span>
+                <button onClick={togglePublicShare} className={`w-12 h-7 rounded-full transition-colors relative flex-shrink-0 ${myPublicShareEnabled ? 'bg-teal-500' : 'bg-stone-300 dark:bg-stone-600'}`}>
+                    <span className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-sm transition-transform ${myPublicShareEnabled ? 'translate-x-5' : 'translate-x-0.5'}`}></span>
+                </button>
+            </div>
+
+            {myPublicShareEnabled && publicShareToken && (
+                <div className="space-y-2">
+                    <div className="flex gap-2">
+                        <input readOnly value={link} onClick={e => e.target.select()} className={CX_INPUT + ' text-xs'} />
+                        <button onClick={copyLink} className="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all active:scale-95">
+                            {copied ? 'Gekopieerd!' : 'Kopieer'}
+                        </button>
+                    </div>
+                    <button onClick={regeneratePublicLink} className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors">Nieuwe link genereren (oude stopt met werken)</button>
+                </div>
+            )}
+        </Modal>
+    );
+};
+
 // --- 6. APP ---
 function App() {
     // ===== STATE =====
@@ -2556,6 +2683,7 @@ function App() {
     const [showSwitchMenu, setShowSwitchMenu] = useState(false);
     const [navCompact, setNavCompact] = useState(false);
     const lastScrollY = useRef(0);
+    const backupFileInputRef = useRef(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -2621,6 +2749,12 @@ function App() {
     const [newLadeNaam, setNewLadeNaam] = useState('');
     const [newUnitNaam, setNewUnitNaam] = useState('');
     const [shareEmail, setShareEmail] = useState('');
+    const [pendingInvites, setPendingInvites] = useState([]);
+    const [mySharedAccounts, setMySharedAccounts] = useState([]);
+    const [myOutgoingShares, setMyOutgoingShares] = useState([]);
+    const [showPublicLinkModal, setShowPublicLinkModal] = useState(false);
+    const [publicShareToken, setPublicShareToken] = useState(null);
+    const [myPublicShareEnabled, setMyPublicShareEnabled] = useState(false);
     
     const [eenheidFilter, setEenheidFilter] = useState('vries'); 
     const [modalType, setModalType] = useState('vriezer');
@@ -2699,6 +2833,8 @@ function App() {
                         setMyShowHelpButton(data.showHelpButton === true);
                         setMyShowBalans(data.showBalans === true);
                         setMyNotificationsEnabled(data.notificationsEnabled !== false);
+                        setPublicShareToken(data.publicShareToken || null);
+                        setMyPublicShareEnabled(data.publicShareEnabled === true);
                         setMyTourDisabled(data.tourDisabled === true);
                         setMyHasSeenTutorial(data.hasSeenTutorial === true);
 
@@ -2755,6 +2891,82 @@ function App() {
         });
         return () => unsubscribe();
     }, []);
+
+    // Luistert naar deel-uitnodigingen die AAN mij (mijn e-mailadres) gericht zijn.
+    // Splitst ze in 'pending' (moet ik nog accepteren/weigeren) en 'accepted' (ik kan
+    // al wisselen naar dat account via de accountwissel-knop in de header/pil).
+    useEffect(() => {
+        if (!user || !user.email) { setPendingInvites([]); setMySharedAccounts([]); return; }
+        const unsub = db.collection('shares').where('sharedWithEmail', '==', user.email).onSnapshot(snap => {
+            const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            setPendingInvites(all.filter(s => s.status === 'pending'));
+            setMySharedAccounts(all.filter(s => s.status === 'accepted'));
+        }, (err) => console.warn('Kon uitnodigingen niet laden:', err));
+        return () => unsub();
+    }, [user]);
+
+    // Luistert naar uitnodigingen die IK heb verstuurd, zodat ik in het deel-menu kan
+    // zien of iemand mijn uitnodiging al geaccepteerd heeft.
+    useEffect(() => {
+        if (!user || !user.uid) { setMyOutgoingShares([]); return; }
+        const unsub = db.collection('shares').where('ownerId', '==', user.uid).onSnapshot(snap => {
+            setMyOutgoingShares(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        }, (err) => console.warn('Kon verzonden uitnodigingen niet laden:', err));
+        return () => unsub();
+    }, [user]);
+
+    const acceptShareInvite = async (invite) => {
+        try {
+            await db.collection('shares').doc(invite.id).update({ status: 'accepted', acceptedAt: new Date().toISOString() });
+            setBeheerdeUserId(invite.ownerId);
+            showNotification(`Uitnodiging van ${invite.ownerEmail} geaccepteerd!`, 'success');
+        } catch (e) {
+            showNotification('Kon de uitnodiging niet accepteren.', 'error');
+        }
+    };
+
+    const declineShareInvite = async (invite) => {
+        try {
+            await db.collection('shares').doc(invite.id).update({ status: 'declined' });
+        } catch (e) {
+            showNotification('Kon de uitnodiging niet weigeren.', 'error');
+        }
+    };
+
+    const revokeShare = async (shareId) => {
+        try {
+            await db.collection('shares').doc(shareId).delete();
+            showNotification('Toegang ingetrokken.', 'success');
+        } catch (e) {
+            showNotification('Kon de toegang niet intrekken.', 'error');
+        }
+    };
+
+    const togglePublicShare = async () => {
+        try {
+            let token = publicShareToken;
+            if (!token) {
+                token = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+                setPublicShareToken(token);
+            }
+            const newEnabled = !myPublicShareEnabled;
+            await db.collection('users').doc(user.uid).set({ publicShareToken: token, publicShareEnabled: newEnabled }, { merge: true });
+            setMyPublicShareEnabled(newEnabled);
+        } catch (e) {
+            showNotification('Kon de deel-link niet bijwerken.', 'error');
+        }
+    };
+
+    const regeneratePublicLink = async () => {
+        try {
+            const token = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+            setPublicShareToken(token);
+            await db.collection('users').doc(user.uid).set({ publicShareToken: token }, { merge: true });
+            showNotification('Nieuwe link gegenereerd. De oude link werkt niet meer.', 'success');
+        } catch (e) {
+            showNotification('Kon geen nieuwe link genereren.', 'error');
+        }
+    };
 
     useEffect(() => {
         const unsub = db.collection('settings').doc('onboarding').onSnapshot(doc => {
@@ -3141,6 +3353,108 @@ const alleEenheden = activeCustomUnits.length > 0
         });
 
         doc.save(`Voorraad_Export_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
+    // Back-up: bundelt alle data van het huidige (beheerde) account in één JSON-bestand.
+    const exportBackup = async () => {
+        setShowProfileMenu(false);
+        try {
+            showNotification('Back-up wordt gemaakt...', 'success');
+            const [vSnap, lSnap, iSnap, sSnap, rSnap, uSnap] = await Promise.all([
+                db.collection('vriezers').where('userId', '==', beheerdeUserId).get(),
+                db.collection('lades').where('userId', '==', beheerdeUserId).get(),
+                db.collection('items').where('userId', '==', beheerdeUserId).get(),
+                db.collection('shoppingList').where('userId', '==', beheerdeUserId).get(),
+                db.collection('recepten').where('userId', '==', beheerdeUserId).get(),
+                db.collection('users').doc(beheerdeUserId).get()
+            ]);
+            const backup = {
+                type: 'voorraad-backup',
+                version: APP_VERSION,
+                createdAt: new Date().toISOString(),
+                userSettings: uSnap.exists ? uSnap.data() : {},
+                vriezers: vSnap.docs.map(d => d.data()),
+                lades: lSnap.docs.map(d => d.data()),
+                items: iSnap.docs.map(d => d.data()),
+                shoppingList: sSnap.docs.map(d => d.data()),
+                recepten: rSnap.docs.map(d => d.data())
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Voorraad_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error(e);
+            showNotification('Kon geen back-up maken.', 'error');
+        }
+    };
+
+    // Herstel: leest een eerder gemaakt back-upbestand in en VOEGT die data toe aan
+    // je huidige voorraad (overschrijft niets, geen dataverlies-risico).
+    const importBackupFile = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (data.type !== 'voorraad-backup') {
+                showNotification('Dit lijkt geen geldig back-upbestand te zijn.', 'error');
+                return;
+            }
+            if (!confirm(`Back-up van ${data.createdAt ? new Date(data.createdAt).toLocaleDateString('nl-BE') : 'onbekende datum'} herstellen? Dit voegt de data toe aan je huidige voorraad.`)) return;
+
+            showNotification('Back-up wordt hersteld...', 'success');
+
+            // Vriezers/locaties eerst herstellen; oude-naar-nieuwe ID's bijhouden zodat
+            // lades en items weer correct aan hun locatie gekoppeld worden.
+            const vriezerIdMap = {};
+            for (const v of (data.vriezers || [])) {
+                const { id: oldId, ...rest } = v;
+                const ref = await db.collection('vriezers').add({ ...rest, userId: beheerdeUserId });
+                if (oldId) vriezerIdMap[oldId] = ref.id;
+            }
+            const ladeIdMap = {};
+            for (const l of (data.lades || [])) {
+                const { id: oldId, ...rest } = l;
+                const ref = await db.collection('lades').add({ ...rest, userId: beheerdeUserId, vriezerId: vriezerIdMap[rest.vriezerId] || rest.vriezerId });
+                if (oldId) ladeIdMap[oldId] = ref.id;
+            }
+            let batch = db.batch();
+            let opCount = 0;
+            const commitIfNeeded = async () => {
+                if (opCount >= 450) { await batch.commit(); batch = db.batch(); opCount = 0; }
+            };
+            for (const it of (data.items || [])) {
+                const { id: oldId, ...rest } = it;
+                const ref = db.collection('items').doc();
+                batch.set(ref, { ...rest, userId: beheerdeUserId, vriezerId: vriezerIdMap[rest.vriezerId] || rest.vriezerId, ladeId: ladeIdMap[rest.ladeId] || rest.ladeId || null });
+                opCount++; await commitIfNeeded();
+            }
+            for (const s of (data.shoppingList || [])) {
+                const { id: oldId, ...rest } = s;
+                const ref = db.collection('shoppingList').doc();
+                batch.set(ref, { ...rest, userId: beheerdeUserId });
+                opCount++; await commitIfNeeded();
+            }
+            for (const r of (data.recepten || [])) {
+                const { id: oldId, ...rest } = r;
+                const ref = db.collection('recepten').doc();
+                batch.set(ref, { ...rest, userId: beheerdeUserId });
+                opCount++; await commitIfNeeded();
+            }
+            if (opCount > 0) await batch.commit();
+
+            showNotification('Back-up succesvol hersteld!', 'success');
+        } catch (e) {
+            console.error(e);
+            showNotification('Kon de back-up niet herstellen. Controleer het bestand.', 'error');
+        }
     };
     
     const handleDragStart = (e, id) => {
@@ -3944,12 +4258,23 @@ const openEdit = (item) => {
 
     const handleShare = async (e) => {
         e.preventDefault();
+        const email = shareEmail.trim().toLowerCase();
+        if (!email) return;
+        if (email === (user.email || '').toLowerCase()) {
+            showNotification('Je kan jezelf niet uitnodigen.', 'error');
+            return;
+        }
+        const existing = await db.collection('shares').where('ownerId', '==', user.uid).where('sharedWithEmail', '==', email).get();
+        const active = existing.docs.find(d => d.data().status !== 'declined');
+        if (active) {
+            showNotification('Deze persoon is al uitgenodigd of heeft al toegang.', 'error');
+            return;
+        }
         await db.collection('shares').add({ 
-            ownerId: user.uid, ownerEmail: user.email, sharedWithEmail: shareEmail, role: 'editor', status: 'pending' 
+            ownerId: user.uid, ownerEmail: user.email, sharedWithEmail: email, role: 'editor', status: 'pending', createdAt: new Date().toISOString()
         });
-        alert("Uitnodiging verstuurd!");
+        showNotification('Uitnodiging verstuurd!', 'success');
         setShareEmail('');
-        setShowShareModal(false);
     };
 
     const toggleUserStatus = async (userId, currentStatus) => {
@@ -4156,7 +4481,7 @@ const toggleMaintenanceMode = async () => {
     let totalFoundItemsInActiveTab = 0;
     if (isSearching) {
         totalFoundItemsInActiveTab = activeItems.filter(i => {
-            if (!i.naam.toLowerCase().includes(search.toLowerCase())) return false;
+            if (!smartMatch(i.naam, search)) return false;
             if (activeCategoryFilter && i.categorie !== activeCategoryFilter) return false;
             return true;
         }).length;
@@ -4273,6 +4598,12 @@ const toggleMaintenanceMode = async () => {
             <button onClick={exportToPDF} className={CX_MENU_ITEM}>
                 <Icon path={Icons.Download} size={16}/> Exporteer naar PDF.
             </button>
+            <button onClick={exportBackup} className={CX_MENU_ITEM}>
+                <Icon path={Icons.Download} size={16}/> Maak back-up.
+            </button>
+            <button onClick={() => { setShowProfileMenu(false); backupFileInputRef.current && backupFileInputRef.current.click(); }} className={CX_MENU_ITEM}>
+                <Icon path={Icons.Upload} size={16}/> Herstel back-up.
+            </button>
             <button onClick={handlePrint} className={CX_MENU_ITEM}>
                 <Icon path={Icons.Printer} size={16}/> Print.
             </button>
@@ -4281,6 +4612,8 @@ const toggleMaintenanceMode = async () => {
             </button>
         </div>
     );
+
+    const switchableAccounts = isAdmin ? usersList : mySharedAccounts.map(s => ({ id: s.ownerId, email: s.ownerEmail }));
 
     // ===== RENDER =====
     return (
@@ -4295,6 +4628,7 @@ const toggleMaintenanceMode = async () => {
             )}
 
             <header className="bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-md sticky top-0 z-30 shadow-sm border-b border-stone-200 dark:border-stone-800 print:hidden transition-colors duration-300">
+                <input ref={backupFileInputRef} type="file" accept="application/json" onChange={importBackupFile} className="hidden" />
                 <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
                     <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 hover:scale-105 transition-transform cursor-default">Voorraad.</h1>
                     <div className="flex gap-2 relative">
@@ -4317,11 +4651,11 @@ const toggleMaintenanceMode = async () => {
                         
                         <button onClick={() => setShowWhatsNew(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-stone-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Meldingen"><Icon path={Icons.Info}/>{alerts.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-stone-800"></span>}</button>
                         
-                        {isAdmin && beheerdeUserId && user && beheerdeUserId !== user.uid && (
+                        {(isAdmin || mySharedAccounts.length > 0) && beheerdeUserId && user && beheerdeUserId !== user.uid && (
                             <div className="relative">
                                 <button onClick={() => setShowSwitchMenu(!showSwitchMenu)} className="h-10 px-3 flex items-center gap-1.5 rounded-full bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 text-xs font-bold hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-all active:scale-95 shadow-sm" title="Je beheert nu een ander account">
                                     <Icon path={Icons.Users} size={14}/>
-                                    <span className="max-w-[100px] truncate">{(usersList.find(u => u.id === beheerdeUserId) || {}).email || 'Ander account'}</span>
+                                    <span className="max-w-[100px] truncate">{(switchableAccounts.find(u => u.id === beheerdeUserId) || {}).email || 'Ander account'}</span>
                                     <Icon path={Icons.ChevronDown} size={12}/>
                                 </button>
                                 {showSwitchMenu && (
@@ -4329,11 +4663,11 @@ const toggleMaintenanceMode = async () => {
                                         <button onClick={() => { setBeheerdeUserId(user.uid); setShowSwitchMenu(false); showNotification('Terug naar je eigen account.', 'success'); }} className={CX_MENU_ITEM}>
                                             <Icon path={Icons.LogOut} size={16}/> Terug naar mijn account.
                                         </button>
-                                        {usersList.filter(u => u.id !== beheerdeUserId).length > 0 && (
+                                        {switchableAccounts.filter(u => u.id !== beheerdeUserId).length > 0 && (
                                             <>
                                                 <div className="border-t border-stone-100 dark:border-stone-700 my-1"></div>
                                                 <p className="px-4 py-1 text-[9px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">Wissel naar</p>
-                                                {usersList.filter(u => u.id !== beheerdeUserId).map(u => (
+                                                {switchableAccounts.filter(u => u.id !== beheerdeUserId).map(u => (
                                                     <button key={u.id} onClick={() => { setBeheerdeUserId(u.id); setShowSwitchMenu(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className={CX_MENU_ITEM}>
                                                         <Icon path={Icons.User} size={16}/> <span className="truncate">{u.email || u.displayName || u.id}</span>
                                                     </button>
@@ -4345,7 +4679,7 @@ const toggleMaintenanceMode = async () => {
                             </div>
                         )}
 
-                        <div className="relative hidden sm:block">
+                        <div className="relative hidden lg:block">
                             <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all active:scale-95 shadow-sm">
                                 {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400"><Icon path={Icons.User} size={20}/></div>}
                             </button>
@@ -4356,7 +4690,7 @@ const toggleMaintenanceMode = async () => {
             </header>
 
             {/* Op tablet/desktop (sm en groter) blijft een bovenste tabbalk zichtbaar; op smartphone wordt de onderste navigatie gebruikt */}
-            <div className="hidden sm:flex max-w-7xl mx-auto px-4 gap-6 border-b border-stone-100 dark:border-stone-800 overflow-x-auto bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-md sticky top-[57px] z-20 print:hidden">
+            <div className="hidden lg:flex max-w-7xl mx-auto px-4 gap-6 border-b border-stone-100 dark:border-stone-800 overflow-x-auto bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-md sticky top-[57px] z-20 print:hidden">
                 <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='vriezer' ? 'border-purple-500 text-purple-600 dark:text-purple-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}><Icon path={Icons.Snowflake}/> Vriez.</button>
                 {(!myHiddenTabs.includes('frig') || isAdmin) && (
                     <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='frig' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
@@ -4383,7 +4717,24 @@ const toggleMaintenanceMode = async () => {
                 )}
             </div>
 
-            <main className="max-w-7xl mx-auto p-4 space-y-4 flex-grow w-full pb-32 sm:pb-20 relative">
+            <main className="max-w-7xl mx-auto p-4 space-y-4 flex-grow w-full pb-32 lg:pb-20 relative">
+                {pendingInvites.length > 0 && pendingInvites.map(invite => (
+                    <div key={invite.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 rounded-2xl p-4 print:hidden">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-300 flex-shrink-0">
+                                <Icon path={Icons.Users} size={18}/>
+                            </div>
+                            <p className="text-sm font-medium text-indigo-900 dark:text-indigo-100 min-w-0">
+                                <span className="font-bold">{invite.ownerEmail}</span> nodigt je uit om mee te beheren.
+                            </p>
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                            <button onClick={() => acceptShareInvite(invite)} className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all active:scale-95 shadow-sm">Accepteren</button>
+                            <button onClick={() => declineShareInvite(invite)} className="px-3 py-1.5 bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 text-xs font-bold rounded-lg border border-stone-200 dark:border-stone-700 transition-all active:scale-95">Weigeren</button>
+                        </div>
+                    </div>
+                ))}
+
                 {activeTab !== 'weekmenu' && activeTab !== 'recepten' && (
                 <div className="flex flex-col gap-3 print:hidden">
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide items-center">
@@ -4931,7 +5282,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                                         <h2 className={`text-lg font-bold mb-3 flex items-center gap-2 bg-clip-text text-transparent bg-gradient-to-r ${gradientClass} tracking-tight pl-1`}>{vriezer.naam}</h2>
                                         <div className="space-y-3">
                                             {lades.filter(l => l.vriezerId === vriezer.id).sort((a,b)=>a.naam.localeCompare(b.naam)).map(lade => {
-                                                let ladeItems = items.filter(i => i.ladeId === lade.id && i.naam.toLowerCase().includes(search.toLowerCase()));
+                                                let ladeItems = items.filter(i => i.ladeId === lade.id && smartMatch(i.naam, search));
                                                 
                                                 if (activeCategoryFilter) {
                                                     ladeItems = ladeItems.filter(i => i.categorie === activeCategoryFilter);
@@ -5123,9 +5474,9 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             {!isBulkMode && (
                 <>
-                <button onClick={handleOpenAdd} className="hidden sm:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
+                <button onClick={handleOpenAdd} className="hidden lg:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
 
-                <nav className="fixed left-4 right-4 z-40 print:hidden sm:hidden" style={{ bottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
+                <nav className="fixed left-4 right-4 z-40 print:hidden lg:hidden" style={{ bottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
                     <div className={`max-w-sm mx-auto flex items-center justify-around bg-white/90 dark:bg-stone-800/90 backdrop-blur-xl rounded-full shadow-xl border border-white/60 dark:border-stone-700/60 transition-all duration-300 ${navCompact ? 'py-1 px-1' : 'py-2 px-2'}`}>
                         <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Vriezer" className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
                             <Icon path={Icons.Snowflake} size={navCompact ? 16 : 19}/>
@@ -5200,6 +5551,8 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             )}
 
             <VersionHistoryModal isOpen={showVersionHistory} onClose={() => setShowVersionHistory(false)} />
+            <ShareModal showShareModal={showShareModal} setShowShareModal={setShowShareModal} shareEmail={shareEmail} setShareEmail={setShareEmail} handleShare={handleShare} myOutgoingShares={myOutgoingShares} revokeShare={revokeShare} setShowPublicLinkModal={setShowPublicLinkModal} />
+            <PublicLinkModal showPublicLinkModal={showPublicLinkModal} setShowPublicLinkModal={setShowPublicLinkModal} myPublicShareEnabled={myPublicShareEnabled} togglePublicShare={togglePublicShare} publicShareToken={publicShareToken} regeneratePublicLink={regeneratePublicLink} />
 
             <DashboardModal dashboardData={dashboardData} dashboardUser={dashboardUser} items={items} lades={lades} openDashboardLades={openDashboardLades} openEditFromDashboard={openEditFromDashboard} setDashboardUser={setDashboardUser} setOpenDashboardLades={setOpenDashboardLades} setShowDashboardModal={setShowDashboardModal} showDashboardModal={showDashboardModal} usersList={usersList} vriezers={vriezers} />
 
@@ -5208,5 +5561,82 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
     );
 }
 
+// Publieke, alleen-lezen weergave zonder account nodig. Wordt getoond wanneer de URL
+// een ?deel=TOKEN parameter bevat. Zoekt de eigenaar op via hun publicShareToken en
+// toont hun voorraad read-only, gegroepeerd per locatie/lade.
+// LET OP: dit vereist een Firestore Security Rule die publiek lezen toestaat wanneer
+// het token geldig is. Zie de meegeleverde voorbeeldregel voor de exacte rule-syntax.
+const PublicShareView = ({ token }) => {
+    const [status, setStatus] = useState('loading'); // loading | notfound | ok
+    const [ownerLabel, setOwnerLabel] = useState('');
+    const [vriezers, setVriezers] = useState([]);
+    const [items, setItems] = useState([]);
+
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const userSnap = await db.collection('users').where('publicShareToken', '==', token).where('publicShareEnabled', '==', true).limit(1).get();
+                if (userSnap.empty) { setStatus('notfound'); return; }
+                const ownerDoc = userSnap.docs[0];
+                const ownerId = ownerDoc.id;
+                setOwnerLabel(ownerDoc.data().displayName || ownerDoc.data().email || 'Iemand');
+
+                const [vSnap, iSnap] = await Promise.all([
+                    db.collection('vriezers').where('userId', '==', ownerId).get(),
+                    db.collection('items').where('userId', '==', ownerId).get()
+                ]);
+                setVriezers(vSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+                setItems(iSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+                setStatus('ok');
+            } catch (e) {
+                console.error('Kon gedeelde voorraad niet laden:', e);
+                setStatus('notfound');
+            }
+        };
+        load();
+    }, [token]);
+
+    if (status === 'loading') {
+        return <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-900 text-stone-500">Laden...</div>;
+    }
+    if (status === 'notfound') {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 dark:bg-stone-900 p-6 text-center gap-3">
+                <Icon path={Icons.Lock} size={40} className="text-stone-300"/>
+                <h1 className="text-lg font-bold text-stone-700 dark:text-stone-200">Deze deel-link is niet (meer) geldig.</h1>
+                <p className="text-sm text-stone-500 dark:text-stone-400">Vraag de eigenaar om een nieuwe link te delen.</p>
+            </div>
+        );
+    }
+
+    const grouped = vriezers.map(v => ({ locatie: v, producten: items.filter(i => i.vriezerId === v.id) }));
+
+    return (
+        <div className="min-h-screen bg-stone-50 dark:bg-stone-900 font-sans">
+            <header className="bg-white/80 dark:bg-stone-800/80 backdrop-blur-md sticky top-0 z-30 shadow-sm border-b border-stone-200 dark:border-stone-800 p-4">
+                <h1 className="text-xl font-bold text-teal-600">Voorraad. <span className="text-sm font-medium text-stone-400">— bekeken via deel-link</span></h1>
+                <p className="text-xs text-stone-500 dark:text-stone-400">Voorraad van {ownerLabel} · alleen-lezen</p>
+            </header>
+            <main className="max-w-3xl mx-auto p-4 space-y-4">
+                {grouped.map(g => g.producten.length > 0 && (
+                    <div key={g.locatie.id} className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-100 dark:border-stone-700 p-4">
+                        <h3 className="font-bold text-stone-800 dark:text-stone-100 mb-2">{g.locatie.naam}</h3>
+                        <ul className="space-y-1.5">
+                            {g.producten.map(p => (
+                                <li key={p.id} className="flex justify-between text-sm text-stone-600 dark:text-stone-300">
+                                    <span>{p.emoji} {p.naam}</span>
+                                    <span className="text-stone-400">{formatAantal(p.aantal)} {p.eenheid}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+                {items.length === 0 && <p className="text-center text-stone-400 text-sm py-10">Geen producten gevonden.</p>}
+            </main>
+        </div>
+    );
+};
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+const publicShareToken = new URLSearchParams(window.location.search).get('deel');
+root.render(publicShareToken ? <PublicShareView token={publicShareToken} /> : <App />);
