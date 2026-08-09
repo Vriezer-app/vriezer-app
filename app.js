@@ -5104,34 +5104,37 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             {!isBulkMode && (
                 <>
-                <button onClick={handleOpenAdd} className="fixed bottom-24 sm:bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
+                <button onClick={handleOpenAdd} className="hidden sm:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
 
-                <nav className="fixed bottom-4 left-4 right-4 z-40 print:hidden safe-bottom sm:hidden" style={{ marginBottom: 'env(safe-area-inset-bottom)' }}>
+                <nav className="fixed left-4 right-4 z-40 print:hidden sm:hidden" style={{ bottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
                     <div className="max-w-sm mx-auto flex items-center justify-around bg-white/90 dark:bg-stone-800/90 backdrop-blur-xl rounded-full shadow-xl border border-white/60 dark:border-stone-700/60 py-2 px-2">
-                        <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Vriezer" className={`flex items-center justify-center w-12 h-12 rounded-full transition-all active:scale-90 ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                            <Icon path={Icons.Snowflake} size={22}/>
+                        <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Vriezer" className={`flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                            <Icon path={Icons.Snowflake} size={20}/>
                         </button>
                         {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Frig" className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all active:scale-90 ${activeTab==='frig' ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.Fridge} size={22}/>
+                            <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Frig" className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='frig' ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.Fridge} size={20}/>
                                 {isAdmin && managedUserHiddenTabs.includes('frig') && <Icon path={Icons.Lock} size={10} className="absolute top-1 right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
+                        <button onClick={handleOpenAdd} title="Toevoegen" className="flex-shrink-0 flex items-center justify-center w-12 h-12 -mt-5 rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-white shadow-lg border-4 border-white dark:border-stone-800 active:scale-90 transition-all">
+                            <Icon path={Icons.Plus} size={22}/>
+                        </button>
                         {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Stock" className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all active:scale-90 ${activeTab==='voorraad' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.Box} size={22}/>
+                            <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Stock" className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='voorraad' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.Box} size={20}/>
                                 {isAdmin && managedUserHiddenTabs.includes('voorraad') && <Icon path={Icons.Lock} size={10} className="absolute top-1 right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
                         {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} title="Weekmenu" className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all active:scale-90 ${activeTab==='weekmenu' ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.Calendar} size={22}/>
+                            <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} title="Weekmenu" className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='weekmenu' ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.Calendar} size={20}/>
                                 {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <Icon path={Icons.Lock} size={10} className="absolute top-1 right-1.5 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
                         {(!myHiddenTabs.includes('recepten') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Recepten" className={`flex items-center justify-center w-12 h-12 rounded-full transition-all active:scale-90 ${activeTab==='recepten' ? 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
-                                <Icon path={Icons.BookOpen} size={22}/>
+                            <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Recepten" className={`flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-90 ${activeTab==='recepten' ? 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                                <Icon path={Icons.BookOpen} size={20}/>
                             </button>
                         )}
                     </div>
