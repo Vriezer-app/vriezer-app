@@ -1509,7 +1509,7 @@ const BeheerModal = ({ actieveCategorieen, beheerTab, customUnitsFrig, customUni
 );
 
 // Gebruikersbeheer modal
-const UserAdminModal = ({ beheerdeUserId, globalOnboardingActive, items, maintenanceMode, recepten, resetTutorialForEveryone, setBeheerdeUserId, setDashboardUser, setShowDashboardModal, setShowUserAdminModal, showNotification, showUserAdminModal, toggleGlobalOnboardingStatus, toggleMaintenanceMode, toggleUserBalansMode, toggleUserHelpButton, toggleUserStatus, toggleUserTabVisibility, toggleUserTourDisabled, triggerTourForUser, usersList }) => (
+const UserAdminModal = ({ beheerdeUserId, globalOnboardingActive, items, maintenanceMode, recepten, resetTutorialForEveryone, setBeheerdeUserId, setDashboardUser, setShowDashboardModal, setShowUserAdminModal, showNotification, showUserAdminModal, toggleGlobalOnboardingStatus, toggleMaintenanceMode, toggleUserBalansMode, toggleUserHelpButton, toggleUserNotifications, toggleUserStatus, toggleUserTabVisibility, toggleUserTourDisabled, triggerTourForUser, usersList }) => (
 <Modal isOpen={showUserAdminModal} onClose={() => setShowUserAdminModal(false)} title="Gebruikers." color="pink">
                 
                 <div className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 p-4 rounded-xl border border-red-200/60 dark:border-red-800/50 mb-5 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-sm">
@@ -1664,6 +1664,16 @@ const UserAdminModal = ({ beheerdeUserId, globalOnboardingActive, items, mainten
                                         className="rounded border-stone-300 text-red-600 focus:ring-red-500 w-3.5 h-3.5"
                                     />
                                     <span className="font-bold text-red-700 dark:text-red-400">Toon lichtrode 'Hulp' knop in hoofdmenu</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 mt-0.5">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={u.notificationsEnabled !== false} 
+                                        onChange={() => toggleUserNotifications(u.id, u.notificationsEnabled !== false)}
+                                        className="rounded border-stone-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
+                                    />
+                                    <span className="font-bold text-teal-700 dark:text-teal-400">Meldingen (bijna vervallen producten) toestaan</span>
                                 </div>
                                 
                                 <div className="flex items-center gap-2 mt-2">
@@ -2365,6 +2375,7 @@ function App() {
     const [darkMode, setDarkMode] = useState(false);
     const [myShowHelpButton, setMyShowHelpButton] = useState(false);
     const [myShowBalans, setMyShowBalans] = useState(false);
+    const [myNotificationsEnabled, setMyNotificationsEnabled] = useState(true);
     const [myTourDisabled, setMyTourDisabled] = useState(false);
     const [myHasSeenTutorial, setMyHasSeenTutorial] = useState(true);
     const [savedOpenLades, setSavedOpenLades] = useState(null);
@@ -2541,6 +2552,7 @@ function App() {
     const [showBeheerModal, setShowBeheerModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false); 
+    const [showSwitchMenu, setShowSwitchMenu] = useState(false);
     const [showUserAdminModal, setShowUserAdminModal] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [notifPermission, setNotifPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
@@ -2669,6 +2681,7 @@ function App() {
                         setMyHiddenTabs(data.hiddenTabs || []);
                         setMyShowHelpButton(data.showHelpButton === true);
                         setMyShowBalans(data.showBalans === true);
+                        setMyNotificationsEnabled(data.notificationsEnabled !== false);
                         setMyTourDisabled(data.tourDisabled === true);
                         setMyHasSeenTutorial(data.hasSeenTutorial === true);
 
@@ -2695,6 +2708,7 @@ function App() {
                             darkMode: false,
                             showHelpButton: false,
                             showBalans: false,
+                            notificationsEnabled: true,
                             tourDisabled: false,
                             hasSeenTutorial: false,
                             openLades: [],
@@ -2704,6 +2718,7 @@ function App() {
                         setMyHiddenTabs([]);
                         setMyShowHelpButton(false);
                         setMyShowBalans(false);
+                        setMyNotificationsEnabled(true);
                         setMyTourDisabled(false);
                         setMyHasSeenTutorial(false);
                     }
@@ -2965,6 +2980,7 @@ const alleEenheden = activeCustomUnits.length > 0
     // Messaging-server, wat buiten deze twee bestanden valt.
     useEffect(() => {
         if (!isDataLoaded || alerts.length === 0) return;
+        if (!myNotificationsEnabled) return;
         if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
 
         const todayKey = new Date().toISOString().split('T')[0];
@@ -2996,7 +3012,7 @@ const alleEenheden = activeCustomUnits.length > 0
             showIt(null);
         }
         localStorage.setItem(notifiedKey, '1');
-    }, [isDataLoaded, alerts]);
+    }, [isDataLoaded, alerts, myNotificationsEnabled]);
 
     const requestNotificationPermission = async () => {
         if (typeof Notification === 'undefined') {
@@ -3951,6 +3967,15 @@ const openEdit = (item) => {
             showNotification("Fout bij aanpassen van instelling.", "error");
         }
     };
+
+    const toggleUserNotifications = async (userId, currentStatus) => {
+        try {
+            await db.collection('users').doc(userId).set({ notificationsEnabled: !currentStatus }, { merge: true });
+            showNotification(`Meldingen zijn nu ${!currentStatus ? 'ingeschakeld' : 'uitgeschakeld'} voor deze gebruiker.`, "success");
+        } catch(e) {
+            showNotification("Fout bij aanpassen van instelling.", "error");
+        }
+    };
 const toggleUserBalansMode = async (userId, currentStatus) => {
     try {
         await db.collection('users').doc(userId).set({ showBalans: !currentStatus }, { merge: true });
@@ -4203,6 +4228,34 @@ const toggleMaintenanceMode = async () => {
                         
                         <button onClick={() => setShowWhatsNew(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-stone-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Meldingen"><Icon path={Icons.Info}/>{alerts.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-stone-800"></span>}</button>
                         
+                        {isAdmin && beheerdeUserId && user && beheerdeUserId !== user.uid && (
+                            <div className="relative">
+                                <button onClick={() => setShowSwitchMenu(!showSwitchMenu)} className="h-10 px-3 flex items-center gap-1.5 rounded-full bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 text-xs font-bold hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-all active:scale-95 shadow-sm" title="Je beheert nu een ander account">
+                                    <Icon path={Icons.Users} size={14}/>
+                                    <span className="max-w-[100px] truncate">{(usersList.find(u => u.id === beheerdeUserId) || {}).email || 'Ander account'}</span>
+                                    <Icon path={Icons.ChevronDown} size={12}/>
+                                </button>
+                                {showSwitchMenu && (
+                                    <div className="absolute right-0 mt-2 w-60 bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-xl shadow-xl border border-stone-100 dark:border-stone-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <button onClick={() => { setBeheerdeUserId(user.uid); setShowSwitchMenu(false); showNotification('Terug naar je eigen account.', 'success'); }} className={CX_MENU_ITEM}>
+                                            <Icon path={Icons.LogOut} size={16}/> Terug naar mijn account.
+                                        </button>
+                                        {usersList.filter(u => u.id !== beheerdeUserId).length > 0 && (
+                                            <>
+                                                <div className="border-t border-stone-100 dark:border-stone-700 my-1"></div>
+                                                <p className="px-4 py-1 text-[9px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">Wissel naar</p>
+                                                {usersList.filter(u => u.id !== beheerdeUserId).map(u => (
+                                                    <button key={u.id} onClick={() => { setBeheerdeUserId(u.id); setShowSwitchMenu(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className={CX_MENU_ITEM}>
+                                                        <Icon path={Icons.User} size={16}/> <span className="truncate">{u.email || u.displayName || u.id}</span>
+                                                    </button>
+                                                ))}
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div className="relative">
                             <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all active:scale-95 shadow-sm">
                                 {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400"><Icon path={Icons.User} size={20}/></div>}
@@ -5072,7 +5125,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
             <BeheerModal actieveCategorieen={actieveCategorieen} beheerTab={beheerTab} customUnitsFrig={customUnitsFrig} customUnitsVoorraad={customUnitsVoorraad} customUnitsVries={customUnitsVries} cycleLocatieColor={cycleLocatieColor} draggedCatName={draggedCatName} draggedLocId={draggedLocId} draggedUnitName={draggedUnitName} editCatInputColor={editCatInputColor} editCatInputName={editCatInputName} editUnitInput={editUnitInput} editingCatName={editingCatName} editingLadeId={editingLadeId} editingLadeName={editingLadeName} editingUnitName={editingUnitName} eenheidFilter={eenheidFilter} filteredLocaties={filteredLocaties} handleAddCat={handleAddCat} handleAddLade={handleAddLade} handleAddLocatie={handleAddLocatie} handleAddUnit={handleAddUnit} handleDeleteCat={handleDeleteCat} handleDeleteLade={handleDeleteLade} handleDeleteLocatie={handleDeleteLocatie} handleDeleteUnit={handleDeleteUnit} handleDragEnd={handleDragEnd} handleDragOver={handleDragOver} handleDragStart={handleDragStart} handleDragStartCat={handleDragStartCat} handleDragStartUnit={handleDragStartUnit} handleDrop={handleDrop} handleDropCat={handleDropCat} handleDropUnit={handleDropUnit} isAdmin={isAdmin} items={items} lades={lades} myHiddenTabs={myHiddenTabs} newCatColor={newCatColor} newCatName={newCatName} newLadeNaam={newLadeNaam} newLocatieColor={newLocatieColor} newLocatieNaam={newLocatieNaam} newUnitNaam={newUnitNaam} saveCat={saveCat} saveLadeName={saveLadeName} saveUnitName={saveUnitName} selectedLocatieForBeheer={selectedLocatieForBeheer} setBeheerTab={setBeheerTab} setDraggedCatName={setDraggedCatName} setDraggedUnitName={setDraggedUnitName} setEditCatInputColor={setEditCatInputColor} setEditCatInputName={setEditCatInputName} setEditUnitInput={setEditUnitInput} setEditingLadeName={setEditingLadeName} setEenheidFilter={setEenheidFilter} setNewCatColor={setNewCatColor} setNewCatName={setNewCatName} setNewLadeNaam={setNewLadeNaam} setNewLocatieColor={setNewLocatieColor} setNewLocatieNaam={setNewLocatieNaam} setNewUnitNaam={setNewUnitNaam} setSelectedLocatieForBeheer={setSelectedLocatieForBeheer} setShowBeheerModal={setShowBeheerModal} showBeheerModal={showBeheerModal} startEditCat={startEditCat} startEditLade={startEditLade} startEditUnit={startEditUnit} />
             
-<UserAdminModal beheerdeUserId={beheerdeUserId} globalOnboardingActive={globalOnboardingActive} items={items} maintenanceMode={maintenanceMode} recepten={recepten} resetTutorialForEveryone={resetTutorialForEveryone} setBeheerdeUserId={setBeheerdeUserId} setDashboardUser={setDashboardUser} setShowDashboardModal={setShowDashboardModal} setShowUserAdminModal={setShowUserAdminModal} showNotification={showNotification} showUserAdminModal={showUserAdminModal} toggleGlobalOnboardingStatus={toggleGlobalOnboardingStatus} toggleUserHelpButton={toggleUserHelpButton} toggleUserStatus={toggleUserStatus} toggleUserTabVisibility={toggleUserTabVisibility} toggleUserTourDisabled={toggleUserTourDisabled} triggerTourForUser={triggerTourForUser} usersList={usersList} toggleMaintenanceMode={toggleMaintenanceMode} toggleUserBalansMode={toggleUserBalansMode} />
+<UserAdminModal beheerdeUserId={beheerdeUserId} globalOnboardingActive={globalOnboardingActive} items={items} maintenanceMode={maintenanceMode} recepten={recepten} resetTutorialForEveryone={resetTutorialForEveryone} setBeheerdeUserId={setBeheerdeUserId} setDashboardUser={setDashboardUser} setShowDashboardModal={setShowDashboardModal} setShowUserAdminModal={setShowUserAdminModal} showNotification={showNotification} showUserAdminModal={showUserAdminModal} toggleGlobalOnboardingStatus={toggleGlobalOnboardingStatus} toggleUserHelpButton={toggleUserHelpButton} toggleUserStatus={toggleUserStatus} toggleUserTabVisibility={toggleUserTabVisibility} toggleUserTourDisabled={toggleUserTourDisabled} triggerTourForUser={triggerTourForUser} usersList={usersList} toggleMaintenanceMode={toggleMaintenanceMode} toggleUserBalansMode={toggleUserBalansMode} toggleUserNotifications={toggleUserNotifications} />
 
             <TourAdminModal editingTourSteps={editingTourSteps} handleAddEditStep={handleAddEditStep} handleDeleteEditStep={handleDeleteEditStep} handleUpdateEditStep={handleUpdateEditStep} items={items} moveEditStep={moveEditStep} saveTourStepsToDb={saveTourStepsToDb} setShowTourAdminModal={setShowTourAdminModal} showTourAdminModal={showTourAdminModal} />
 
