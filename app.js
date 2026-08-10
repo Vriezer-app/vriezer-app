@@ -5709,3 +5709,4 @@ const PublicShareView = ({ token }) => {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const publicShareToken = new URLSearchParams(window.location.search).get('deel');
 root.render(publicShareToken ? <PublicShareView token={publicShareToken} /> : <App />);
+        
