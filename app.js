@@ -1626,7 +1626,8 @@ const UserAdminModal = ({ beheerdeUserId, globalOnboardingActive, items, mainten
                                         <Icon path={Icons.LayoutDashboard} size={12}/> Dashboard
                                     </button>
                                     {u.id !== beheerdeUserId && (
-                                        <button onClick={() => { setBeheerdeUserId(u.id); setShowUserAdminModal(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className="px-2.5 py-1.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-600 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-all shadow-sm active:scale-95">
+                                        <button onClick={async() => {  setBeheerdeUserId(u.id); await db.collection('users').doc(user.uid).set({ activeBeheerdeUserId: u.id }, { merge: true }); 
+                                        setShowUserAdminModal(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className="px-2.5 py-1.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-600 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-all shadow-sm active:scale-95">
                                             Wissel
                                         </button>
                                     )}
@@ -2863,12 +2864,25 @@ function App() {
         }
     };
 
-    useEffect(() => {
+useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (u) => {
             if (u) {
                 setUser(u);
-                setBeheerdeUserId(u.uid);
                 
+                // --- NIEUW: Haal actieve gebruiker direct uit Firestore ---
+                try {
+                    const userDoc = await db.collection('users').doc(u.uid).get();
+                    if (userDoc.exists && userDoc.data().activeBeheerdeUserId) {
+                        setBeheerdeUserId(userDoc.data().activeBeheerdeUserId);
+                    } else {
+                        setBeheerdeUserId(u.uid);
+                    }
+                } catch(e) {
+                    console.error("Fout bij ophalen actieve account", e);
+                    setBeheerdeUserId(u.uid); // Fallback als Firestore even weigert
+                }
+                // --------------------------------------------------------
+
                 try {
                     await db.collection('users').doc(u.uid).set({
                         laatstGezien: firebase.firestore.FieldValue.serverTimestamp(),
@@ -2968,10 +2982,11 @@ function App() {
         return () => unsub();
     }, [user]);
 
-    const acceptShareInvite = async (invite) => {
+const acceptShareInvite = async (invite) => {
         try {
             await db.collection('shares').doc(invite.id).update({ status: 'accepted', acceptedAt: new Date().toISOString() });
             setBeheerdeUserId(invite.ownerId);
+            await db.collection('users').doc(user.uid).set({ activeBeheerdeUserId: invite.ownerId }, { merge: true });
             showNotification(`Uitnodiging van ${invite.ownerEmail} geaccepteerd!`, 'success');
         } catch (e) {
             showNotification('Kon de uitnodiging niet accepteren.', 'error');
@@ -4742,10 +4757,15 @@ const renderProfileMenu = (positionClasses) => (
                                             <span className="truncate flex-grow">{(usersList.find(u => u.id === beheerdeUserId) || {}).email || 'Ander account'}</span>
                                         </div>
                                         <div className="border-t border-stone-100 dark:border-stone-700 my-1"></div>
-                                        <button onClick={() => { setBeheerdeUserId(user.uid); setShowSwitchMenu(false); showNotification('Terug naar je eigen account.', 'success'); }} className="w-full text-left px-4 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-700">
-                                            <Icon path={Icons.Home} size={16} /> 
-                                            <span className="truncate flex-grow">Terug naar mijn account</span>
-                                        </button>
+                                        <button onClick={async () => { 
+    setBeheerdeUserId(user.uid); 
+    await db.collection('users').doc(user.uid).set({ activeBeheerdeUserId: user.uid }, { merge: true });
+    setShowSwitchMenu(false); 
+    showNotification('Terug naar je eigen account.', 'success'); 
+}} className="w-full text-left px-4 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-700">
+    <Icon path={Icons.Home} size={16} /> 
+    <span className="truncate flex-grow">Terug naar mijn account</span>
+</button>
                                     </div>
                                 )}
                             </div>
