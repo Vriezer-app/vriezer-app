@@ -4758,6 +4758,8 @@ const renderProfileMenu = (positionClasses) => (
                                 )}
                             </div>
                         )}
+
+                        <div className="relative hidden lg:block">
             </header>
 
             <main className="max-w-7xl mx-auto p-4 space-y-4 flex-grow w-full pb-32 lg:pb-20 relative">
