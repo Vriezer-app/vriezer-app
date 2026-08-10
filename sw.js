@@ -1,7 +1,7 @@
 // Service Worker voor Voorraad.
 // Zorgt voor offline-toegang (cachet de app-shell) en verwerkt kliks op meldingen.
 // Verhoog CACHE_NAME bij elke nieuwe release om oude caches automatisch te vervangen.
-const CACHE_NAME = 'voorraad-shell-v1';
+const CACHE_NAME = 'voorraad-shell-v2';
 
 const APP_SHELL = [
     './',
