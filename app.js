@@ -4727,32 +4727,24 @@ const renderProfileMenu = (positionClasses) => (
                             </button>
                         )}
                         
-                        <button onClick={() => setShowWhatsNew(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-stone-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Meldingen"><Icon path={Icons.Info}/>{alerts.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-stone-800"></span>}</button>
+<button onClick={() => setShowWhatsNew(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-stone-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Meldingen"><Icon path={Icons.Info}/>{alerts.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-stone-800"></span>}</button>
                         
-{(mySharedAccounts.length > 0 || beheerdeUserId !== user.uid) && user && (
+                        {isAdmin && user && beheerdeUserId !== user.uid && (
                             <div className="relative">
-                                <button onClick={() => setShowSwitchMenu(!showSwitchMenu)} className={`w-10 h-10 flex items-center justify-center rounded-full border transition-all active:scale-95 shadow-sm ${beheerdeUserId === user.uid ? 'bg-stone-100 border-stone-200 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-700' : 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'}`} title={beheerdeUserId === user.uid ? 'Mijn account' : 'Gedeeld account'}>
+                                <button onClick={() => setShowSwitchMenu(!showSwitchMenu)} className="w-10 h-10 flex items-center justify-center rounded-full border transition-all active:scale-95 shadow-sm bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50" title="Gedeeld account (Wissel terug)">
                                     <Icon path={Icons.Users} size={18}/>
                                 </button>
                                 {showSwitchMenu && (
                                     <div className="absolute right-0 mt-2 w-64 bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-xl shadow-xl border border-stone-100 dark:border-stone-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                        
-                                        {mySharedAccounts.length > 0 && (
-                                            <>
-                                                <p className="px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">Gedeelde accounts</p>
-                                                {mySharedAccounts.map(s => (
-                                                    <button key={s.ownerId} onClick={() => { setBeheerdeUserId(s.ownerId); setShowSwitchMenu(false); showNotification(`Ingelogd als ${s.ownerEmail}`, 'success'); }} className={`w-full text-left px-4 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors ${beheerdeUserId === s.ownerId ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' : 'text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-700'}`}>
-                                                        <Icon path={beheerdeUserId === s.ownerId ? Icons.Check : Icons.User} size={16} /> 
-                                                        <span className="truncate flex-grow">{s.ownerEmail}</span>
-                                                    </button>
-                                                ))}
-                                                <div className="border-t border-stone-100 dark:border-stone-700 my-1"></div>
-                                            </>
-                                        )}
-                                        
-                                        <button onClick={() => { setBeheerdeUserId(user.uid); setShowSwitchMenu(false); showNotification('Terug naar je eigen account.', 'success'); }} className={`w-full text-left px-4 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors ${beheerdeUserId === user.uid ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' : 'text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-700'}`}>
-                                            <Icon path={beheerdeUserId === user.uid ? Icons.Check : Icons.Home} size={16} /> 
-                                            <span className="truncate flex-grow">Mijn account</span>
+                                        <p className="px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">Beherend als</p>
+                                        <div className="px-4 py-2 text-sm font-medium flex items-center gap-2 text-orange-700 dark:text-orange-300">
+                                            <Icon path={Icons.Check} size={16} /> 
+                                            <span className="truncate flex-grow">{(usersList.find(u => u.id === beheerdeUserId) || {}).email || 'Ander account'}</span>
+                                        </div>
+                                        <div className="border-t border-stone-100 dark:border-stone-700 my-1"></div>
+                                        <button onClick={() => { setBeheerdeUserId(user.uid); setShowSwitchMenu(false); showNotification('Terug naar je eigen account.', 'success'); }} className="w-full text-left px-4 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-700">
+                                            <Icon path={Icons.Home} size={16} /> 
+                                            <span className="truncate flex-grow">Terug naar mijn account</span>
                                         </button>
                                     </div>
                                 )}
@@ -4760,6 +4752,13 @@ const renderProfileMenu = (positionClasses) => (
                         )}
 
                         <div className="relative hidden lg:block">
+                            <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all active:scale-95 shadow-sm">
+                                {user.photoURL ? <img src={user.photoURL} alt="Profiel" className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400"><Icon path={Icons.User} size={20}/></div>}
+                            </button>
+                            {showProfileMenu && renderProfileMenu('right-0 mt-2 animate-in fade-in slide-in-from-top-2 duration-200')}
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <main className="max-w-7xl mx-auto p-4 space-y-4 flex-grow w-full pb-32 lg:pb-20 relative">
