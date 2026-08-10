@@ -45,8 +45,8 @@ if ('serviceWorker' in navigator) {
 // tekst in elke modal is vertaald. Onvertaalde teksten vallen automatisch terug op NL.
 const TRANSLATIONS = {
     nl: {
-        tab_vriezer: 'Vriezer', tab_frig: 'Frig', tab_voorraad: 'Stock', tab_weekmenu: 'Week', tab_recepten: 'Recepten',
-        nav_vriezer_full: 'Vriezer', nav_frig_full: 'Frig.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Week.', nav_recepten_full: 'Recepten.',
+        tab_vriezer: 'Vriez', tab_frig: 'Frig', tab_voorraad: 'Stock', tab_weekmenu: 'Week', tab_recepten: 'Recept',
+        nav_vriezer_full: 'Vriez.', nav_frig_full: 'Frig.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Week.', nav_recepten_full: 'Recept.',
         search_placeholder: 'Zoek producten...', items_label: 'items',
         btn_filter: 'Filter', btn_select: 'Selecteer', btn_calendar: 'Kalender', btn_list: 'Lijst', btn_rapid: 'Snelle invoer',
         btn_add: 'Toevoegen', btn_save: 'Opslaan', btn_cancel: 'Annuleren', btn_delete: 'Verwijderen', btn_edit: 'Bewerken',
