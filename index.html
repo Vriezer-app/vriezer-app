@@ -5,65 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Voorraad.</title>
     
-    <!-- Favicon (Browser tab) -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="shortcut icon" href="favicon.ico">
-    
-    <!-- Apple Touch Icon (iOS Home Screen) - Zorg dat dit bestand bestaat! -->
     <link rel="apple-touch-icon" sizes="180x180" href="icon_180x180.png">
-    
-    <!-- Android / Chrome Icon -->
     <link rel="icon" type="image/png" sizes="192x192" href="icon_192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon_512x512.png">
-
-    <!-- Web App Manifest (Voor Android installeerbaarheid) -->
     <link rel="manifest" href="site.webmanifest.json">
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-  tailwind.config = {
-    darkMode: 'class', // <--- DEZE REGEL IS NODIG!
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Inter"', 'sans-serif'],
+            },
+          },
         },
-      },
-    },
-  }
-</script>
-
+      }
+    </script>
     
-    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- jsPDF (voor PDF-export) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Inter ingeladen als modern, strak lettertype -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fafaf9; -webkit-tap-highlight-color: transparent; }
-        h1, h2, h3, .font-display { font-family: 'Fraunces', serif; font-optical-sizing: auto; letter-spacing: -0.01em; }
+        body { font-family: 'Inter', sans-serif; background-color: #fafaf9; -webkit-tap-highlight-color: transparent; }
+        h1, h2, h3, .font-display { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
         .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .modal-animate { animation: fadeIn 0.2s ease-out forwards; }
         
-        /* Print styles specific fix */
         @media print {
             body { background-color: white; }
             .no-print { display: none !important; }
