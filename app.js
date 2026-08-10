@@ -45,8 +45,8 @@ if ('serviceWorker' in navigator) {
 // tekst in elke modal is vertaald. Onvertaalde teksten vallen automatisch terug op NL.
 const TRANSLATIONS = {
     nl: {
-        tab_vriezer: 'Vriez', tab_frig: 'Frig', tab_voorraad: 'Stock', tab_weekmenu: 'Week', tab_recepten: 'Recept',
-        nav_vriezer_full: 'Vriez.', nav_frig_full: 'Frig.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Week.', nav_recepten_full: 'Recept.',
+        tab_vriezer: 'Vriezer', tab_frig: 'Frig', tab_voorraad: 'Stock', tab_weekmenu: 'Week', tab_recepten: 'Recepten',
+        nav_vriezer_full: 'Vriezer', nav_frig_full: 'Frig.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Week.', nav_recepten_full: 'Recepten.',
         search_placeholder: 'Zoek producten...', items_label: 'items',
         btn_filter: 'Filter', btn_select: 'Selecteer', btn_calendar: 'Kalender', btn_list: 'Lijst', btn_rapid: 'Snelle invoer',
         btn_add: 'Toevoegen', btn_save: 'Opslaan', btn_cancel: 'Annuleren', btn_delete: 'Verwijderen', btn_edit: 'Bewerken',
@@ -4682,7 +4682,7 @@ const renderProfileMenu = (positionClasses) => (
                     <div className="flex items-center gap-4 min-w-0">
                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 hover:scale-105 transition-transform cursor-default flex-shrink-0">Voorraad.</h1>
 
-                        <nav className="hidden lg:flex items-center gap-1 bg-white/40 dark:bg-stone-800/40 backdrop-blur-md border border-white/50 dark:border-stone-700/50 s6hadow-sm rounded-full p-1 flex-shrink-0">
+                        <nav className="hidden lg:flex items-center gap-1 bg-transparent rounded-full p-1 flex-shrink-0">
                             <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab==='vriezer' ? 'bg-white dark:bg-stone-700 shadow-sm text-purple-600 dark:text-purple-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}><Icon path={Icons.Snowflake} size={16}/> {t('nav_vriezer_full')}</button>
                             {(!myHiddenTabs.includes('frig') || isAdmin) && (
                                 <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 relative ${activeTab==='frig' ? 'bg-white dark:bg-stone-700 shadow-sm text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}>
@@ -5542,10 +5542,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 <button onClick={handleOpenAdd} className="hidden lg:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
 
                 <nav className="fixed left-4 right-4 z-40 print:hidden lg:hidden" style={{ bottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
-                    <div className={`relative max-w-sm mx-auto flex items-center justify-around transition-all duration-300 ${navCompact ? 'py-1 px-1' : 'py-2 px-2'}`}>
-                        <div className="absolute inset-0 rounded-full overflow-hidden bg-white/40 dark:bg-stone-900/40 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_8px_32px_rgba(0,0,0,0.15)] border border-white/50 dark:border-white/10 ring-1 ring-inset ring-white/30 dark:ring-white/5 pointer-events-none">
-                            <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 dark:from-white/10 to-transparent"></div>
-                        </div>
+                    <div className={`max-w-sm mx-auto flex items-center justify-around bg-white/90 dark:bg-stone-800/90 backdrop-blur-xl rounded-full shadow-xl border border-white/60 dark:border-stone-700/60 transition-all duration-300 ${navCompact ? 'py-1 px-1' : 'py-2 px-2'}`}>
                         <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title={t('tab_vriezer')} className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
                             <Icon path={Icons.Snowflake} size={navCompact ? 16 : 19}/>
                         </button>
@@ -5709,4 +5706,3 @@ const PublicShareView = ({ token }) => {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const publicShareToken = new URLSearchParams(window.location.search).get('deel');
 root.render(publicShareToken ? <PublicShareView token={publicShareToken} /> : <App />);
-        
