@@ -5542,8 +5542,10 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                 <button onClick={handleOpenAdd} className="hidden lg:flex fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-full shadow-lg items-center justify-center z-40 print:hidden hover:scale-105 hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"><Icon path={Icons.Plus} size={28}/></button>
 
                 <nav className="fixed left-4 right-4 z-40 print:hidden lg:hidden" style={{ bottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
-                    <div className={`relative max-w-sm mx-auto flex items-center justify-around bg-white/40 dark:bg-stone-900/40 backdrop-blur-2xl backdrop-saturate-150 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.15)] border border-white/50 dark:border-white/10 ring-1 ring-inset ring-white/30 dark:ring-white/5 transition-all duration-300 overflow-hidden ${navCompact ? 'py-1 px-1' : 'py-2 px-2'}`}>
-                        <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 dark:from-white/10 to-transparent"></div>
+                    <div className={`relative max-w-sm mx-auto flex items-center justify-around transition-all duration-300 ${navCompact ? 'py-1 px-1' : 'py-2 px-2'}`}>
+                        <div className="absolute inset-0 rounded-full overflow-hidden bg-white/40 dark:bg-stone-900/40 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_8px_32px_rgba(0,0,0,0.15)] border border-white/50 dark:border-white/10 ring-1 ring-inset ring-white/30 dark:ring-white/5 pointer-events-none">
+                            <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 dark:from-white/10 to-transparent"></div>
+                        </div>
                         <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title={t('tab_vriezer')} className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
                             <Icon path={Icons.Snowflake} size={navCompact ? 16 : 19}/>
                         </button>
