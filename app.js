@@ -43,35 +43,7 @@ if ('serviceWorker' in navigator) {
 // Vertalingen voor de belangrijkste navigatie en veelgebruikte UI-teksten.
 // LET OP: dit dekt de kernnavigatie/chrome (tabbladen, knoppen, koppen) — niet elke
 // tekst in elke modal is vertaald. Onvertaalde teksten vallen automatisch terug op NL.
-const TRANSLATIONS = {
-    nl: {
-        tab_vriezer: 'Vriezer', tab_frig: 'Frig', tab_voorraad: 'Stock', tab_weekmenu: 'Week', tab_recepten: 'Recepten',
-        nav_vriezer_full: 'Vriezer', nav_frig_full: 'Frig.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Week.', nav_recepten_full: 'Recepten.',
-        search_placeholder: 'Zoek producten...', items_label: 'items',
-        btn_filter: 'Filter', btn_select: 'Selecteer', btn_calendar: 'Kalender', btn_list: 'Lijst', btn_rapid: 'Snelle invoer',
-        btn_add: 'Toevoegen', btn_save: 'Opslaan', btn_cancel: 'Annuleren', btn_delete: 'Verwijderen', btn_edit: 'Bewerken',
-        all_open: 'Alles open', all_closed: 'Alles dicht',
-        profile_light: 'Licht.', profile_dark: 'Donker.', profile_logout: 'Uitloggen.', profile_language: 'Taal.'
-    },
-    fr: {
-        tab_vriezer: 'Congél.', tab_frig: 'Frigo', tab_voorraad: 'Stock', tab_weekmenu: 'Semaine', tab_recepten: 'Recettes',
-        nav_vriezer_full: 'Congélateur', nav_frig_full: 'Frigo.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Semaine.', nav_recepten_full: 'Recettes.',
-        search_placeholder: 'Rechercher des produits...', items_label: 'articles',
-        btn_filter: 'Filtrer', btn_select: 'Sélectionner', btn_calendar: 'Calendrier', btn_list: 'Liste', btn_rapid: 'Saisie rapide',
-        btn_add: 'Ajouter', btn_save: 'Enregistrer', btn_cancel: 'Annuler', btn_delete: 'Supprimer', btn_edit: 'Modifier',
-        all_open: 'Tout ouvrir', all_closed: 'Tout fermer',
-        profile_light: 'Clair.', profile_dark: 'Sombre.', profile_logout: 'Déconnexion.', profile_language: 'Langue.'
-    },
-    en: {
-        tab_vriezer: 'Freezer', tab_frig: 'Fridge', tab_voorraad: 'Stock', tab_weekmenu: 'Menu', tab_recepten: 'Recipes',
-        nav_vriezer_full: 'Freezer', nav_frig_full: 'Fridge.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Menu.', nav_recepten_full: 'Recipes.',
-        search_placeholder: 'Search products...', items_label: 'items',
-        btn_filter: 'Filter', btn_select: 'Select', btn_calendar: 'Calendar', btn_list: 'List', btn_rapid: 'Quick add',
-        btn_add: 'Add', btn_save: 'Save', btn_cancel: 'Cancel', btn_delete: 'Delete', btn_edit: 'Edit',
-        all_open: 'Expand all', all_closed: 'Collapse all',
-        profile_light: 'Light.', profile_dark: 'Dark.', profile_logout: 'Log out.', profile_language: 'Language.'
-    }
-};
+
 const APP_VERSION = '10.2'; 
 
 // Versie Geschiedenis Data
@@ -1689,47 +1661,34 @@ const UserAdminModal = ({ beheerdeUserId, globalOnboardingActive, items, mainten
                                     />
                                     <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Recepten.' tabblad</span>
                                 </div>                                    
-{/* Gecombineerde rij voor Controle Knop instellingen */}
-<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-medium text-stone-700 dark:text-stone-300 mt-1 border-t border-stone-200/60 dark:border-stone-700/60 pt-2 pb-1">
-    
-    {/* Optie 1: Verberg de knop (Bestaande checkbox) */}
-    <div className="flex items-center gap-2">
-        <input 
-            type="checkbox" 
-            checked={(u.hiddenTabs || []).includes('balans')} 
-            onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
-            className="rounded border-stone-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
-        />
-        <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Controle' knop</span>
-    </div>
 
-    {/* Optie 2: Mooie Tailwind schakelaar voor Actief AAN/UIT */}
-    <div className="flex items-center gap-2">
-        <span className="font-bold text-stone-500 dark:text-stone-400">Status:</span>
-        <button
-            type="button"
-            onClick={() => toggleUserBalansMode(u.id, u.showBalans)}
-            className={`w-10 h-6 rounded-full p-1 transition-colors border shadow-inner flex items-center focus:outline-none ${u.showBalans ? 'bg-green-500 border-green-600' : 'bg-stone-300 border-stone-400 dark:bg-stone-600 dark:border-stone-700'}`}
-            title={u.showBalans ? "Controle staat AAN" : "Controle staat UIT"}
-        >
-            <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${u.showBalans ? 'translate-x-4' : 'translate-x-0'}`}></div>
-        </button>
-        <span className={`font-bold w-6 ${u.showBalans ? 'text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400'}`}>
-            {u.showBalans ? 'AAN' : 'UIT'}
-        </span>
-    </div>
-</div>
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-medium text-stone-700 dark:text-stone-300 mt-1 border-t border-stone-200/60 dark:border-stone-700/60 pt-2 pb-1">
+                                    
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={(u.hiddenTabs || []).includes('balans')} 
+                                            onChange={() => toggleUserTabVisibility(u.id, u.hiddenTabs, 'balans')}
+                                            className="rounded border-stone-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5"
+                                        />
+                                        <span className="font-bold text-teal-700 dark:text-teal-400">Verberg 'Controle' knop</span>
+                                    </div>
 
-{/* NIEUW: Code voor het aanzetten van de controle modus */}
-<div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 mt-0.5">
-    <input 
-        type="checkbox" 
-        checked={u.showBalans || false} 
-        onChange={() => toggleUserBalansMode(u.id, u.showBalans)}
-        className="rounded border-stone-300 text-green-600 focus:ring-green-500 w-3.5 h-3.5"
-    />
-    <span className="font-bold text-green-700 dark:text-green-400">Zet 'Controle' modus actief AAN</span>
-</div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold text-stone-500 dark:text-stone-400">Status:</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleUserBalansMode(u.id, u.showBalans)}
+                                            className={`w-10 h-6 rounded-full p-1 transition-colors border shadow-inner flex items-center focus:outline-none ${u.showBalans ? 'bg-green-500 border-green-600' : 'bg-stone-300 border-stone-400 dark:bg-stone-600 dark:border-stone-700'}`}
+                                            title={u.showBalans ? "Controle staat AAN" : "Controle staat UIT"}
+                                        >
+                                            <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${u.showBalans ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                                        </button>
+                                        <span className={`font-bold w-6 ${u.showBalans ? 'text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400'}`}>
+                                            {u.showBalans ? 'AAN' : 'UIT'}
+                                        </span>
+                                    </div>
+                                </div>
 
                                 <div className="flex items-center gap-2 text-xs font-medium text-stone-700 dark:text-stone-300 border-t border-stone-200/60 dark:border-stone-700/60 pt-2 mt-1">
                                     <input 
@@ -2578,7 +2537,7 @@ function App() {
     const [managedUserHiddenTabs, setManagedUserHiddenTabs] = useState([]);
     const [myHiddenTabs, setMyHiddenTabs] = useState([]);
     const [darkMode, setDarkMode] = useState(false);
-    const [language, setLanguage] = useState(() => localStorage.getItem('app_language') || 'nl');
+    const language = 'nl';
     const [myShowHelpButton, setMyShowHelpButton] = useState(false);
     const [myShowBalans, setMyShowBalans] = useState(false);
     const [myNotificationsEnabled, setMyNotificationsEnabled] = useState(true);
@@ -2862,15 +2821,6 @@ function App() {
             document.documentElement.classList.remove('dark');
         }
     }, [darkMode]);
-
-    // Vertaalfunctie: geeft de tekst voor 'key' terug in de gekozen taal, met NL als terugval.
-    const t = (key) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS.nl[key] || key;
-
-    const changeLanguage = (lang) => {
-        setLanguage(lang);
-        localStorage.setItem('app_language', lang);
-        setShowProfileMenu(false);
-    };
 
     const toggleDarkMode = async () => {
         if (!user) return;
@@ -4632,7 +4582,7 @@ const toggleMaintenanceMode = async () => {
 
     // Bouwt het profielmenu-paneel op; 'positionClasses' bepaalt waar het paneel verschijnt
     // (rechtsboven vanaf de header, of rechtsboven-de-pil vanaf de onderste navigatie).
-    const renderProfileMenu = (positionClasses) => (
+const renderProfileMenu = (positionClasses) => (
         <div className={`absolute w-56 bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-xl shadow-xl border border-stone-100 dark:border-stone-700 py-2 z-50 ${positionClasses}`}>
             <div className="px-4 py-2 border-b border-stone-50 dark:border-stone-700 mb-1">
                 <p className="text-sm font-bold text-stone-900 dark:text-stone-100 truncate">{user.displayName || 'Gebruiker'}</p>
@@ -4650,14 +4600,7 @@ const toggleMaintenanceMode = async () => {
                     </>
                 )}
             </button>
-            <div className="px-4 py-2 flex items-center justify-between">
-                <span className="text-xs font-bold text-stone-700 dark:text-stone-200 flex items-center gap-2"><Icon path={Icons.Globe} size={16}/> {t('profile_language')}</span>
-                <div className="flex gap-1">
-                    <button onClick={() => changeLanguage('nl')} title="Nederlands" className={`w-7 h-7 rounded-full text-sm flex items-center justify-center transition-all active:scale-90 ${language === 'nl' ? 'bg-teal-100 dark:bg-teal-900/50 ring-2 ring-teal-500' : 'hover:bg-stone-100 dark:hover:bg-stone-700'}`}>🇳🇱</button>
-                    <button onClick={() => changeLanguage('fr')} title="Français" className={`w-7 h-7 rounded-full text-sm flex items-center justify-center transition-all active:scale-90 ${language === 'fr' ? 'bg-teal-100 dark:bg-teal-900/50 ring-2 ring-teal-500' : 'hover:bg-stone-100 dark:hover:bg-stone-700'}`}>🇫🇷</button>
-                    <button onClick={() => changeLanguage('en')} title="English" className={`w-7 h-7 rounded-full text-sm flex items-center justify-center transition-all active:scale-90 ${language === 'en' ? 'bg-teal-100 dark:bg-teal-900/50 ring-2 ring-teal-500' : 'hover:bg-stone-100 dark:hover:bg-stone-700'}`}>🇬🇧</button>
-                </div>
-            </div>
+            
             {notifPermission !== 'granted' && notifPermission !== 'unsupported' && (
                 <button onClick={requestNotificationPermission} className={CX_MENU_ITEM}>
                     <Icon path={Icons.Bell} size={16} /> {notifPermission === 'denied' ? 'Meldingen geblokkeerd.' : 'Meldingen inschakelen.'}
