@@ -2538,6 +2538,7 @@ function App() {
     const [myHiddenTabs, setMyHiddenTabs] = useState([]);
     const [darkMode, setDarkMode] = useState(false);
     const language = 'nl';
+    const t = (key) => TRANSLATIONS.nl[key] || key;
     const [myShowHelpButton, setMyShowHelpButton] = useState(false);
     const [myShowBalans, setMyShowBalans] = useState(false);
     const [myNotificationsEnabled, setMyNotificationsEnabled] = useState(true);
