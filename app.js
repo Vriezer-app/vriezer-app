@@ -39,6 +39,39 @@ if ('serviceWorker' in navigator) {
 }
 
 // --- 2. CONFIGURATIE DATA ---
+
+// Vertalingen voor de belangrijkste navigatie en veelgebruikte UI-teksten.
+// LET OP: dit dekt de kernnavigatie/chrome (tabbladen, knoppen, koppen) — niet elke
+// tekst in elke modal is vertaald. Onvertaalde teksten vallen automatisch terug op NL.
+const TRANSLATIONS = {
+    nl: {
+        tab_vriezer: 'Vriezer', tab_frig: 'Frig', tab_voorraad: 'Stock', tab_weekmenu: 'Week', tab_recepten: 'Recepten',
+        nav_vriezer_full: 'Vriezer', nav_frig_full: 'Frig.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Week.', nav_recepten_full: 'Recepten.',
+        search_placeholder: 'Zoek producten...', items_label: 'items',
+        btn_filter: 'Filter', btn_select: 'Selecteer', btn_calendar: 'Kalender', btn_list: 'Lijst', btn_rapid: 'Snelle invoer',
+        btn_add: 'Toevoegen', btn_save: 'Opslaan', btn_cancel: 'Annuleren', btn_delete: 'Verwijderen', btn_edit: 'Bewerken',
+        all_open: 'Alles open', all_closed: 'Alles dicht',
+        profile_light: 'Licht.', profile_dark: 'Donker.', profile_logout: 'Uitloggen.', profile_language: 'Taal.'
+    },
+    fr: {
+        tab_vriezer: 'Congél.', tab_frig: 'Frigo', tab_voorraad: 'Stock', tab_weekmenu: 'Semaine', tab_recepten: 'Recettes',
+        nav_vriezer_full: 'Congélateur', nav_frig_full: 'Frigo.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Semaine.', nav_recepten_full: 'Recettes.',
+        search_placeholder: 'Rechercher des produits...', items_label: 'articles',
+        btn_filter: 'Filtrer', btn_select: 'Sélectionner', btn_calendar: 'Calendrier', btn_list: 'Liste', btn_rapid: 'Saisie rapide',
+        btn_add: 'Ajouter', btn_save: 'Enregistrer', btn_cancel: 'Annuler', btn_delete: 'Supprimer', btn_edit: 'Modifier',
+        all_open: 'Tout ouvrir', all_closed: 'Tout fermer',
+        profile_light: 'Clair.', profile_dark: 'Sombre.', profile_logout: 'Déconnexion.', profile_language: 'Langue.'
+    },
+    en: {
+        tab_vriezer: 'Freezer', tab_frig: 'Fridge', tab_voorraad: 'Stock', tab_weekmenu: 'Menu', tab_recepten: 'Recipes',
+        nav_vriezer_full: 'Freezer', nav_frig_full: 'Fridge.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Menu.', nav_recepten_full: 'Recipes.',
+        search_placeholder: 'Search products...', items_label: 'items',
+        btn_filter: 'Filter', btn_select: 'Select', btn_calendar: 'Calendar', btn_list: 'List', btn_rapid: 'Quick add',
+        btn_add: 'Add', btn_save: 'Save', btn_cancel: 'Cancel', btn_delete: 'Delete', btn_edit: 'Edit',
+        all_open: 'Expand all', all_closed: 'Collapse all',
+        profile_light: 'Light.', profile_dark: 'Dark.', profile_logout: 'Log out.', profile_language: 'Language.'
+    }
+};
 const APP_VERSION = '10.2'; 
 
 // Versie Geschiedenis Data
@@ -221,6 +254,7 @@ const Icons = {
     Users: <g><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>,
     Check: <path d="M20 6 9 17l-5-5"/>,
     Home: <g><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></g>,
+    Globe: <g><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></g>,
     Alert: <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3zM12 9v4M12 17h.01"/>,
     Settings: <g><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></g>,
     ChevronDown: <path d="m6 9 6 6 6-6"/>,
@@ -2449,6 +2483,48 @@ const ShareModal = ({ showShareModal, setShowShareModal, shareEmail, setShareEma
 
 // Modal om een publieke, alleen-lezen deel-link te genereren zonder dat de ontvanger
 // een account nodig heeft. Vereist een passende Firestore Security Rule (zie PublicShareView).
+// Combineert export (Excel/PDF) en back-up (maken/herstellen) in één modal,
+// zodat het profielmenu niet overladen wordt met losse links.
+const ExportBackupModal = ({ showExportBackupModal, setShowExportBackupModal, exportToCSV, exportToPDF, exportBackup, backupFileInputRef }) => (
+    <Modal isOpen={showExportBackupModal} onClose={() => setShowExportBackupModal(false)} title="Export & Back-up." color="blue">
+        <div className="space-y-2">
+            <p className={CX_LABEL}>Exporteren</p>
+            <button onClick={exportToCSV} className="w-full flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800/50 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-xl border border-stone-100 dark:border-stone-700 transition-all active:scale-[0.98] text-left">
+                <div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 flex items-center justify-center flex-shrink-0"><Icon path={Icons.Download} size={16}/></div>
+                <div className="min-w-0">
+                    <p className="text-sm font-bold text-stone-800 dark:text-stone-100">Exporteer naar Excel</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">CSV-bestand, te openen in Excel/Sheets.</p>
+                </div>
+            </button>
+            <button onClick={exportToPDF} className="w-full flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800/50 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-xl border border-stone-100 dark:border-stone-700 transition-all active:scale-[0.98] text-left">
+                <div className="w-9 h-9 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 flex items-center justify-center flex-shrink-0"><Icon path={Icons.Download} size={16}/></div>
+                <div className="min-w-0">
+                    <p className="text-sm font-bold text-stone-800 dark:text-stone-100">Exporteer naar PDF</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Netjes overzicht, klaar om te printen/delen.</p>
+                </div>
+            </button>
+        </div>
+
+        <div className="space-y-2 pt-2 border-t border-stone-100 dark:border-stone-700">
+            <p className={CX_LABEL}>Back-up</p>
+            <button onClick={exportBackup} className="w-full flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800/50 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-xl border border-stone-100 dark:border-stone-700 transition-all active:scale-[0.98] text-left">
+                <div className="w-9 h-9 rounded-lg bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 flex items-center justify-center flex-shrink-0"><Icon path={Icons.Download} size={16}/></div>
+                <div className="min-w-0">
+                    <p className="text-sm font-bold text-stone-800 dark:text-stone-100">Maak back-up</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Alles als JSON-bestand, om later terug te zetten.</p>
+                </div>
+            </button>
+            <button onClick={() => { setShowExportBackupModal(false); backupFileInputRef.current && backupFileInputRef.current.click(); }} className="w-full flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800/50 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-xl border border-stone-100 dark:border-stone-700 transition-all active:scale-[0.98] text-left">
+                <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0"><Icon path={Icons.Upload} size={16}/></div>
+                <div className="min-w-0">
+                    <p className="text-sm font-bold text-stone-800 dark:text-stone-100">Herstel back-up</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">Voegt toe aan je huidige voorraad, overschrijft niets.</p>
+                </div>
+            </button>
+        </div>
+    </Modal>
+);
+
 const PublicLinkModal = ({ showPublicLinkModal, setShowPublicLinkModal, myPublicShareEnabled, togglePublicShare, publicShareToken, regeneratePublicLink }) => {
     const link = publicShareToken ? `${window.location.origin}${window.location.pathname}?deel=${publicShareToken}` : '';
     const [copied, setCopied] = useState(false);
@@ -2502,6 +2578,7 @@ function App() {
     const [managedUserHiddenTabs, setManagedUserHiddenTabs] = useState([]);
     const [myHiddenTabs, setMyHiddenTabs] = useState([]);
     const [darkMode, setDarkMode] = useState(false);
+    const [language, setLanguage] = useState(() => localStorage.getItem('app_language') || 'nl');
     const [myShowHelpButton, setMyShowHelpButton] = useState(false);
     const [myShowBalans, setMyShowBalans] = useState(false);
     const [myNotificationsEnabled, setMyNotificationsEnabled] = useState(true);
@@ -2757,6 +2834,7 @@ function App() {
     const [mySharedAccounts, setMySharedAccounts] = useState([]);
     const [myOutgoingShares, setMyOutgoingShares] = useState([]);
     const [showPublicLinkModal, setShowPublicLinkModal] = useState(false);
+    const [showExportBackupModal, setShowExportBackupModal] = useState(false);
     const [publicShareToken, setPublicShareToken] = useState(null);
     const [myPublicShareEnabled, setMyPublicShareEnabled] = useState(false);
     
@@ -2784,6 +2862,15 @@ function App() {
             document.documentElement.classList.remove('dark');
         }
     }, [darkMode]);
+
+    // Vertaalfunctie: geeft de tekst voor 'key' terug in de gekozen taal, met NL als terugval.
+    const t = (key) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS.nl[key] || key;
+
+    const changeLanguage = (lang) => {
+        setLanguage(lang);
+        localStorage.setItem('app_language', lang);
+        setShowProfileMenu(false);
+    };
 
     const toggleDarkMode = async () => {
         if (!user) return;
@@ -4555,14 +4642,22 @@ const toggleMaintenanceMode = async () => {
             <button onClick={toggleDarkMode} className={CX_MENU_ITEM}>
                 {darkMode ? (
                     <>
-                        <Icon path={Icons.Sun} size={16} /> Licht.
+                        <Icon path={Icons.Sun} size={16} /> {t('profile_light')}
                     </>
                 ) : (
                     <>
-                        <Icon path={Icons.Moon} size={16} /> Donker.
+                        <Icon path={Icons.Moon} size={16} /> {t('profile_dark')}
                     </>
                 )}
             </button>
+            <div className="px-4 py-2 flex items-center justify-between">
+                <span className="text-xs font-bold text-stone-700 dark:text-stone-200 flex items-center gap-2"><Icon path={Icons.Globe} size={16}/> {t('profile_language')}</span>
+                <div className="flex gap-1">
+                    <button onClick={() => changeLanguage('nl')} title="Nederlands" className={`w-7 h-7 rounded-full text-sm flex items-center justify-center transition-all active:scale-90 ${language === 'nl' ? 'bg-teal-100 dark:bg-teal-900/50 ring-2 ring-teal-500' : 'hover:bg-stone-100 dark:hover:bg-stone-700'}`}>🇳🇱</button>
+                    <button onClick={() => changeLanguage('fr')} title="Français" className={`w-7 h-7 rounded-full text-sm flex items-center justify-center transition-all active:scale-90 ${language === 'fr' ? 'bg-teal-100 dark:bg-teal-900/50 ring-2 ring-teal-500' : 'hover:bg-stone-100 dark:hover:bg-stone-700'}`}>🇫🇷</button>
+                    <button onClick={() => changeLanguage('en')} title="English" className={`w-7 h-7 rounded-full text-sm flex items-center justify-center transition-all active:scale-90 ${language === 'en' ? 'bg-teal-100 dark:bg-teal-900/50 ring-2 ring-teal-500' : 'hover:bg-stone-100 dark:hover:bg-stone-700'}`}>🇬🇧</button>
+                </div>
+            </div>
             {notifPermission !== 'granted' && notifPermission !== 'unsupported' && (
                 <button onClick={requestNotificationPermission} className={CX_MENU_ITEM}>
                     <Icon path={Icons.Bell} size={16} /> {notifPermission === 'denied' ? 'Meldingen geblokkeerd.' : 'Meldingen inschakelen.'}
@@ -4600,23 +4695,14 @@ const toggleMaintenanceMode = async () => {
             <button onClick={() => { setShowShareModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
                 <Icon path={Icons.Share} size={16}/> Delen.
             </button>
-            <button onClick={exportToCSV} className={CX_MENU_ITEM}>
-                <Icon path={Icons.Download} size={16}/> Exporteer naar Excel.
-            </button>
-            <button onClick={exportToPDF} className={CX_MENU_ITEM}>
-                <Icon path={Icons.Download} size={16}/> Exporteer naar PDF.
-            </button>
-            <button onClick={exportBackup} className={CX_MENU_ITEM}>
-                <Icon path={Icons.Download} size={16}/> Maak back-up.
-            </button>
-            <button onClick={() => { setShowProfileMenu(false); backupFileInputRef.current && backupFileInputRef.current.click(); }} className={CX_MENU_ITEM}>
-                <Icon path={Icons.Upload} size={16}/> Herstel back-up.
+            <button onClick={() => { setShowExportBackupModal(true); setShowProfileMenu(false); }} className={CX_MENU_ITEM}>
+                <Icon path={Icons.Download} size={16}/> Export & Back-up.
             </button>
             <button onClick={handlePrint} className={CX_MENU_ITEM}>
                 <Icon path={Icons.Printer} size={16}/> Print.
             </button>
             <button onClick={handleLogout} className="w-full text-left px-4 py-2 mt-1 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t border-stone-50 dark:border-stone-700 transition-colors">
-                <Icon path={Icons.LogOut} size={16}/> Uitloggen.
+                <Icon path={Icons.LogOut} size={16}/> {t('profile_logout')}
             </button>
         </div>
     );
@@ -4637,9 +4723,38 @@ const toggleMaintenanceMode = async () => {
 
             <header className="bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-md sticky top-0 z-30 shadow-sm border-b border-stone-200 dark:border-stone-800 print:hidden transition-colors duration-300">
                 <input ref={backupFileInputRef} type="file" accept="application/json" onChange={importBackupFile} className="hidden" />
-                <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
-                    <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 hover:scale-105 transition-transform cursor-default">Voorraad.</h1>
-                    <div className="flex gap-2 relative">
+                <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center gap-4">
+                    <div className="flex items-center gap-4 min-w-0">
+                        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 hover:scale-105 transition-transform cursor-default flex-shrink-0">Voorraad.</h1>
+
+                        <nav className="hidden lg:flex items-center gap-1 bg-stone-100 dark:bg-stone-800 rounded-full p-1 flex-shrink-0">
+                            <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab==='vriezer' ? 'bg-white dark:bg-stone-700 shadow-sm text-purple-600 dark:text-purple-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}><Icon path={Icons.Snowflake} size={16}/> {t('nav_vriezer_full')}</button>
+                            {(!myHiddenTabs.includes('frig') || isAdmin) && (
+                                <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 relative ${activeTab==='frig' ? 'bg-white dark:bg-stone-700 shadow-sm text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}>
+                                    <Icon path={Icons.Fridge} size={16}/> {t('nav_frig_full')}
+                                    {isAdmin && managedUserHiddenTabs.includes('frig') && <Icon path={Icons.Lock} size={11} className="text-stone-400"/>}
+                                </button>
+                            )}
+                            {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
+                                <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 relative ${activeTab==='voorraad' ? 'bg-white dark:bg-stone-700 shadow-sm text-orange-600 dark:text-orange-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}>
+                                    <Icon path={Icons.Box} size={16}/> {t('nav_voorraad_full')}
+                                    {isAdmin && managedUserHiddenTabs.includes('voorraad') && <Icon path={Icons.Lock} size={11} className="text-stone-400"/>}
+                                </button>
+                            )}
+                            {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
+                                <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 relative ${activeTab==='weekmenu' ? 'bg-white dark:bg-stone-700 shadow-sm text-pink-600 dark:text-pink-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}>
+                                    <Icon path={Icons.Calendar} size={16}/> {t('nav_weekmenu_full')}
+                                    {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <Icon path={Icons.Lock} size={11} className="text-stone-400"/>}
+                                </button>
+                            )}
+                            {(!myHiddenTabs.includes('recepten') || isAdmin) && (
+                                <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab==='recepten' ? 'bg-white dark:bg-stone-700 shadow-sm text-teal-600 dark:text-teal-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}>
+                                    <Icon path={Icons.BookOpen} size={16}/> {t('nav_recepten_full')}
+                                </button>
+                            )}
+                        </nav>
+                    </div>
+                    <div className="flex gap-2 relative flex-shrink-0">
                         <button onClick={() => { setSelectedLocatieForBeheer(null); setBeheerdeUserId(beheerdeUserId); setShowBeheerModal(true); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Instellingen"><Icon path={Icons.Settings}/></button>
 
                         <button onClick={() => setShowShoppingModal(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-teal-50/50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-teal-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95 text-teal-600 dark:text-teal-400" title="Boodschappenlijst">
@@ -4697,34 +4812,6 @@ const toggleMaintenanceMode = async () => {
                 </div>
             </header>
 
-            {/* Op tablet/desktop (sm en groter) blijft een bovenste tabbalk zichtbaar; op smartphone wordt de onderste navigatie gebruikt */}
-            <div className="hidden lg:flex max-w-7xl mx-auto px-4 gap-6 border-b border-stone-100 dark:border-stone-800 overflow-x-auto bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-md sticky top-[57px] z-20 print:hidden">
-                <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='vriezer' ? 'border-purple-500 text-purple-600 dark:text-purple-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}><Icon path={Icons.Snowflake}/> Vriez.</button>
-                {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                    <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='frig' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                        <Icon path={Icons.Fridge}/> Frig.
-                        {isAdmin && managedUserHiddenTabs.includes('frig') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
-                    </button>
-                )}
-                {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                    <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='voorraad' ? 'border-orange-500 text-orange-600 dark:text-orange-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                        <Icon path={Icons.Box}/> Stock.
-                        {isAdmin && managedUserHiddenTabs.includes('voorraad') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
-                    </button>
-                )}
-                {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
-                    <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='weekmenu' ? 'border-pink-500 text-pink-600 dark:text-pink-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                        <Icon path={Icons.Calendar}/> Week.
-                        {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <span title="Verborgen voor gebruiker" className="ml-1 text-stone-400"><Icon path={Icons.Lock} size={14}/></span>}
-                    </button>
-                )}
-                {(!myHiddenTabs.includes('recepten') || isAdmin) && (
-                    <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`py-2.5 flex items-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab==='recepten' ? 'border-teal-500 text-teal-600 dark:text-teal-400' : 'border-transparent text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-300'}`}>
-                        <Icon path={Icons.BookOpen}/> Recepten.
-                    </button>
-                )}
-            </div>
-
             <main className="max-w-7xl mx-auto p-4 space-y-4 flex-grow w-full pb-32 lg:pb-20 relative">
                 {pendingInvites.length > 0 && pendingInvites.map(invite => (
                     <div key={invite.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 rounded-2xl p-4 print:hidden">
@@ -4766,7 +4853,7 @@ const toggleMaintenanceMode = async () => {
 
                 <div className="flex flex-col gap-3 print:hidden">
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide items-center">
-                        <div className="flex-shrink-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 shadow-sm text-sm font-bold">{activeItems.length} items</div>
+                        <div className="flex-shrink-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 shadow-sm text-sm font-bold">{activeItems.length} {t('items_label')}</div>
                         {filteredLocaties.map(l => <div key={l.id} className="flex-shrink-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 shadow-sm text-sm font-medium">{items.filter(i=>i.vriezerId===l.id).length} {l.naam}</div>)}
                     </div>
 
@@ -4775,33 +4862,33 @@ const toggleMaintenanceMode = async () => {
                         <div className="flex gap-2 flex-grow">
                             <div className="relative group flex-grow">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Icon path={Icons.Search} size={18} className="text-stone-400"/></div>
-                                <input type="text" className="block w-full pl-9 pr-3 py-2 border border-stone-200 dark:border-stone-700 rounded-xl bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm focus:ring-2 focus:ring-teal-500 outline-none text-stone-900 dark:text-stone-100 placeholder-stone-400 shadow-sm transition-all text-sm" placeholder="Zoek producten..." value={search} onChange={e=>setSearch(e.target.value)}/>
+                                <input type="text" className="block w-full pl-9 pr-3 py-2 border border-stone-200 dark:border-stone-700 rounded-xl bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm focus:ring-2 focus:ring-teal-500 outline-none text-stone-900 dark:text-stone-100 placeholder-stone-400 shadow-sm transition-all text-sm" placeholder={t('search_placeholder')} value={search} onChange={e=>setSearch(e.target.value)}/>
                             </div>
                             
                             <button onClick={() => setShowFilterModal(true)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 relative shadow-sm hover:shadow-md active:scale-95 ${activeCategoryFilter || sortBy !== 'name' ? 'bg-teal-50 border-teal-200 text-teal-600 dark:bg-teal-900/40 dark:border-teal-800 dark:text-teal-400' : 'bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700'}`} title="Filter & Sorteer">
                                 <Icon path={Icons.Filter} size={18} />
-                                <span className="hidden sm:inline font-medium text-sm">Filter</span>
+                                <span className="hidden sm:inline font-medium text-sm">{t('btn_filter')}</span>
                                 {(activeCategoryFilter || sortBy !== 'name') && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-gradient-to-r from-teal-500 to-indigo-500 rounded-full border border-white dark:border-stone-800 sm:hidden translate-x-1 -translate-y-1"></span>}
                             </button>
 
                             <button onClick={() => setIsBulkMode(!isBulkMode)} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 relative shadow-sm hover:shadow-md active:scale-95 ${isBulkMode ? 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-900/50 dark:border-indigo-500 dark:text-indigo-300' : 'bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700'}`} title="Meerdere selecteren (Bulk Acties)">
                                 <Icon path={Icons.CheckSquare} size={18} />
-                                <span className="hidden sm:inline font-medium text-sm">Selecteer</span>
+                                <span className="hidden sm:inline font-medium text-sm">{t('btn_select')}</span>
                             </button>
                                     
                             <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className={`flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 ${viewMode === 'calendar' ? 'bg-teal-100 border-teal-300 text-teal-600 dark:bg-teal-900/50 dark:border-teal-500 dark:text-teal-300' : 'bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700'}`} title={viewMode === 'list' ? 'Wissel naar Kalender' : 'Wissel naar Lijst'}>
                                 <Icon path={viewMode === 'list' ? Icons.Calendar : Icons.LayoutDashboard} size={18} />
-                                <span className="hidden sm:inline font-medium text-sm">{viewMode === 'list' ? 'Kalender' : 'Lijst'}</span>
+                                <span className="hidden sm:inline font-medium text-sm">{viewMode === 'list' ? t('btn_calendar') : t('btn_list')}</span>
                             </button>
                                     
                             <button onClick={() => setShowRapidEntry(!showRapidEntry)} className="flex-none w-10 sm:w-auto sm:px-4 rounded-xl border transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95 bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300 text-amber-600 dark:from-yellow-900/50 dark:to-amber-900/50 dark:border-yellow-500 dark:text-yellow-300" title="Snelle Invoer">
                             <Icon path={Icons.Lightning} size={18} />
-                            <span className="hidden sm:inline font-medium text-sm">Snelle invoer</span>
+                            <span className="hidden sm:inline font-medium text-sm">{t('btn_rapid')}</span>
                             </button>        
                         </div>
                         
                         <button onClick={toggleAll} className="flex-none bg-white/90 dark:bg-stone-800/90 backdrop-blur-sm border border-stone-200 dark:border-stone-700 px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700 whitespace-nowrap text-center shadow-sm hover:shadow-md transition-all active:scale-95">
-                            {collapsedLades.size > 0 ? "Alles open" : "Alles dicht"}
+                            {collapsedLades.size > 0 ? t('all_open') : t('all_closed')}
                         </button>
                     </div>
 )}
@@ -5507,17 +5594,17 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
 
                 <nav className="fixed left-4 right-4 z-40 print:hidden lg:hidden" style={{ bottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
                     <div className={`max-w-sm mx-auto flex items-center justify-around bg-white/90 dark:bg-stone-800/90 backdrop-blur-xl rounded-full shadow-xl border border-white/60 dark:border-stone-700/60 transition-all duration-300 ${navCompact ? 'py-1 px-1' : 'py-2 px-2'}`}>
-                        <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Vriezer" className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                        <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title={t('tab_vriezer')} className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='vriezer' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400' : 'text-stone-400 dark:text-stone-500'}`}>
                             <Icon path={Icons.Snowflake} size={navCompact ? 16 : 19}/>
                         </button>
                         {(!myHiddenTabs.includes('frig') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Frig" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='frig' ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                            <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title={t('tab_frig')} className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='frig' ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'text-stone-400 dark:text-stone-500'}`}>
                                 <Icon path={Icons.Fridge} size={navCompact ? 16 : 19}/>
                                 {isAdmin && managedUserHiddenTabs.includes('frig') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
                         {(!myHiddenTabs.includes('voorraad') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Stock" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='voorraad' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                            <button onClick={() => { setActiveTab('voorraad'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title={t('tab_voorraad')} className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='voorraad' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' : 'text-stone-400 dark:text-stone-500'}`}>
                                 <Icon path={Icons.Box} size={navCompact ? 16 : 19}/>
                                 {isAdmin && managedUserHiddenTabs.includes('voorraad') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
@@ -5526,13 +5613,13 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
                             <Icon path={Icons.Plus} size={navCompact ? 16 : 22}/>
                         </button>
                         {(!myHiddenTabs.includes('weekmenu') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} title="Weekmenu" className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='weekmenu' ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                            <button onClick={() => { setActiveTab('weekmenu'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); setWeekOffset(0); }} title={t('tab_weekmenu')} className={`relative flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='weekmenu' ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : 'text-stone-400 dark:text-stone-500'}`}>
                                 <Icon path={Icons.Calendar} size={navCompact ? 16 : 19}/>
                                 {isAdmin && managedUserHiddenTabs.includes('weekmenu') && <Icon path={Icons.Lock} size={10} className="absolute top-0.5 right-1 text-stone-400 bg-white dark:bg-stone-900 rounded-full"/>}
                             </button>
                         )}
                         {(!myHiddenTabs.includes('recepten') || isAdmin) && (
-                            <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title="Recepten" className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='recepten' ? 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
+                            <button onClick={() => { setActiveTab('recepten'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} title={t('tab_recepten')} className={`flex items-center justify-center rounded-full transition-all duration-300 active:scale-90 ${navCompact ? 'w-8 h-8' : 'w-10 h-10'} ${activeTab==='recepten' ? 'bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
                                 <Icon path={Icons.BookOpen} size={navCompact ? 16 : 19}/>
                             </button>
                         )}
@@ -5582,6 +5669,7 @@ if (e.key === 'Enter' && rapidEntryText.trim()) {
             <VersionHistoryModal isOpen={showVersionHistory} onClose={() => setShowVersionHistory(false)} />
             <ShareModal showShareModal={showShareModal} setShowShareModal={setShowShareModal} shareEmail={shareEmail} setShareEmail={setShareEmail} handleShare={handleShare} myOutgoingShares={myOutgoingShares} revokeShare={revokeShare} setShowPublicLinkModal={setShowPublicLinkModal} />
             <PublicLinkModal showPublicLinkModal={showPublicLinkModal} setShowPublicLinkModal={setShowPublicLinkModal} myPublicShareEnabled={myPublicShareEnabled} togglePublicShare={togglePublicShare} publicShareToken={publicShareToken} regeneratePublicLink={regeneratePublicLink} />
+            <ExportBackupModal showExportBackupModal={showExportBackupModal} setShowExportBackupModal={setShowExportBackupModal} exportToCSV={exportToCSV} exportToPDF={exportToPDF} exportBackup={exportBackup} backupFileInputRef={backupFileInputRef} />
 
             <DashboardModal dashboardData={dashboardData} dashboardUser={dashboardUser} items={items} lades={lades} openDashboardLades={openDashboardLades} openEditFromDashboard={openEditFromDashboard} setDashboardUser={setDashboardUser} setOpenDashboardLades={setOpenDashboardLades} setShowDashboardModal={setShowDashboardModal} showDashboardModal={showDashboardModal} usersList={usersList} vriezers={vriezers} />
 
