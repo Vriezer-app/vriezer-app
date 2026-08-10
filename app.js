@@ -4682,7 +4682,7 @@ const renderProfileMenu = (positionClasses) => (
                     <div className="flex items-center gap-4 min-w-0">
                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-500 hover:scale-105 transition-transform cursor-default flex-shrink-0">Voorraad.</h1>
 
-                        <nav className="hidden lg:flex items-center gap-1 bg-transparent rounded-full p-1 flex-shrink-0">
+                        <nav className="hidden lg:flex items-center gap-1 bg-white/40 dark:bg-stone-800/40 backdrop-blur-md border border-white/50 dark:border-stone-700/50 shadow-sm rounded-full p-1 flex-shrink-0">
                             <button onClick={() => { setActiveTab('vriezer'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab==='vriezer' ? 'bg-white dark:bg-stone-700 shadow-sm text-purple-600 dark:text-purple-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}><Icon path={Icons.Snowflake} size={16}/> {t('nav_vriezer_full')}</button>
                             {(!myHiddenTabs.includes('frig') || isAdmin) && (
                                 <button onClick={() => { setActiveTab('frig'); setActiveCategoryFilter(null); setIsBulkMode(false); setSelectedBulkItems(new Set()); }} className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 relative ${activeTab==='frig' ? 'bg-white dark:bg-stone-700 shadow-sm text-green-600 dark:text-green-400' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'}`}>
