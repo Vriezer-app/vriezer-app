@@ -220,6 +220,7 @@ const Icons = {
     LogOut: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>,
     Users: <g><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>,
     Check: <path d="M20 6 9 17l-5-5"/>,
+    Home: <g><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></g>,
     Alert: <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3zM12 9v4M12 17h.01"/>,
     Settings: <g><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></g>,
     ChevronDown: <path d="m6 9 6 6 6-6"/>,
@@ -2744,6 +2745,9 @@ function App() {
     
     const [rememberLocation, setRememberLocation] = useState(false); 
     const [newLocatieNaam, setNewLocatieNaam] = useState('');
+    const [activeLocatieGroep, setActiveLocatieGroep] = useState('Thuis');
+    const [showAddLocatieGroep, setShowAddLocatieGroep] = useState(false);
+    const [newLocatieGroepNaam, setNewLocatieGroepNaam] = useState('');
     const [newLocatieColor, setNewLocatieColor] = useState('blue'); 
     const [selectedLocatieForBeheer, setSelectedLocatieForBeheer] = useState(null);
     const [newLadeNaam, setNewLadeNaam] = useState('');
@@ -3118,8 +3122,11 @@ function App() {
         return () => { isMounted = false; };
     }, [dashboardUser]);
 
+    const locatieGroepen = Array.from(new Set(['Thuis', ...vriezers.map(l => l.locatieGroep || 'Thuis')]));
+
     const filteredLocaties = sortLocaties(vriezers.filter(l => {
         if (l.type !== activeTab) return false;
+        if ((l.locatieGroep || 'Thuis') !== activeLocatieGroep) return false;
         
         // Verberg de locatie 'Ongesorteerd' als er geen producten in zitten
         if (l.naam.toLowerCase() === 'ongesorteerd') {
@@ -3130,7 +3137,7 @@ function App() {
     }));
     
     const activeItems = items.filter(i => filteredLocaties.some(l => l.id === i.vriezerId));
-    const modalLocaties = sortLocaties(vriezers.filter(l => l.type === modalType));
+    const modalLocaties = sortLocaties(vriezers.filter(l => l.type === modalType && (l.locatieGroep || 'Thuis') === activeLocatieGroep));
 
     const formLades = formData.vriezerId 
         ? lades.filter(l => l.vriezerId === formData.vriezerId).sort((a,b) => a.naam.localeCompare(b.naam))
@@ -4107,7 +4114,8 @@ const openEdit = (item) => {
             type: activeTab, 
             userId: beheerdeUserId,
             color: newLocatieColor,
-            order: filteredLocaties.length
+            order: filteredLocaties.length,
+            locatieGroep: activeLocatieGroep
         });
         setNewLocatieNaam('');
         setNewLocatieColor('blue');
@@ -4735,13 +4743,34 @@ const toggleMaintenanceMode = async () => {
                     </div>
                 ))}
 
-                {activeTab !== 'weekmenu' && activeTab !== 'recepten' && (
+                {activeTab !== 'weekmenu' && activeTab !== 'recepten' && (locatieGroepen.length > 1 || showAddLocatieGroep) && (
+                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide print:hidden pb-1">
+                        {locatieGroepen.map(groep => (
+                            <button key={groep} onClick={() => setActiveLocatieGroep(groep)} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 ${activeLocatieGroep === groep ? 'bg-teal-600 text-white shadow-sm' : 'bg-white dark:bg-stone-800 text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700'}`}>
+                                <Icon path={Icons.Home} size={12} className="inline -mt-0.5 mr-1"/>{groep}
+                            </button>
+                        ))}
+                        {showAddLocatieGroep ? (
+                            <form onSubmit={(e) => { e.preventDefault(); const naam = newLocatieGroepNaam.trim(); if (naam) { setActiveLocatieGroep(naam); setNewLocatieGroepNaam(''); setShowAddLocatieGroep(false); showNotification(`Locatiegroep "${naam}" aangemaakt — voeg er nu een locatie aan toe.`, 'success'); } }} className="flex items-center gap-1 flex-shrink-0">
+                                <input autoFocus value={newLocatieGroepNaam} onChange={e => setNewLocatieGroepNaam(e.target.value)} placeholder="Vakantiehuis..." className="w-32 px-2 py-1.5 text-xs rounded-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 outline-none focus:ring-2 focus:ring-teal-500" />
+                                <button type="submit" className="p-1.5 bg-teal-600 text-white rounded-full active:scale-95"><Icon path={Icons.Check} size={12}/></button>
+                                <button type="button" onClick={() => setShowAddLocatieGroep(false)} className="p-1.5 text-stone-400 rounded-full active:scale-95"><Icon path={Icons.X} size={12}/></button>
+                            </form>
+                        ) : (
+                            <button onClick={() => setShowAddLocatieGroep(true)} className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border border-dashed border-stone-300 dark:border-stone-600 text-stone-400 dark:text-stone-500 hover:border-teal-400 hover:text-teal-600 transition-all active:scale-95">
+                                <Icon path={Icons.Plus} size={12} className="inline -mt-0.5 mr-1"/>Nieuwe locatie
+                            </button>
+                        )}
+                    </div>
+                )}
+
                 <div className="flex flex-col gap-3 print:hidden">
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide items-center">
                         <div className="flex-shrink-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 shadow-sm text-sm font-bold">{activeItems.length} items</div>
                         {filteredLocaties.map(l => <div key={l.id} className="flex-shrink-0 bg-white/80 dark:bg-stone-800/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-stone-200/50 dark:border-stone-700/50 shadow-sm text-sm font-medium">{items.filter(i=>i.vriezerId===l.id).length} {l.naam}</div>)}
                     </div>
-                    
+
+                    {activeTab !== 'weekmenu' && activeTab !== 'recepten' && (
                     <div className="flex flex-col sm:flex-row gap-2 items-stretch">
                         <div className="flex gap-2 flex-grow">
                             <div className="relative group flex-grow">
@@ -4775,8 +4804,8 @@ const toggleMaintenanceMode = async () => {
                             {collapsedLades.size > 0 ? "Alles open" : "Alles dicht"}
                         </button>
                     </div>
-                </div>
 )}
+                </div>
 {/* Snelle Invoer Balk */}
                 {showRapidEntry && (
                     <div className="w-full bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 border border-yellow-300 dark:border-yellow-600 rounded-xl p-3 flex items-center gap-2 shadow-sm animate-in fade-in slide-in-from-top-2">
