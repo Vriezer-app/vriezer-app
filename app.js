@@ -4729,21 +4729,25 @@ const renderProfileMenu = (positionClasses) => (
                         
                         <button onClick={() => setShowWhatsNew(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-50 dark:bg-stone-800 border dark:border-stone-700 relative hover:bg-stone-100 dark:hover:bg-stone-700 transition-all hover:shadow-md active:scale-95" title="Meldingen"><Icon path={Icons.Info}/>{alerts.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-stone-800"></span>}</button>
                         
-                        {(isAdmin || mySharedAccounts.length > 0) && beheerdeUserId && user && beheerdeUserId !== user.uid && (
+                        {(isAdmin || mySharedAccounts.length > 0) && beheerdeUserId && user && (
                             <div className="relative">
-                                <button onClick={() => setShowSwitchMenu(!showSwitchMenu)} className="h-10 px-3 flex items-center gap-1.5 rounded-full bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 text-xs font-bold hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-all active:scale-95 shadow-sm" title="Je beheert nu een ander account">
+                                <button onClick={() => setShowSwitchMenu(!showSwitchMenu)} className={`h-10 px-3 flex items-center gap-1.5 rounded-full border text-xs font-bold transition-all active:scale-95 shadow-sm ${beheerdeUserId === user.uid ? 'bg-stone-100 border-stone-200 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-700' : 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'}`} title="Wissel van account">
                                     <Icon path={Icons.Users} size={14}/>
-                                    <span className="max-w-[100px] truncate">{(switchableAccounts.find(u => u.id === beheerdeUserId) || {}).email || 'Ander account'}</span>
+                                    <span className="max-w-[100px] truncate">
+                                        {beheerdeUserId === user.uid ? 'Mijn account' : (switchableAccounts.find(u => u.id === beheerdeUserId) || {}).email || 'Ander account'}
+                                    </span>
                                     <Icon path={Icons.ChevronDown} size={12}/>
                                 </button>
                                 {showSwitchMenu && (
                                     <div className="absolute right-0 mt-2 w-60 bg-white/95 dark:bg-stone-800/95 backdrop-blur-md rounded-xl shadow-xl border border-stone-100 dark:border-stone-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <button onClick={() => { setBeheerdeUserId(user.uid); setShowSwitchMenu(false); showNotification('Terug naar je eigen account.', 'success'); }} className={CX_MENU_ITEM}>
-                                            <Icon path={Icons.LogOut} size={16}/> Terug naar mijn account.
-                                        </button>
+                                        {beheerdeUserId !== user.uid && (
+                                            <button onClick={() => { setBeheerdeUserId(user.uid); setShowSwitchMenu(false); showNotification('Terug naar je eigen account.', 'success'); }} className={CX_MENU_ITEM}>
+                                                <Icon path={Icons.LogOut} size={16}/> Terug naar mijn account.
+                                            </button>
+                                        )}
                                         {switchableAccounts.filter(u => u.id !== beheerdeUserId).length > 0 && (
                                             <>
-                                                <div className="border-t border-stone-100 dark:border-stone-700 my-1"></div>
+                                                {beheerdeUserId !== user.uid && <div className="border-t border-stone-100 dark:border-stone-700 my-1"></div>}
                                                 <p className="px-4 py-1 text-[9px] font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">Wissel naar</p>
                                                 {switchableAccounts.filter(u => u.id !== beheerdeUserId).map(u => (
                                                     <button key={u.id} onClick={() => { setBeheerdeUserId(u.id); setShowSwitchMenu(false); showNotification(`Ingelogd als ${u.email || 'gebruiker'}`, 'success'); }} className={CX_MENU_ITEM}>
