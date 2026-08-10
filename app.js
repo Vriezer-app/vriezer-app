@@ -43,6 +43,17 @@ if ('serviceWorker' in navigator) {
 // Vertalingen voor de belangrijkste navigatie en veelgebruikte UI-teksten.
 // LET OP: dit dekt de kernnavigatie/chrome (tabbladen, knoppen, koppen) — niet elke
 // tekst in elke modal is vertaald. Onvertaalde teksten vallen automatisch terug op NL.
+const TRANSLATIONS = {
+    nl: {
+        tab_vriezer: 'Vriezer', tab_frig: 'Frig', tab_voorraad: 'Stock', tab_weekmenu: 'Week', tab_recepten: 'Recepten',
+        nav_vriezer_full: 'Vriezer', nav_frig_full: 'Frig.', nav_voorraad_full: 'Stock.', nav_weekmenu_full: 'Week.', nav_recepten_full: 'Recepten.',
+        search_placeholder: 'Zoek producten...', items_label: 'items',
+        btn_filter: 'Filter', btn_select: 'Selecteer', btn_calendar: 'Kalender', btn_list: 'Lijst', btn_rapid: 'Snelle invoer',
+        btn_add: 'Toevoegen', btn_save: 'Opslaan', btn_cancel: 'Annuleren', btn_delete: 'Verwijderen', btn_edit: 'Bewerken',
+        all_open: 'Alles open', all_closed: 'Alles dicht',
+        profile_light: 'Licht.', profile_dark: 'Donker.', profile_logout: 'Uitloggen.'
+    }
+};
 
 const APP_VERSION = '10.2'; 
 
